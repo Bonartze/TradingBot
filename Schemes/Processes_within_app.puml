@@ -1,0 +1,36 @@
+@startuml
+start
+
+:Receive request from API;
+:Validate request;
+
+' Главная часть: выбор и выполнение стратегии
+if (Arbitrage opportunity available?) then (yes)
+  :Execute arbitrage strategy;
+else (no)
+  if (Is market trending?) then (yes)
+    :Apply trend trading strategy;
+  else (no)
+    if (High volatility detected?) then (yes)
+      :Perform breakout trading;
+    else
+      :Use scalping strategy for short-term profits;
+    endif
+  endif
+endif
+
+:Access database to retrieve necessary data;
+:Process data and apply trading strategy;
+
+if (Data valid?) then (yes)
+  :Prepare response;
+else (no)
+  :Log error;   
+  :Prepare error response;
+endif
+
+:Create prediciton model using series (????) and provide expected profit + predictions;
+
+:Send response back to API;
+stop
+@enduml

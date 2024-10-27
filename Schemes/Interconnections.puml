@@ -1,0 +1,17 @@
+@startuml
+actor User
+queue API as api
+database Database as db
+collections Application_backend as application
+component Forecasting_Model as model
+
+application --> db : fill
+User -> api : Request data
+api -> db : SQL-query
+db -> api : Response
+
+api -> model: Data for prediction
+model --> api: Predicted result
+
+api -> User: Final result with prediction
+@enduml

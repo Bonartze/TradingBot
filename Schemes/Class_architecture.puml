@@ -1,0 +1,62 @@
+@startuml
+
+class ConfigLoader {
+    + loadConfig(filePath: string): Config
+    + parseConfig(): Config
+}
+
+class TradingEngine {
+    + initialize(config: Config)
+    + run()
+    - strategies: list<Strategy>
+    - orderManager: OrderManager
+    - riskManager: RiskManager
+    - apiClient: ApiClient
+    - logger: Logger
+    - databaseManager: DatabaseManager
+}
+
+abstract class Strategy {
+    + execute(data: MarketData)
+}
+
+class ArbitrageStrategy extends Strategy
+class TrendStrategy extends Strategy
+class ScalpingStrategy extends Strategy
+
+class OrderManager {
+    + sendOrder(order: Order)
+    + trackOrder(orderId: string)
+}
+
+class RiskManager {
+    + checkRiskLimits()
+    - maxDrawdown: float
+    - maxPositionSize: float
+}
+
+class ApiClient {
+    + fetchMarketData(symbol: string)
+    + placeOrder(order: Order)
+    + subscribeToWebSocket(symbol: string)
+}
+
+class Logger {
+    + logEvent(message: string)
+    + logError(error: string)
+}
+
+class DatabaseManager {
+    + saveTrade(trade: Trade)
+    + loadHistory(symbol: string)
+}
+
+ConfigLoader ---- TradingEngine : dependent
+TradingEngine o-- Strategy : aggregation
+TradingEngine o-- OrderManager : aggregation
+TradingEngine o-- RiskManager : aggregation
+TradingEngine o-- ApiClient : aggregation
+TradingEngine o-- Logger : aggregation
+TradingEngine o-- DatabaseManager : aggregation
+
+@enduml
