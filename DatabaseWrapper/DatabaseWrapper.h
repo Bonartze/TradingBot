@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <sstream>
+#include <optional>
 
 #define CHECK_SQLITE_EXEC(db, query)                                     \
     do {                                                                 \
@@ -29,7 +30,7 @@ public:
     }
 };
 
-auto sqlite_deleter = [](sqlite3 *db) {
+auto inline sqlite_deleter = [](sqlite3 *db) {
     if (db) {
         sqlite3_close(db);
         std::cout << "Database connection closed." << std::endl;
@@ -38,16 +39,27 @@ auto sqlite_deleter = [](sqlite3 *db) {
 
 //
 
-class DatabaseWrapper {
-    struct Column {
-        std::string name;
-        std::string type;
-        std::vector<std::string> constraints;
-    };
+struct Column {
+    std::string name;
+    std::string type;
+    std::vector<std::string> constraints;
+};
 
-    struct CreateTableInput {
-        std::string table_name;
-        std::vector<Column> columns;
+struct CreateTableInput {
+    std::string table_name;
+    std::vector<Column> columns;
+};
+
+class DatabaseWrapper {
+    static std::string join(const std::vector<std::string> &elements, const std::string &delimiter) {
+        std::ostringstream os;
+        for (size_t i = 0; i < elements.size(); ++i) {
+            os << elements[i];
+            if (i < elements.size() - 1) {
+                os << delimiter;
+            }
+        }
+        return os.str();
     };
 
 public:
@@ -57,10 +69,23 @@ public:
 
     void create_table(const CreateTableInput &) const;
 
-    void insert_into_table(const std::string &, const std::vector<std::string> &,
+    void insert_into_table(const std::string &,
+                           const std::vector<std::string> &,
                            const std::vector<std::string> &) const;
 
-    void select(const std::string &, bool, const std::vector<std::string> &, const std::vector<std::string> &) const;
+    [[nodiscard]] std::string select(const std::string &,
+                                     bool,
+                                     const std::vector<std::string> &,
+                                     const std::optional<std::vector<std::string> > &) const;
+
+    void update() const;
+
+    void delete_from_table(const std::string &,
+                           const std::optional<std::vector<std::string> > &) const;
+
+    void update_table(const std::string &,
+                      const std::vector<std::pair<std::string, std::string> > &,
+                      const std::vector<std::string> &) const;
 
 private:
     std::unique_ptr<sqlite3, decltype(sqlite_deleter)> database{nullptr, sqlite_deleter};

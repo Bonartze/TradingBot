@@ -16,6 +16,4 @@ target_include_directories(sqlite3 PUBLIC "${sqlite3_SOURCE_DIR}")
 
 add_library(DatabaseWrapper DatabaseWrapper.cpp)
 
-target_link_libraries(DatabaseWrapper PRIVATE sqlite3)
-
 target_include_directories(DatabaseWrapper PRIVATE "${sqlite3_SOURCE_DIR}")

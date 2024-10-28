@@ -1,7 +1,6 @@
 #include "DatabaseWrapper.h"
 
 DatabaseWrapper::DatabaseWrapper(const std::string &database_name) {
-    // Сonnecting to the database
     sqlite3 *raw_db = nullptr;
     if (sqlite3_open(database_name.c_str(), &raw_db) != SQLITE_OK) {
         std::string error_message = sqlite3_errmsg(raw_db);
@@ -12,19 +11,6 @@ DatabaseWrapper::DatabaseWrapper(const std::string &database_name) {
 }
 
 void DatabaseWrapper::create_table(const CreateTableInput &input) const {
-    // Lambda for joining elements with a delimiter
-    auto join = [](const std::vector<std::string> &elements, const std::string &delimiter) {
-        std::ostringstream os;
-        for (size_t i = 0; i < elements.size(); ++i) {
-            os << elements[i];
-            if (i < elements.size() - 1) {
-                os << delimiter;
-            }
-        }
-        return os.str();
-    };
-
-    // Validate table name and columns
     if (input.table_name.empty()) {
         throw std::runtime_error("Table name cannot be empty.");
     }
@@ -32,7 +18,6 @@ void DatabaseWrapper::create_table(const CreateTableInput &input) const {
         throw std::runtime_error("Cannot create a table with no columns.");
     }
 
-    // Construct the SQL query
     std::ostringstream sql_query;
     sql_query << "CREATE TABLE IF NOT EXISTS " << input.table_name << " (";
 
@@ -50,7 +35,6 @@ void DatabaseWrapper::create_table(const CreateTableInput &input) const {
     }
     sql_query << ");";
 
-    // Execute the query and handle errors
     CHECK_SQLITE_EXEC(database.get(), sql_query.str().c_str());
 }
 
@@ -63,67 +47,136 @@ void DatabaseWrapper::insert_into_table(const std::string &table_name,
 
     std::ostringstream sql_query;
     sql_query << "INSERT INTO " << table_name << " (";
-
-    for (size_t i = 0; i < columns.size(); ++i) {
-        sql_query << columns[i];
-        if (i < columns.size() - 1) {
-            sql_query << ", ";
-        }
-    }
-
-    sql_query << ") VALUES (";
-
+    sql_query << join(columns, ", ") << ") VALUES (";
     for (size_t i = 0; i < values.size(); ++i) {
-        sql_query << "'" << values[i] << "'";
+        sql_query << "?";
         if (i < values.size() - 1) {
             sql_query << ", ";
         }
     }
-
     sql_query << ");";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(database.get(), sql_query.str().c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::string error_message = sqlite3_errmsg(database.get());
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("SQL error: " + error_message);
+    }
 
-    CHECK_SQLITE_EXEC(database.get(), sql_query.str().c_str());
+    for (size_t i = 0; i < values.size(); ++i)
+        sqlite3_bind_text(stmt, i + 1, values[i].c_str(), -1, SQLITE_TRANSIENT);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::string error_message = sqlite3_errmsg(database.get());
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("SQL error: " + error_message);
+    }
+
+    sqlite3_finalize(stmt);
 }
 
-void DatabaseWrapper::select(const std::string &table_name,
-                             bool is_distinct,
-                             const std::vector<std::string> &column_names,
-                             const std::vector<std::string> &additions) const {
+std::string DatabaseWrapper::select(const std::string &table_name,
+                                    bool is_distinct,
+                                    const std::vector<std::string> &column_names,
+                                    const std::optional<std::vector<std::string> > &conditions) const {
     if (table_name.empty()) {
         throw std::runtime_error("Table name cannot be empty.");
     }
 
-    auto join = [](const std::vector<std::string> &elements, const std::string &delimiter) {
-        std::ostringstream os;
-        for (size_t i = 0; i < elements.size(); ++i) {
-            os << elements[i];
-            if (i < elements.size() - 1) {
-                os << delimiter;
-            }
-        }
-        return os.str();
-    };
+    std::stringstream result;
 
     std::ostringstream sql_query;
     sql_query << "SELECT ";
-
     if (is_distinct) {
         sql_query << "DISTINCT ";
     }
-
-    if (column_names.empty()) {
-        sql_query << "*";
-    } else {
-        sql_query << join(column_names, ", ");
-    }
-
+    sql_query << (column_names.empty() ? "*" : join(column_names, ", "));
     sql_query << " FROM " << table_name;
 
-    if (!additions.empty()) {
-        sql_query << " " << join(additions, " ");
+    if (conditions && !conditions->empty()) {
+        sql_query << " WHERE " << join(*conditions, " AND ");
+    }
+
+    sql_query << ";";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(database.get(), sql_query.str().c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::string error_message = sqlite3_errmsg(database.get());
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("SQL error: " + error_message);
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+            result << sqlite3_column_name(stmt, i) << " = ";
+            const char *text = reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+            result << (text ? text : "NULL") << std::endl;
+        }
+        result << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    return result.str();
+}
+
+
+void DatabaseWrapper::delete_from_table(const std::string &table_name,
+                                        const std::optional<std::vector<std::string> > &conditions) const {
+    if (table_name.empty()) {
+        throw std::runtime_error("Table name cannot be empty.");
+    }
+
+    std::ostringstream sql_query;
+    sql_query << "DELETE FROM " << table_name;
+
+    if (conditions && !conditions->empty()) {
+        sql_query << " WHERE " << join(*conditions, " AND ");
     }
 
     sql_query << ";";
 
     CHECK_SQLITE_EXEC(database.get(), sql_query.str().c_str());
+}
+
+void DatabaseWrapper::update_table(const std::string &table_name,
+                                   const std::vector<std::pair<std::string, std::string> > &updates,
+                                   const std::vector<std::string> &conditions) const {
+    if (table_name.empty()) {
+        throw std::runtime_error("Table name cannot be empty.");
+    }
+    if (updates.empty()) {
+        throw std::runtime_error("No updates provided.");
+    }
+
+    std::ostringstream sql_query;
+    sql_query << "UPDATE " << table_name << " SET ";
+    for (size_t i = 0; i < updates.size(); ++i) {
+        sql_query << updates[i].first << " = ?";
+        if (i < updates.size() - 1) {
+            sql_query << ", ";
+        }
+    }
+
+    if (!conditions.empty()) {
+        sql_query << " WHERE " << join(conditions, " AND ");
+    }
+    sql_query << ";";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(database.get(), sql_query.str().c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::string error_message = sqlite3_errmsg(database.get());
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("SQL error: " + error_message);
+    }
+
+    for (size_t i = 0; i < updates.size(); ++i) {
+        sqlite3_bind_text(stmt, i + 1, updates[i].second.c_str(), -1, SQLITE_TRANSIENT);
+    }
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::string error_message = sqlite3_errmsg(database.get());
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("SQL error: " + error_message);
+    }
+
+    sqlite3_finalize(stmt);
 }
