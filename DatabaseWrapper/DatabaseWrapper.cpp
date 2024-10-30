@@ -3,18 +3,22 @@
 DatabaseWrapper::DatabaseWrapper(const std::string &database_name) {
     sqlite3 *raw_db = nullptr;
     if (sqlite3_open(database_name.c_str(), &raw_db) != SQLITE_OK) {
+        Logger(LogLevel::ERROR) << "Failed to open database: " << database_name;
         std::string error_message = sqlite3_errmsg(raw_db);
         sqlite3_close(raw_db);
         throw SQLiteException(error_message);
     };
+    Logger(LogLevel::INFO) << "Opened database: " << database_name;
     database.reset(raw_db);
 }
 
 void DatabaseWrapper::create_table(const CreateTableInput &input) const {
     if (input.table_name.empty()) {
+        Logger(LogLevel::ERROR) << "Table name cannot be empty.";
         throw std::runtime_error("Table name cannot be empty.");
     }
     if (input.columns.empty()) {
+        Logger(LogLevel::ERROR) << "Cannot create a table with no columns.";
         throw std::runtime_error("Cannot create a table with no columns.");
     }
 
@@ -36,12 +40,14 @@ void DatabaseWrapper::create_table(const CreateTableInput &input) const {
     sql_query << ");";
 
     CHECK_SQLITE_EXEC(database.get(), sql_query.str().c_str());
+    Logger(LogLevel::INFO) << "Table " << input.table_name << " created.";
 }
 
 void DatabaseWrapper::insert_into_table(const std::string &table_name,
                                         const std::vector<std::string> &columns,
                                         const std::vector<std::string> &values) const {
     if (columns.size() != values.size()) {
+        Logger(LogLevel::ERROR) << "Mismatch between columns and values.";
         throw std::runtime_error("Mismatch between columns and values.");
     }
 
@@ -59,6 +65,7 @@ void DatabaseWrapper::insert_into_table(const std::string &table_name,
     if (sqlite3_prepare_v2(database.get(), sql_query.str().c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::string error_message = sqlite3_errmsg(database.get());
         sqlite3_finalize(stmt);
+        Logger(LogLevel::ERROR) << "SQL error: " << error_message;
         throw std::runtime_error("SQL error: " + error_message);
     }
 
@@ -68,9 +75,10 @@ void DatabaseWrapper::insert_into_table(const std::string &table_name,
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::string error_message = sqlite3_errmsg(database.get());
         sqlite3_finalize(stmt);
+        Logger(LogLevel::ERROR) << "SQL error: " << error_message;
         throw std::runtime_error("SQL error: " + error_message);
     }
-
+    Logger(LogLevel::INFO) << "Inserted into table " << table_name;
     sqlite3_finalize(stmt);
 }
 
@@ -79,6 +87,7 @@ std::string DatabaseWrapper::select(const std::string &table_name,
                                     const std::vector<std::string> &column_names,
                                     const std::optional<std::vector<std::string> > &conditions) const {
     if (table_name.empty()) {
+        Logger(LogLevel::ERROR) << "Table name cannot be empty.";
         throw std::runtime_error("Table name cannot be empty.");
     }
 
@@ -102,6 +111,7 @@ std::string DatabaseWrapper::select(const std::string &table_name,
     if (sqlite3_prepare_v2(database.get(), sql_query.str().c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::string error_message = sqlite3_errmsg(database.get());
         sqlite3_finalize(stmt);
+        Logger(LogLevel::ERROR) << "SQL error: " << error_message;
         throw std::runtime_error("SQL error: " + error_message);
     }
 
@@ -115,6 +125,7 @@ std::string DatabaseWrapper::select(const std::string &table_name,
     }
 
     sqlite3_finalize(stmt);
+    Logger(LogLevel::INFO) << "Selected from table " << table_name;
     return result.str();
 }
 
@@ -122,6 +133,7 @@ std::string DatabaseWrapper::select(const std::string &table_name,
 void DatabaseWrapper::delete_from_table(const std::string &table_name,
                                         const std::optional<std::vector<std::string> > &conditions) const {
     if (table_name.empty()) {
+        Logger(LogLevel::ERROR) << "Table name cannot be empty.";
         throw std::runtime_error("Table name cannot be empty.");
     }
 
@@ -135,15 +147,18 @@ void DatabaseWrapper::delete_from_table(const std::string &table_name,
     sql_query << ";";
 
     CHECK_SQLITE_EXEC(database.get(), sql_query.str().c_str());
+    Logger(LogLevel::INFO) << "Deleted from table " << table_name;
 }
 
 void DatabaseWrapper::update_table(const std::string &table_name,
                                    const std::vector<std::pair<std::string, std::string> > &updates,
                                    const std::vector<std::string> &conditions) const {
     if (table_name.empty()) {
+        Logger(LogLevel::ERROR) << "Table name cannot be empty.";
         throw std::runtime_error("Table name cannot be empty.");
     }
     if (updates.empty()) {
+        Logger(LogLevel::ERROR) << "No updates provided.";
         throw std::runtime_error("No updates provided.");
     }
 
@@ -165,6 +180,7 @@ void DatabaseWrapper::update_table(const std::string &table_name,
     if (sqlite3_prepare_v2(database.get(), sql_query.str().c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::string error_message = sqlite3_errmsg(database.get());
         sqlite3_finalize(stmt);
+        Logger(LogLevel::ERROR) << "SQL error: " << error_message;
         throw std::runtime_error("SQL error: " + error_message);
     }
 
@@ -175,8 +191,9 @@ void DatabaseWrapper::update_table(const std::string &table_name,
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::string error_message = sqlite3_errmsg(database.get());
         sqlite3_finalize(stmt);
+        Logger(LogLevel::ERROR) << "SQL error: " << error_message;
         throw std::runtime_error("SQL error: " + error_message);
     }
-
+    Logger(LogLevel::INFO) << "Updated table " << table_name;
     sqlite3_finalize(stmt);
 }
