@@ -3,4 +3,4 @@ project(TradingBot VERSION 1.0)
 
 add_subdirectory(DatabaseWrapper)
 add_subdirectory(Autotests)
-
+add_subdirectory(TradingServer)

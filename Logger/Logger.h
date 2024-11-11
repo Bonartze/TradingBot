@@ -1,5 +1,5 @@
 #ifndef LOGGER_H
-#define LOGGER_H
+#define LOGGER_Hz
 
 #include <sstream>
 #include <mutex>

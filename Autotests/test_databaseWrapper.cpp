@@ -185,7 +185,7 @@ TEST_F(DatabaseWrapperTest, InsertAndSelectNoData) {
     CreateTableInput table_input = {
         "test_table",
         {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
+                                                                                                                                                                                        {"id", "INTEGER", {"PRIMARY KEY"}},
             {"name", "TEXT", {}}
         }
     };
