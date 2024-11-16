@@ -1,0 +1,5 @@
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+add_library(TradingServer TradingServer.cpp)
+target_link_libraries(TradingServer PRIVATE nlohmann_json::nlohmann_json)

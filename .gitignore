@@ -2,4 +2,8 @@ cmake-build-debug
 cmake-build-release
 build
 .idea
-Backtesting/*
+Backtesting/Data_extracted
+Backtesting/Data_zips
+Backtesting/StatisticsPlots
+venv
+TradingStrategies/build

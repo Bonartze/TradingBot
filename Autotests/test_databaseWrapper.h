@@ -11,4 +11,4 @@ protected:
     void TearDown() override;
 };
 
-#endif // TEST_DATABASEWRAPPER_H
+#endif

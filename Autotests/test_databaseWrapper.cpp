@@ -13,11 +13,11 @@ TEST_F(DatabaseWrapperTest, InsertIntoTable) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
 
     ASSERT_NO_THROW(db.create_table(table_input));
@@ -31,11 +31,11 @@ TEST_F(DatabaseWrapperTest, SelectFromTable) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -51,12 +51,12 @@ TEST_F(DatabaseWrapperTest, CreateTableWithConstraints) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY", "NOT NULL"}},
-            {"name", "TEXT", {"UNIQUE"}},
-            {"age", "INTEGER", {"CHECK(age > 0)"}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY", "NOT NULL"}},
+                    {"name", "TEXT", {"UNIQUE"}},
+                    {"age", "INTEGER", {"CHECK(age > 0)"}}
+            }
     };
 
     EXPECT_NO_THROW(db.create_table(table_input));
@@ -66,11 +66,11 @@ TEST_F(DatabaseWrapperTest, InsertMultipleRows) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -85,11 +85,11 @@ TEST_F(DatabaseWrapperTest, SelectWithConditions) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -105,11 +105,11 @@ TEST_F(DatabaseWrapperTest, UpdateData) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -126,11 +126,11 @@ TEST_F(DatabaseWrapperTest, DeleteData) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -146,11 +146,11 @@ TEST_F(DatabaseWrapperTest, InsertLargeNumberOfRows) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -165,11 +165,11 @@ TEST_F(DatabaseWrapperTest, SelectFromEmptyTable) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -183,11 +183,11 @@ TEST_F(DatabaseWrapperTest, InsertAndSelectNoData) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-                                                                                                                                                                                        {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
@@ -204,11 +204,11 @@ TEST_F(DatabaseWrapperTest, DeleteFromEmptyTable) {
     DatabaseWrapper db("test.db");
 
     CreateTableInput table_input = {
-        "test_table",
-        {
-            {"id", "INTEGER", {"PRIMARY KEY"}},
-            {"name", "TEXT", {}}
-        }
+            "test_table",
+            {
+                    {"id", "INTEGER", {"PRIMARY KEY"}},
+                    {"name", "TEXT", {}}
+            }
     };
     db.create_table(table_input);
 
