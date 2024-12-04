@@ -2,8 +2,6 @@
 #include <vector>
 #include <algorithm>
 
-using Graph = std::unordered_map<std::string, std::unordered_map<std::string, double>>;
-
 Bellman_Ford::Bellman_Ford(const Graph &graph) : graph(graph) {}
 
 bool Bellman_Ford::find_negative_cycle(const std::string &source, std::vector<std::string> &cycle) {

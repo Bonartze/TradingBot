@@ -1,20 +1,35 @@
 #include "TradingServer.h"
 
-boost::beast::http<beast::http::string_body> handle_http_request(
-    beast::http::request<beast::http::string_body> const &request) {
-    if (request.method() == beast::http::verb::post && request.target() == "/application/json") {
-        auto json_request = nlohmann::json::parse(request.body());
-        /*
-         * call method for handling json_request
-         *
-         */
-    } else if (request.method() == beast::http::verb::get) {
-        /*
-         * call method to get result from executed query
-         */
-    } else {
-        // handlers for PUT and DELETE aren't done yet
-    }
+boost::beast::http <beast::http::string_body> handle_http_request(
+        beast::http::request < beast::http::string_body >
+const &request) {
+if (request.
+
+method()
+
+==
+beast::http::verb::post &&request
+.
+
+target()
+
+== "/application/json") {
+auto json_request = nlohmann::json::parse(request.body());
+/*
+ * call method for handling json_request
+ *
+ */
+} else if (request.
+
+method()
+
+== beast::http::verb::get) {
+/*
+ * call method to get result from executed query
+ */
+} else {
+// handlers for PUT and DELETE aren't done yet
+}
 }
 
 void SSLSession::start() {
@@ -47,7 +62,7 @@ void SSLSession::do_write(std::size_t length) {
 }
 
 TradingServer::TradingServer(asio::io_context &io_context, short port, asio::ssl::context &ssl_context)
-    : acceptor_(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)), ssl_context_(ssl_context) {
+        : acceptor_(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)), ssl_context_(ssl_context) {
     do_accept();
 }
 

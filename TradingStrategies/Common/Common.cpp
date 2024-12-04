@@ -621,3 +621,7 @@ std::unordered_set<std::string> currencies = {
         "ZRX",
         "UNKNOWN"
 };
+
+const char *const host = "api.binance.com";
+const char *const port = "443";
+const char *const target = "/api/v3/ticker/price";

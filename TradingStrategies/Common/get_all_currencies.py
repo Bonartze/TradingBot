@@ -1,5 +1,6 @@
 import requests
 
+# just simple scripts for pasrsing all currencies from binance
 response = requests.get('https://api.binance.com/api/v3/exchangeInfo')
 data = response.json()
 

@@ -5,14 +5,11 @@
 #include <string>
 #include <vector>
 #include <limits>
-
-using Graph = std::unordered_map<std::string, std::unordered_map<std::string, double>>;
+#include "../Common/Graph.h"
 
 class Bellman_Ford {
 public:
-
     explicit Bellman_Ford(const Graph &graph);
-
 
     bool find_negative_cycle(const std::string &source, std::vector<std::string> &cycle);
 

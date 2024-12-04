@@ -1,9 +1,6 @@
 #include "BinanceScalping.h"
 #include <iostream>
-
-auto const host = "api.binance.com";
-auto const port = "443";
-auto const target = "/api/v3/ticker/price";
+#include "../Common/Common.h"
 
 BinanceScalping::BinanceScalping(const int &version)
         : version(version), ctx(ssl::context::tlsv12_client), stream(ioc, ctx) {
@@ -50,7 +47,6 @@ const std::unordered_map<std::string, double> &BinanceScalping::get_price_map() 
 }
 
 Graph &BinanceScalping::generate_order_graph(const std::unordered_set<std::string> &user_symbols) {
-
     for (const auto &[currency_pair, price]: cryptomarket_pairs) {
         std::string_view base_currency;
         std::string_view quote_currency;

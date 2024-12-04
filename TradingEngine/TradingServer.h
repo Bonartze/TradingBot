@@ -31,7 +31,6 @@ private:
 class TradingServer {
 public:
     TradingServer(asio::io_context &io_context, short port, asio::ssl::context &ssl_context);
-
 private:
     void do_accept();
 
