@@ -15,10 +15,16 @@ double Arbitrage::calculate_potential_profit(double initial_amount, double curre
 
 Arbitrage::Arbitrage(const std::unordered_set<std::string> &user_symbols, const int &version,
                      const std::string &api_key, const std::string &secret_key){
-  	binance_scalping = std::make_unique<BinanceScalping>(version);
-    binance_scalping->fetch_raw_data();
-    order_graph = std::make_unique<Graph>(binance_scalping->generate_order_graph(user_symbols));
-    order_manager->init(api_key, secret_key);
+  	try {
+  	    binance_scalping = std::make_unique<BinanceScalping>(version);
+        binance_scalping->fetch_raw_data();
+        order_graph = std::make_unique<Graph>(binance_scalping->generate_order_graph(user_symbols));
+        order_manager->init(api_key, secret_key);
+    }
+    catch (const std::exception &e) {
+      Logger(LogLevel::ERROR) << "Error during Arbitrage initialization: " << e.what();
+        throw;
+    }
 }
 
 
@@ -38,13 +44,21 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
     for (size_t i = 1; i < cycle.size(); i++) {
         std::string from_currency = cycle[i - 1];
         std::string to_currency = cycle[i];
-        double price = binance_scalping->get_price(from_currency + to_currency);
-
+        try {
+            double price = binance_scalping->get_price(from_currency + to_currency);
+		    if (price <= 0) {
+                throw std::runtime_error("Invalid price encountered for " + from_currency + " to " + to_currency);
+        }
         current_amount = apply_commission(current_amount, commission_rate);
 
         current_amount = (i % 2 == 1) ? current_amount * price : current_amount / price;
 
         potential_profit += calculate_potential_profit(current_amount, current_amount, i);
+        }
+        catch (const std::exception &e) {
+           Logger(LogLevel::ERROR) << "Error during order execution: " << e.what();
+           throw;
+        }
     }
 
     if (potential_profit < 0)
@@ -70,21 +84,32 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
 }
 
 void Arbitrage::find_arbitrage_opportunities(const std::string &source, const double amount) {
-    std::unique_ptr<Bellman_Ford> bellmanFord = std::make_unique<Bellman_Ford>(*order_graph);
-    std::vector<std::string> cycle;
+    if (!order_graph) {
+        throw std::runtime_error("Order graph is not initialized. Cannot find arbitrage opportunities.");
+    }
 
-    if (bellmanFord->find_negative_cycle(source, cycle)) {
-        for (size_t i = 0; i < cycle.size(); ++i) {
-            std::cout << cycle[i];
-            if (i < cycle.size() - 1) {
-                std::cout << " -> ";
+    try {
+        std::unique_ptr<Bellman_Ford> bellmanFord = std::make_unique<Bellman_Ford>(*order_graph);
+        std::vector<std::string> cycle;
+
+        if (bellmanFord->find_negative_cycle(source, cycle)) {
+            if (cycle.empty()) {
+                throw std::runtime_error("Negative cycle found, but it is empty.");
             }
+
+            for (size_t i = 0; i < cycle.size(); ++i) {
+                std::cout << cycle[i];
+                if (i < cycle.size() - 1) {
+                    std::cout << " -> ";
+                }
+            }
+            Logger(LogLevel::INFO) << "IntraExchangeArbitration opportunity found.";
+            do_order_sequence(cycle, amount);
+        } else {
+            Logger(LogLevel::INFO) << "IntraExchangeArbitration opportunity isn't found.";
         }
-        Logger(LogLevel::INFO) << "IntraExchangeArbitration opportunity found.";
-        do_order_sequence(cycle, amount);
-    } else {
-        Logger(LogLevel::INFO) << "IntraExchangeArbitration opportunity isn't found.";
-        return;
+    } catch (const std::exception& e) {
+        Logger(LogLevel::ERROR) << "Error during arbitrage search: " << e.what();
     }
 }
 
