@@ -32,7 +32,7 @@ class BinanceScalping {
     std::unordered_map<std::string, double> cryptomarket_pairs;
     Graph order_graph;
 public:
-    double operator[](const std::string &crypto_pair) {
+    double get_price(const std::string &crypto_pair) {
         return cryptomarket_pairs[crypto_pair];
     }
 

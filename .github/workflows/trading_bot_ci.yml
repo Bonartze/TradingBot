@@ -1,0 +1,33 @@
+name: trading_bot_ci.yml
+on:
+  push:
+    branches:
+      main
+  pull_request:
+    types: [ opened, reopened ]
+
+jobs:
+  linters:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Linters
+        run: # Linter logic
+
+  stock market availability:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: stock market availability
+        run: #logic
+
+  backtesting:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: backtesting
+        run: #logic
+
+  tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Run Tests
+        run: # Test logic
+

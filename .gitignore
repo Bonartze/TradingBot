@@ -5,5 +5,5 @@ build
 Backtesting/Data_extracted
 Backtesting/Data_zips
 Backtesting/StatisticsPlots
-venv
-TradingStrategies/build
+venv/
+TradingStrategies/*/*/build

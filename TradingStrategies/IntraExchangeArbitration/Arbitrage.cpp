@@ -14,11 +14,11 @@ double Arbitrage::calculate_potential_profit(double initial_amount, double curre
 
 
 Arbitrage::Arbitrage(const std::unordered_set<std::string> &user_symbols, const int &version,
-                     const std::string &api_key, const std::string &secret_key) : binance_scalping(
-        version) {
-    binance_scalping.fetch_raw_data();
-    order_graph = binance_scalping.generate_order_graph(user_symbols);
-    order_manager.init(api_key, secret_key);
+                     const std::string &api_key, const std::string &secret_key){
+  	binance_scalping = std::make_unique<BinanceScalping>(version);
+    binance_scalping->fetch_raw_data();
+    order_graph = std::make_unique<Graph>(binance_scalping->generate_order_graph(user_symbols));
+    order_manager->init(api_key, secret_key);
 }
 
 
@@ -30,15 +30,15 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
     auto send_order_wrapper = [&](const std::string &from_currency, const std::string &to_currency,
                                   double amount, const std::string &order_type, const std::string &order_id,
                                   Json::Value &json_result) {
-        order_manager.send_order(from_currency.c_str(), order_type.c_str(), "LIMIT", "GTC",
-                                 amount, binance_scalping[from_currency + to_currency],
+        order_manager->send_order(from_currency.c_str(), order_type.c_str(), "LIMIT", "GTC",
+                                 amount, binance_scalping->get_price(from_currency + to_currency),
                                  order_id.c_str(), 0, 0, 0, json_result);
     };
 
     for (size_t i = 1; i < cycle.size(); i++) {
         std::string from_currency = cycle[i - 1];
         std::string to_currency = cycle[i];
-        double price = binance_scalping[from_currency + to_currency];
+        double price = binance_scalping->get_price(from_currency + to_currency);
 
         current_amount = apply_commission(current_amount, commission_rate);
 
@@ -70,10 +70,10 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
 }
 
 void Arbitrage::find_arbitrage_opportunities(const std::string &source, const double amount) {
-    Bellman_Ford bellmanFord(order_graph);
+    std::unique_ptr<Bellman_Ford> bellmanFord = std::make_unique<Bellman_Ford>(*order_graph);
     std::vector<std::string> cycle;
 
-    if (bellmanFord.find_negative_cycle(source, cycle)) {
+    if (bellmanFord->find_negative_cycle(source, cycle)) {
         for (size_t i = 0; i < cycle.size(); ++i) {
             std::cout << cycle[i];
             if (i < cycle.size() - 1) {
