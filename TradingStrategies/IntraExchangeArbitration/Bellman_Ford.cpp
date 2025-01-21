@@ -39,7 +39,6 @@ bool Bellman_Ford::find_negative_cycle(const std::string &source, std::vector<st
             }
         }
 
-        // Проверка на отрицательный цикл
         if (!last_updated_vertex.empty()) {
             for (size_t i = 0; i < graph.size(); ++i) {
                 last_updated_vertex = predecessors[last_updated_vertex];

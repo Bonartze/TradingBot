@@ -6,7 +6,7 @@
 LogLevel Logger::s_currentLevel = LogLevel::INFO;
 std::mutex Logger::s_mutex;
 
-Logger::Logger(LogLevel level) : m_level(level) {
+Logger::Logger(LogLevel level, std::ostream& stream_) : m_level(level), m_stream(stream_) {
     if (m_level >= s_currentLevel) {
         m_buffer << levelToString(level) << " [" << getCurrentTime() << "] ";
     }
@@ -15,7 +15,7 @@ Logger::Logger(LogLevel level) : m_level(level) {
 Logger::~Logger() {
     if (m_level >= s_currentLevel) {
         std::lock_guard<std::mutex> lock(s_mutex);
-        std::cerr << m_buffer.str() << std::endl;
+        m_stream << m_buffer.str() << std::endl;
     }
 }
 

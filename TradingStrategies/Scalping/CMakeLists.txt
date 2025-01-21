@@ -12,6 +12,9 @@ include_directories(
 
 set(SOURCE_FILES
         ScalpingStr.cpp
+        ../Common/TradingMethods.cpp
+        ../Common/TradingMethods.h
+        ../../Logger/Logger.cpp
 )
 
 add_executable(run_scalping ${SOURCE_FILES})

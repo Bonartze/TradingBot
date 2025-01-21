@@ -1,8 +1,7 @@
 #include "TradingServer.h"
 
 boost::beast::http <beast::http::string_body> handle_http_request(
-        beast::http::request < beast::http::string_body >
-const &request) {
+        beast::http::request < beast::http::string_body > const &request) {
 if (request.
 
 method()

@@ -1,6 +1,14 @@
 Checks: >
+  performance-*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  cert-*,
+  hicpp-*,
+  clang-analyzer-*,
+  portability-*,
   readability-*,
   modernize-*,
   google-*,
+  misc-*,
   -readability-identifier-naming
 WarningsAsErrors: '*'

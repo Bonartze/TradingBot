@@ -1,5 +1,4 @@
-#ifndef TRADINGSERVER_H
-#define TRADINGSERVER_H
+#pragma once
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -38,6 +37,3 @@ private:
 
     asio::ssl::context &ssl_context_;
 };
-
-
-#endif

@@ -7,3 +7,4 @@ Backtesting/Data_zips
 Backtesting/StatisticsPlots
 venv/
 TradingStrategies/*/*/build
+*/cmake-build-debug
