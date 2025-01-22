@@ -164,8 +164,7 @@ OrderManager::curl_cb(void *content, size_t size, size_t nmemb, std::string *buf
 }
 
 
-void
-OrderManager::curl_api_with_header(std::string &url, std::string &str_result,
+void OrderManager::curl_api_with_header(std::string &url, std::string &str_result,
                                    std::vector<std::string> &extra_http_header, std::string &post_data,
                                    std::string &action) {
 

@@ -22,12 +22,60 @@ jobs:
   backtesting:
     runs-on: ubuntu-22.04
     steps:
-      - name: backtesting
-        run: #logic
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+
+      - name: Extract data for backtesting
+        run: |
+          set -e
+          cd Backtesting
+          for year in {2020..2024}
+          do
+            if [ ! -f "Data_extracted/5m/BTCUSDT/${year}.csv" ]; then
+              python3 binance_stats.py BTCUSDT 5m $year >> data_extraction.log 2>&1
+              echo "Data for year $year extracted."
+            else
+              echo "Data for year $year already exists. Skipping."
+            fi
+          done
+          echo "Data extraction completed."
+
+      - name: Build and run backtesting
+        run: |
+          set -e
+          cd Backtesting
+          rm -rf build && mkdir build && cd build
+          cmake ../
+          make || { echo "Build failed"; exit 1; }
+          ./backtesting >> backtesting_results.log 2>&1
+          echo "Backtesting completed."
+
+      - name: Notify completion
+        run: echo "Backtesting workflow completed successfully."
 
   tests:
     runs-on: ubuntu-22.04
     steps:
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+
       - name: Run Tests
-        run: # Test logic
+        run: |
+          set -e
+          cd Autotests
+          rm -rf build && mkdir build && cd build
+          cmake ../ || { echo "CMake configuration failed"; exit 1; }
+          make || { echo "Build failed"; exit 1; }
+          ./test_ > test_results.log 2>&1 || { echo "Tests failed"; exit 1; }
+          echo "Tests completed successfully."
+
+      - name: Upload Test Results (Optional)
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: Autotests/build/test_results.log
+
 

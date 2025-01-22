@@ -8,3 +8,7 @@ Backtesting/StatisticsPlots
 venv/
 TradingStrategies/*/*/build
 */cmake-build-debug
+.venv
+bin
+include
+Backtesting/scalping_results

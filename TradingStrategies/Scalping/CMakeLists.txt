@@ -15,6 +15,8 @@ set(SOURCE_FILES
         ../Common/TradingMethods.cpp
         ../Common/TradingMethods.h
         ../../Logger/Logger.cpp
+        ../../Backtesting/scalping_backtesting.cpp
+        ../../Backtesting/scalping_backtesting.h
 )
 
 add_executable(run_scalping ${SOURCE_FILES})
