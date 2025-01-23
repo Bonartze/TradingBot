@@ -40,7 +40,7 @@ public:
     void fetch_raw_data(size_t scalping_data_points = 1) override;
 
     // just getting the price map
-    const std::unordered_map<std::string, double> &get_price_map(); // нужен ли он вообще?
+    const std::unordered_map<std::string, double> &get_price_map();
 
     //parse obtained data and creating graph order, for clarifying check DOXYGEN docs
     Graph &generate_order_graph(const std::unordered_set<std::string> &);

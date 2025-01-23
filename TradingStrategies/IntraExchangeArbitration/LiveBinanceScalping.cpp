@@ -3,7 +3,8 @@
 #include "../Common/Common.h"
 
 LiveBinanceScalping::LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
-                                         const std::string &target_): BinanceScalping(version, host_, port_, target_) {
+                                         const std::string &target_): BinanceScalping(version, host_, port_, target_)
+{
 }
 
 void LiveBinanceScalping::fetch_raw_data(size_t scalping_data_point) {

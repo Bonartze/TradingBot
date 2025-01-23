@@ -44,6 +44,8 @@ set(SOURCE_FILES
         ../../Logger/Logger.cpp
         ../../TradingEngine/OrderManager.cpp
         ../Common/BinanceScalping.cpp
+        ../Scalping/LiveBinanceScalpingCurrency.cpp
+        ../Scalping/LiveBinanceScalpingCurrency.h
 )
 
 add_executable(run_arbitrage ${SOURCE_FILES})
