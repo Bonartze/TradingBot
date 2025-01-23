@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
+# Подключение simdjson
 FetchContent_Declare(
         simdjson
         GIT_REPOSITORY https://github.com/simdjson/simdjson.git
@@ -13,24 +14,66 @@ FetchContent_Declare(
 set(SIMDJSON_BUILD_STATIC ON)
 FetchContent_MakeAvailable(simdjson)
 
+# Подключение Boost
+find_package(Boost REQUIRED COMPONENTS system filesystem regex)
+if (NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost libraries not found!")
+endif ()
+
+# Подключение OpenSSL
+find_package(OpenSSL REQUIRED)
+if (NOT OpenSSL_FOUND)
+    message(FATAL_ERROR "OpenSSL not found!")
+endif ()
+
+# Подключение libcurl
+find_package(CURL REQUIRED)
+if (NOT CURL_FOUND)
+    message(FATAL_ERROR "CURL library not found!")
+endif ()
+
+# Указание директорий для заголовков
 include_directories(
         ${CMAKE_SOURCE_DIR}/TradingEngine
         ${CMAKE_SOURCE_DIR}/TradingStrategies/Common
         ${CMAKE_SOURCE_DIR}/Logger
         ${simdjson_SOURCE_DIR}/include
-        ${jsoncpp_SOURCE_DIR}/include
+        ${Boost_INCLUDE_DIRS}
+        ${OPENSSL_INCLUDE_DIR}
 )
 
+# Указание файлов исходного кода
 set(SOURCE_FILES
         ScalpingStr.cpp
         ../Common/TradingMethods.cpp
-        ../Common/TradingMethods.h
         ../../Logger/Logger.cpp
-        ../../Backtesting/scalping_backtesting.cpp
-        ../../Backtesting/scalping_backtesting.h
+        ../../Logger/CSVLogger.cpp
         ../Common/BinanceScalping.cpp
+        LiveBinanceScalpingCurrency.cpp
+        main.cpp
+        ../Common/Common.cpp
 )
 
+# Создание исполняемого файла
 add_executable(run_scalping ${SOURCE_FILES})
 
-target_link_libraries(run_scalping PRIVATE simdjson)
+# Линковка библиотек
+target_link_libraries(run_scalping PRIVATE
+        simdjson
+        Boost::system
+        Boost::filesystem
+        Boost::regex
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        CURL::libcurl
+)
+
+# Установка дополнительных флагов компиляции
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(run_scalping PRIVATE -Wall -Wextra -Wpedantic)
+endif ()
+
+# Указание директории для исполняемых файлов
+set_target_properties(run_scalping PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)

@@ -4,7 +4,12 @@
 class LiveBinanceScalpingCurrency : public BinanceScalping {
 private:
     std::vector<double> prices;
+
 public:
+    const std::vector<double> &get_prices() const {
+        return prices;
+    }
+
     LiveBinanceScalpingCurrency(int8_t version, const std::string &host_, const std::string &port_,
                                 const std::string &target_);
 
