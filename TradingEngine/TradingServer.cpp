@@ -18,11 +18,7 @@ auto json_request = nlohmann::json::parse(request.body());
  * call method for handling json_request
  *
  */
-} else if (request.
-
-method()
-
-== beast::http::verb::get) {
+} else if (request.method()== beast::http::verb::get) {
 /*
  * call method to get result from executed query
  */

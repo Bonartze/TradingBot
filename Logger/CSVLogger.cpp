@@ -2,10 +2,8 @@
 
 CSVLogger::CSVLogger(const std::string &file_path) {
     csv_file.open(file_path, std::ios::out | std::ios::app);
-    if (!csv_file.is_open()) {
+    if (!csv_file.is_open())
         throw std::runtime_error("Failed to open CSV file: " + file_path);
-    }
-    //csv_file << "Check Type,Current Price,SMA Short,SMA Long,Entry Price,RSI\n";
     csv_file << "\nCheck Type,Current Price,SMA Short,SMA Long,RSI\n";
 }
 

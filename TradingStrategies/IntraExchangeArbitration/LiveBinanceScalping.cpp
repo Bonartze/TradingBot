@@ -1,17 +1,12 @@
-#include "BinanceScalping.h"
+#include "LiveBinanceScalping.h"
 #include <iostream>
 #include "../Common/Common.h"
 
-BinanceScalping::BinanceScalping(const int &version)
-        : version(version), ctx(ssl::context::tlsv12_client), stream(ioc, ctx) {
-
-    if (!SSL_set_tlsext_host_name(stream.native_handle(), host)) {
-        beast::error_code ec{static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()};
-        throw beast::system_error{ec};
-    }
+LiveBinanceScalping::LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
+                                         const std::string &target_): BinanceScalping(version, host_, port_, target_) {
 }
 
-void BinanceScalping::fetch_raw_data() {
+void LiveBinanceScalping::fetch_raw_data(size_t scalping_data_point) {
     tcp::resolver resolver(ioc);
     auto const results = resolver.resolve(host, port);
     if (!beast::get_lowest_layer(stream).connect(results).data()) {
@@ -20,7 +15,7 @@ void BinanceScalping::fetch_raw_data() {
     }
     stream.handshake(ssl::stream_base::client);
 
-    http::request<http::string_body> req{http::verb::get, target, version};
+    http::request<http::string_body> req{http::verb::get, target, m_version};
     req.set(http::field::host, host);
     req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
     req.set(http::field::connection, "keep-alive");
@@ -42,11 +37,11 @@ void BinanceScalping::fetch_raw_data() {
     }
 }
 
-const std::unordered_map<std::string, double> &BinanceScalping::get_price_map() {
+const std::unordered_map<std::string, double> &LiveBinanceScalping::get_price_map() {
     return cryptomarket_pairs;
 }
 
-Graph &BinanceScalping::generate_order_graph(const std::unordered_set<std::string> &user_symbols) {
+Graph &LiveBinanceScalping::generate_order_graph(const std::unordered_set<std::string> &user_symbols) {
     for (const auto &[currency_pair, price]: cryptomarket_pairs) {
         std::string_view base_currency;
         std::string_view quote_currency;
@@ -77,4 +72,3 @@ Graph &BinanceScalping::generate_order_graph(const std::unordered_set<std::strin
     }
     return order_graph;
 }
-

@@ -10,7 +10,6 @@ namespace beast = boost::beast;
 boost::beast::http<beast::http::string_body> handle_http_request(
     beast::http::request<beast::http::string_body> const &request);
 
-
 // is used ssl session to create a secure connection
 class SSLSession : public std::enable_shared_from_this<SSLSession> {
 public:

@@ -18,7 +18,9 @@ FetchContent_MakeAvailable(googletest)
 add_executable(backtesting scalping_backtesting.cpp ../TradingStrategies/Scalping/ScalpingStr.cpp
         run_backtesting.cpp ../Logger/Logger.cpp ../TradingStrategies/Common/TradingMethods.cpp
         ../Logger/CSVLogger.cpp
-        ../Logger/CSVLogger.h)
+        ../Logger/CSVLogger.h
+        ../TradingStrategies/Common/BinanceScalping.cpp
+        ../TradingStrategies/Common/BinanceScalping.h)
 
 target_link_libraries(backtesting PRIVATE gtest gtest_main)
 

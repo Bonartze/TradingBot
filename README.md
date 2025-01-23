@@ -1,3 +1,4 @@
 # Notes
-
-- поменять названия файла TradingStrategies/IntraExchangeArbitrage/BinanceScalping*
+- implement data fetching from binance 
+- think up new strategy 
+- release Inter exchange arbitrage
