@@ -7,8 +7,6 @@
 #include <filesystem>
 #include <chrono>
 
-std::ofstream logs_output("/home/ivan/logs.log"); // переделать потом на другое логировани
-
 auto ScalpingStr::loadCandles(const std::string &filename) -> std::vector<Candle> {
     std::vector<Candle> candles;
     std::ifstream file(filename);
@@ -34,7 +32,7 @@ auto ScalpingStr::loadCandles(const std::string &filename) -> std::vector<Candle
         candles.push_back(candle);
     }
 
-    Logger(LogLevel::INFO, logs_output) << "Loaded candles: " << candles.size() << " from file: " << filename;
+    Logger(LogLevel::INFO) << "Loaded candles: " << candles.size() << " from file: " << filename;
     return candles;
 }
 
@@ -44,7 +42,7 @@ auto ScalpingStr::should_buy(const std::vector<double> &prices, const ScalpingPa
     const double sma_long = TradingMethods::sma(prices, scalping_params.sma_long);
     const double current_price = prices.back();
 
-    Logger(LogLevel::DEBUG, logs_output) << "Buy Check - Current Price: " << current_price
+    Logger(LogLevel::DEBUG) << "Buy Check - Current Price: " << current_price
             << ", SMA Short: " << sma_short
             << ", SMA Long: " << sma_long
             << ", RSI: " << scalping_params.rsi_value;
@@ -64,7 +62,7 @@ auto ScalpingStr::should_sell(const std::vector<double> &prices, const ScalpingP
     const double sma_short = TradingMethods::sma(prices, scalping_params.sma_short);
     const double current_price = prices.back();
 
-    Logger(LogLevel::DEBUG, logs_output) << "Sell Check - Current Price: " << current_price
+    Logger(LogLevel::DEBUG) << "Sell Check - Current Price: " << current_price
             << ", SMA Short: " << sma_short
             << ", Entry Price: " << entry_price
             << ", RSI: " << scalping_params.rsi_value;
@@ -81,7 +79,7 @@ auto ScalpingStr::should_sell(const std::vector<double> &prices, const ScalpingP
 }
 
 auto ScalpingStr::execute(const std::vector<double> &prices, ScalpingParams sp_params,
-                          CSVLogger &csv_logger) -> double {
+                          CSVLogger &csv_logger) -> double { // implements trades later
     const double current_price = prices.back();
     double profit = 0.0;
 
@@ -93,7 +91,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices, ScalpingParams sp_p
             balance -= asset_quantity * entry_price;
             position_open = true;
 
-            Logger(LogLevel::INFO, logs_output) << "Buy at: " << entry_price
+            Logger(LogLevel::INFO) << "Buy at: " << entry_price
                     << " | Quantity: " << asset_quantity
                     << " | Remaining Balance: " << balance;
 
@@ -102,7 +100,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices, ScalpingParams sp_p
                 std::to_string(balance)
             });
         } else {
-            Logger(LogLevel::WARNING, logs_output) << "Not enough balance to buy. Current balance: " << balance;
+            Logger(LogLevel::WARNING) << "Not enough balance to buy. Current balance: " << balance;
         }
     } else if (position_open && should_sell(prices, sp_params, entry_price, csv_logger)) {
         const double exit_price = current_price;
@@ -111,7 +109,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices, ScalpingParams sp_p
         asset_quantity = 0.0;
         position_open = false;
 
-        Logger(LogLevel::INFO, logs_output) << "Sell at: " << exit_price
+        Logger(LogLevel::INFO) << "Sell at: " << exit_price
                 << " | Profit: " << profit
                 << " | Total Balance: " << balance;
 
@@ -120,7 +118,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices, ScalpingParams sp_p
             std::to_string(balance), std::to_string(profit)
         });
     } else {
-        Logger(LogLevel::DEBUG, logs_output) << "No action taken. Position Open: " << position_open
+        Logger(LogLevel::DEBUG) << "No action taken. Position Open: " << position_open
                 << ", Current Price: " << current_price;
 
         csv_logger.logRow({
@@ -137,6 +135,6 @@ auto ScalpingStr::extract_prices(const std::vector<Candle> &candles) -> std::vec
     std::vector<double> prices(candles.size());
     std::transform(candles.begin(), candles.end(), prices.begin(),
                    [](const Candle &candle) { return candle.close; });
-    Logger(LogLevel::DEBUG, logs_output) << "Extracted prices: " << prices.size();
+    Logger(LogLevel::DEBUG) << "Extracted prices: " << prices.size();
     return prices;
 }

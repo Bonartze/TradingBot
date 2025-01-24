@@ -50,7 +50,6 @@ set(SOURCE_FILES
         ../../Logger/CSVLogger.cpp
         ../Common/BinanceScalping.cpp
         LiveBinanceScalpingCurrency.cpp
-        main.cpp
         ../Common/Common.cpp
 )
 

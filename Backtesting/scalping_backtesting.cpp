@@ -37,11 +37,11 @@ namespace {
                       return file_a.filename().string() < file_b.filename().string();
                   });
 
-        Logger(LogLevel::INFO, logs_output) << "Starting backtesting for directory: " << data_dir
+        Logger(LogLevel::INFO) << "Starting backtesting for directory: " << data_dir
                 << ". Total files: " << files.size();
 
         for (const auto &file: files) {
-            Logger(LogLevel::INFO, logs_output) << "Processing file: " << file;
+            Logger(LogLevel::INFO) << "Processing file: " << file;
 
             auto start_time = std::chrono::high_resolution_clock::now();
             auto candles = ScalpingStr::loadCandles(file);
@@ -59,7 +59,7 @@ namespace {
             auto end_time = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
-            Logger(LogLevel::INFO, logs_output) << "File Processed: " << file
+            Logger(LogLevel::INFO) << "File Processed: " << file
                     << " | Total Trades: " << total_trades
                     << " | Duration: " << duration << " ms";
         }
@@ -79,7 +79,7 @@ TEST_F(Backtesting, ScalpingBacktesting) {
 
         processYearData(year_dir, scalp, total_profit, total_trades, csv_logger);
 
-        Logger(LogLevel::DEBUG) << "Year: " << year
+        Logger(LogLevel::INFO) << "Year: " << year
                 << " | Expected Profit: " << EXPECTED_PROFIT[year - START_YEAR]
                 << " | Calculated Profit: " << total_profit
                 << " | Total Trades: " << total_trades;

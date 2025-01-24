@@ -5,16 +5,11 @@
 
 #include "../../Logger/CSVLogger.h"
 #include "../Common/Common.h"
-//#include "../Common/LiveBinanceScalping.h"
-//#include "../Common/LiveBinanceScalping.h"
 constexpr double RSI_OVERSOLD_THRESHOLD = 75.0;
 constexpr double RSI_OVERBOUGHT_THRESHOLD = 25.0;
 
 constexpr double PRICE_ABOVE_SMA_THRESHOLD = 0.9999;
 constexpr double SMA_SHORT_LONG_RATIO_THRESHOLD = 1.0001;
-
-
-extern std::ofstream logs_output; // переделать потом на другое логировани
 
 struct ScalpingParams {
     size_t sma_short;

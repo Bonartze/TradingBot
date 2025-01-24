@@ -1,6 +1,4 @@
-#ifndef TRADINGBOT_BELLMAN_FORD_H
-#define TRADINGBOT_BELLMAN_FORD_H
-
+#pragma once
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -16,5 +14,3 @@ public:
 private:
     const Graph &graph;
 };
-
-#endif

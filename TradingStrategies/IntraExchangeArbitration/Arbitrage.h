@@ -1,6 +1,4 @@
-#ifndef TRADINGBOT_ARBITRAGE_H
-#define TRADINGBOT_ARBITRAGE_H
-
+#prama once
 #include "LiveBinanceScalping.h"
 #include "Bellman_Ford.h"
 #include "../../TradingEngine/OrderManager.h"
@@ -32,4 +30,3 @@ public:
 };
 
 
-#endif

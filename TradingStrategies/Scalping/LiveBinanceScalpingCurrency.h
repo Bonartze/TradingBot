@@ -6,12 +6,12 @@ private:
     std::vector<double> prices;
 
 public:
-    const std::vector<double> &get_prices() const {
+    [[nodiscard]] auto get_prices() const -> const std::vector<double> &{
         return prices;
     }
 
     LiveBinanceScalpingCurrency(int8_t version, const std::string &host_, const std::string &port_,
                                 const std::string &target_);
 
-    void fetch_raw_data(size_t scalping_data_point = 100) override;
+    void fetch_raw_data(size_t scalping_data_point) override;
 };
