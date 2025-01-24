@@ -5,3 +5,4 @@
 - release Inter exchange arbitrage
 - update IntraExchangeArbitration into longer model
 - implement trades a bit later
+- update root CMake + create API via dynamic library
