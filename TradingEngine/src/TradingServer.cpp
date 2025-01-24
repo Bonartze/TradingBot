@@ -1,4 +1,4 @@
-#include "TradingServer.h"
+#include "../include/TradingServer.h"
 
 boost::beast::http <beast::http::string_body> handle_http_request(
         beast::http::request < beast::http::string_body > const &request) {
@@ -7,13 +7,8 @@ if (request.
 method()
 
 ==
-beast::http::verb::post &&request
-.
-
-target()
-
-== "/application/json") {
-auto json_request = nlohmann::json::parse(request.body());
+beast::http::verb::post &&request.target() == "/application/json") {
+    auto json_request = nlohmann::json::parse(request.body());
 /*
  * call method for handling json_request
  *

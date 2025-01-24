@@ -1,6 +1,6 @@
-#include "LiveBinanceScalping.h"
+#include "../include/LiveBinanceScalping.h"
 #include <iostream>
-#include "../Common/Common.h"
+#include "../../Common/include/Common.h"
 
 LiveBinanceScalping::LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
                                          const std::string &target_): BinanceScalping(version, host_, port_, target_)

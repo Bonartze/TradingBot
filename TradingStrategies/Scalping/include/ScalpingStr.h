@@ -3,8 +3,8 @@
 #include <fstream>
 #include <optional>
 
-#include "../../Logger/CSVLogger.h"
-#include "../Common/Common.h"
+#include "../../../Logger/include/CSVLogger.h"
+#include "../../Common/include/Common.h"
 constexpr double RSI_OVERSOLD_THRESHOLD = 75.0;
 constexpr double RSI_OVERBOUGHT_THRESHOLD = 25.0;
 

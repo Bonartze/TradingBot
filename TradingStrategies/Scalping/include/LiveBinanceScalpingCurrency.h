@@ -1,5 +1,5 @@
 #pragma once
-#include "../Common/BinanceScalping.h"
+#include "../../Common/include/BinanceScalping.h"
 
 class LiveBinanceScalpingCurrency : public BinanceScalping {
 private:

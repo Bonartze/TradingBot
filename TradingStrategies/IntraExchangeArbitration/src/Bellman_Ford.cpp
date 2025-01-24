@@ -1,4 +1,4 @@
-#include "Bellman_Ford.h"
+#include "../include/Bellman_Ford.h"
 #include <vector>
 #include <algorithm>
 #include <exception>

@@ -1,4 +1,4 @@
-#include "LiveBinanceScalpingCurrency.h"
+#include "../includeLiveBinanceScalpingCurrency.h"
 #include "simdjson.h"
 #include <boost/beast/version.hpp>
 #include <locale>

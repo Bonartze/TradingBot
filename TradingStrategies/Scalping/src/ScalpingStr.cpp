@@ -1,6 +1,6 @@
-#include "ScalpingStr.h"
-#include "../../Logger/Logger.h"
-#include "../Common/TradingMethods.h"
+#include "../../Common/include/ScalpingStr.h"
+#include "../../../Logger/include/Logger.h"
+#include "../../Common/include/TradingMethods.h"
 #include <sstream>
 #include <algorithm>
 #include <iostream>
