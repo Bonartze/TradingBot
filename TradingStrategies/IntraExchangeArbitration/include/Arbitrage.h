@@ -1,4 +1,4 @@
-#prama once
+#pragma once
 #include "LiveBinanceScalping.h"
 #include "Bellman_Ford.h"
 #include "../../../TradingEngine/include/OrderManager.h"

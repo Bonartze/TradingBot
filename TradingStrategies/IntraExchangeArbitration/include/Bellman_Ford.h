@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <limits>
-#include "../Common/Graph.h"
+#include "../../Common/include/Graph.h"
 
 class Bellman_Ford {
 public:

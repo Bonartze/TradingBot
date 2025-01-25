@@ -1,10 +1,10 @@
-#include "../includeLiveBinanceScalpingCurrency.h"
+#include "../include/LiveBinanceScalpingCurrency.h"
 #include "simdjson.h"
 #include <boost/beast/version.hpp>
 #include <locale>
 #include <iomanip>
 
-#include "../../Logger/Logger.h"
+#include "../../../Logger/include/Logger.h"
 
 
 LiveBinanceScalpingCurrency::LiveBinanceScalpingCurrency(int8_t version, const std::string &host_,

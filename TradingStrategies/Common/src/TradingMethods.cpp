@@ -1,4 +1,4 @@
-#include "TradingMethods.h"
+#include "../include/TradingMethods.h"
 #include <numeric>
 #include <iostream>
 

@@ -4,7 +4,7 @@
 #include <curl/curl.h>
 #include <json/json.h>
 #include <execution>
-#include "../Logger/Logger.h"
+#include "../../Logger/include/Logger.h"
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 #include <openssl/sha.h>

@@ -7,13 +7,13 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/json.hpp>
-#include "simdjson.h"
+#include <simdjson.h>
 #include <boost/container/flat_map.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <cmath>
-#include "../Common/Graph.h"
-#include "../Common/BinanceScalping.h"
+#include "../../Common/include/Graph.h"
+#include "../../Common/include/BinanceScalping.h"
 
 namespace beast = boost::beast;
 namespace http = beast::http;

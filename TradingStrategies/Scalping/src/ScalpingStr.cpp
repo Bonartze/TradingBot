@@ -1,4 +1,4 @@
-#include "../../Common/include/ScalpingStr.h"
+#include "../include/ScalpingStr.h"
 #include "../../../Logger/include/Logger.h"
 #include "../../Common/include/TradingMethods.h"
 #include <sstream>

@@ -27,9 +27,3 @@ void BinanceFetchData::FetchCurrentPrice(std::string currency_name, size_t amoun
     std::cout << json_data << std::endl;
 
 }
-
-int main() {
-    BinanceFetchData binanceFetchData;
-    binanceFetchData.FetchCurrentPrice("BTCUSDT", 100);
-    return 0;
-}

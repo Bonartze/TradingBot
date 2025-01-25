@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../include/Common.h"
 
 std::unordered_set<std::string> currencies = {
         "1000SATS",
