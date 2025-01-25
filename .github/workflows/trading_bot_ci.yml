@@ -7,11 +7,31 @@ jobs:
       - name: Linters
         run: # todo
 
-  stock market availability:
+  stock_market_availability:
     runs-on: ubuntu-22.04
     steps:
       - name: stock market availability
         run: # todo
+
+  build_library_api:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: build library api
+        run: #todo
+
+  build_project:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: build project
+        run: #todo
+
+
+  build_docker:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: build docker
+        run: #todo
+
 
   backtesting:
     runs-on: ubuntu-22.04
@@ -49,7 +69,7 @@ jobs:
       - name: Notify completion
         run: echo "Backtesting workflow completed successfully."
 
-  tests:
+  docker_image_tests:
     runs-on: ubuntu-22.04
     steps:
       - name: Install Dependencies

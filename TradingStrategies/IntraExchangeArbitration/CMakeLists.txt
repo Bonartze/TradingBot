@@ -46,6 +46,7 @@ set(SOURCE_FILES
         ../Common/BinanceScalping.cpp
         ../Scalping/LiveBinanceScalpingCurrency.cpp
         ../Scalping/LiveBinanceScalpingCurrency.h
+        ../../include/strategies_api.h
 )
 
 add_executable(run_arbitrage ${SOURCE_FILES})
