@@ -26,6 +26,7 @@ add_library(StrategiesAPI SHARED
         InterExchangeArbitration/src/FetchData.cpp
         Common/src/BinanceScalping.cpp
         Common/src/Common.cpp Common/src/TradingMethods.cpp
+        Common/src/TradingStrategy.cpp
         IntraExchangeArbitration/src/Arbitrage.cpp
         IntraExchangeArbitration/src/Bellman_Ford.cpp
         IntraExchangeArbitration/src/LiveBinanceScalping.cpp

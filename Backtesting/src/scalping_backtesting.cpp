@@ -1,5 +1,7 @@
-#include "scalping_backtesting.h"
-#include "../Logger/Logger.h"
+#include "../include/scalping_backtesting.h"
+#include "../../Logger/include/Logger.h"
+#include "../../TradingStrategies/Common/include/Common.h"
+#include <filesystem>
 
 
 constexpr double START_BALANCE = 1000.0;
@@ -15,7 +17,7 @@ constexpr size_t EXPECTED_PROFIT_MARGIN = 100.0;
 constexpr std::array<double, 5> EXPECTED_PROFIT = {700, 200, -600, 300, 200};
 
 void Backtesting::SetUp() {
-    data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/Data_extracted/5m/BTCUSDT/";
+    data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
 }
 
 void Backtesting::TearDown() {
@@ -44,11 +46,11 @@ namespace {
             Logger(LogLevel::INFO) << "Processing file: " << file;
 
             auto start_time = std::chrono::high_resolution_clock::now();
-            auto candles = ScalpingStr::loadCandles(file);
+            auto candles = loadCandles(file);
             auto prices = ScalpingStr::extract_prices(candles);
-
+            //!! integrate into scalping itself (in execute_wrapper)
             for (size_t i = WINDOW_SIZE; i <= prices.size(); i += WINDOW_SIZE) {
-                const std::vector<double> price_segment(prices.begin(), prices.begin() + i);
+                const std::vector<double> price_segment(prices.begin()+i-WINDOW_SIZE, prices.begin() + i);
                 total_profit += scalp.execute(price_segment, {
                                                   SCALPING_SMA_SHORT, SCALPING_SMA_LONG, SCALPING_RSI_OVERSOLD,
                                                   SCALPING_RSI_OVERBOUGHT
@@ -68,16 +70,15 @@ namespace {
 
 TEST_F(Backtesting, ScalpingBacktesting) {
     ScalpingStr scalp(START_BALANCE, false, 0.0, 0.0);
-
     for (size_t year = START_YEAR; year <= END_YEAR; ++year) {
-        const std::string year_dir = data_dir + std::to_string(year) + "/";
-        std::string output_file = "/home/ivan/scalping_metrics_" + std::to_string(year) + ".csv";
+        std::string output_file = "../data/scalping_metrics_" + std::to_string(year) + ".csv";
+        std::filesystem::create_directory("../data/scalping_metrics_" + std::to_string(year));
         CSVLogger csv_logger(output_file);
 
         double total_profit = 0.0;
         size_t total_trades = 0;
 
-        processYearData(year_dir, scalp, total_profit, total_trades, csv_logger);
+        processYearData("../data/scalping_metrics_" + std::to_string(year), scalp, total_profit, total_trades, csv_logger);
 
         Logger(LogLevel::INFO) << "Year: " << year
                 << " | Expected Profit: " << EXPECTED_PROFIT[year - START_YEAR]

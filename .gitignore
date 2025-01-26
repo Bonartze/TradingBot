@@ -12,3 +12,4 @@ TradingStrategies/*/*/build
 bin
 Backtesting/scalping_results
 *.png
+CMakeFiles

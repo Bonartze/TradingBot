@@ -46,7 +46,9 @@ set(SOURCE_FILES
         ../Common/BinanceScalping.cpp
         ../Scalping/LiveBinanceScalpingCurrency.cpp
         ../Scalping/LiveBinanceScalpingCurrency.h
-        ../../include/strategies_api.h
+        ../include/strategies_api.h
+        ../MeanReversionStrategy/include/MeanReverseStr.h
+        ../MeanReversionStrategy/src/MeanReverseStr.cpp
 )
 
 add_executable(run_arbitrage ${SOURCE_FILES})

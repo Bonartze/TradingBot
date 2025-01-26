@@ -110,13 +110,13 @@ def analyze_backtesting_results(input_files, output_folder):
 
 
 input_files = [
-    "/home/ivan/scalping_metrics_2020.csv",
-    "/home/ivan/scalping_metrics_2021.csv",
-    "/home/ivan/scalping_metrics_2022.csv",
-    "/home/ivan/scalping_metrics_2023.csv",
-    "/home/ivan/scalping_metrics_2024.csv"
+    "../data/scalping_metrics_2020.csv",
+    "../data/scalping_metrics_2021.csv",
+    "/../data/scalping_metrics_2022.csv",
+    "/../data/scalping_metrics_2023.csv",
+    "/../data/scalping_metrics_2024.csv"
 ]
 
-output_folder = "./scalping_results"
+output_folder = "../data/scalping_results"
 
 analyze_backtesting_results(input_files, output_folder)

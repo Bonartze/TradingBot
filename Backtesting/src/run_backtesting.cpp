@@ -1,4 +1,4 @@
-#include "scalping_backtesting.h"
+#include "../include/scalping_backtesting.h"
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

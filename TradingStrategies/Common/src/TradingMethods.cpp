@@ -36,3 +36,19 @@ auto TradingMethods::rsi(const std::vector<double> &prices, int period) -> doubl
     const double rs_ = gain / loss;
     return 100.0 - (100.0 / (1.0 + rs_));
 }
+
+auto TradingMethods::ema(const std::vector<double> &prices, size_t window_size) -> double {
+    if (prices.size() < window_size) {
+        throw std::invalid_argument("Not enough data to calculate EMA.");
+    }
+
+    double k = 2.0 / (window_size + 1);
+
+    double ema_prev = prices.back();
+
+    for (size_t i = prices.size() - 2; i != static_cast<size_t>(-1); --i) {
+        ema_prev = (prices[i] * k) + (ema_prev * (1 - k));
+    }
+
+    return ema_prev;
+}

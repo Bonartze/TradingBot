@@ -44,13 +44,14 @@ include_directories(
 
 # Указание файлов исходного кода
 set(SOURCE_FILES
-        ScalpingStr.cpp
-        ../Common/TradingMethods.cpp
-        ../../Logger/Logger.cpp
-        ../../Logger/CSVLogger.cpp
-        ../Common/BinanceScalping.cpp
-        LiveBinanceScalpingCurrency.cpp
-        ../Common/Common.cpp
+        src/ScalpingStr.cpp
+        ../Common/src/TradingMethods.cpp
+        ../../Logger/src/Logger.cpp
+        ../../Logger/src/CSVLogger.cpp
+        ../Common/src/BinanceScalping.cpp
+        src/LiveBinanceScalpingCurrency.cpp
+        ../Common/src/Common.cpp
+        ../Common/src/TradingStrategy.cpp
 )
 
 # Создание исполняемого файла

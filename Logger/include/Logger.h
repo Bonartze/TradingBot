@@ -1,6 +1,4 @@
-#ifndef LOGGER_H
-#define LOGGER_Hz
-
+#pragma once
 #include <sstream>
 #include <mutex>
 #include <string>
@@ -41,4 +39,3 @@ public:
     static void setLogLevel(LogLevel level);
 };
 
-#endif

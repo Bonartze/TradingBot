@@ -7,36 +7,7 @@
 #include <filesystem>
 #include <chrono>
 
-auto ScalpingStr::loadCandles(const std::string &filename) -> std::vector<Candle> {
-    std::vector<Candle> candles;
-    std::ifstream file(filename);
-    std::string line;
-    while (std::getline(file, line)) {
-        std::stringstream ss_(line);
-        std::string value;
-        Candle candle = {};
-
-        std::getline(ss_, value, ',');
-        candle.timestamp = std::stol(value);
-        std::getline(ss_, value, ',');
-        candle.open = std::stod(value);
-        std::getline(ss_, value, ',');
-        candle.high = std::stod(value);
-        std::getline(ss_, value, ',');
-        candle.low = std::stod(value);
-        std::getline(ss_, value, ',');
-        candle.close = std::stod(value);
-        std::getline(ss_, value, ',');
-        candle.volume = std::stod(value);
-
-        candles.push_back(candle);
-    }
-
-    Logger(LogLevel::INFO) << "Loaded candles: " << candles.size() << " from file: " << filename;
-    return candles;
-}
-
-auto ScalpingStr::should_buy(const std::vector<double> &prices, const ScalpingParams &scalping_params,
+auto ScalpingStr::should_buy(const std::vector<double> &prices, const TradingParams &scalping_params,
                              CSVLogger &csv_logger) -> bool {
     const double sma_short = TradingMethods::sma(prices, scalping_params.sma_short);
     const double sma_long = TradingMethods::sma(prices, scalping_params.sma_long);
@@ -57,7 +28,7 @@ auto ScalpingStr::should_buy(const std::vector<double> &prices, const ScalpingPa
             scalping_params.rsi_value < RSI_OVERSOLD_THRESHOLD);
 }
 
-auto ScalpingStr::should_sell(const std::vector<double> &prices, const ScalpingParams &scalping_params,
+auto ScalpingStr::should_sell(const std::vector<double> &prices, const TradingParams &scalping_params,
                               double entry_price, CSVLogger &csv_logger) -> bool {
     const double sma_short = TradingMethods::sma(prices, scalping_params.sma_short);
     const double current_price = prices.back();
@@ -78,8 +49,9 @@ auto ScalpingStr::should_sell(const std::vector<double> &prices, const ScalpingP
             current_price < entry_price * PRICE_ABOVE_SMA_THRESHOLD); // Stop loss
 }
 
-auto ScalpingStr::execute(const std::vector<double> &prices, ScalpingParams sp_params,
-                          CSVLogger &csv_logger) -> double { // implements trades later
+auto ScalpingStr::execute(const std::vector<double> &prices, TradingParams sp_params,
+                          CSVLogger &csv_logger) -> double {
+    // implements trades later
     const double current_price = prices.back();
     double profit = 0.0;
 
@@ -137,4 +109,7 @@ auto ScalpingStr::extract_prices(const std::vector<Candle> &candles) -> std::vec
                    [](const Candle &candle) { return candle.close; });
     Logger(LogLevel::DEBUG) << "Extracted prices: " << prices.size();
     return prices;
+}
+
+auto ScalpingStr::execute() -> void {
 }

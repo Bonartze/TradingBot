@@ -1,7 +1,7 @@
 #pragma once
 #include <gtest/gtest.h>
 #include <filesystem>
-#include "../TradingStrategies/Scalping/ScalpingStr.h"
+#include "../../TradingStrategies/Scalping/include/ScalpingStr.h"
 
 class Backtesting : public ::testing::Test {
 public:
