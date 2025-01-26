@@ -1,7 +1,5 @@
 #pragma once
 #include <vector>
-#include <fstream>
-#include <optional>
 
 #include "../../../Logger/include/CSVLogger.h"
 #include "../../Common/include/Common.h"
@@ -23,20 +21,21 @@ public:
                                    }, 1000.0, false, 0.0, 0.0) {
     };
 
-    ScalpingStr(TradingParams &trading_params, double balance_, bool position_open_, double entry_price_,
+    ScalpingStr(const TradingParams &trading_params, double balance_, bool position_open_, double entry_price_,
                 double asset_quantity_) : TradingStrategy(trading_params, balance_, position_open_, entry_price_,
                                                           asset_quantity_) {
     }
 
-    auto ScalpingStr::should_buy(const std::vector<double> &prices, const TradingParams &scalping_params,
-                                 CSVLogger &csv_logger) -> bool;
+    auto should_buy(const std::vector<double> &prices,
+                    CSVLogger &csv_logger) -> bool;
 
-    auto ScalpingStr::should_sell(const std::vector<double> &prices, const TradingParams &scalping_params,
-                                  double entry_price, CSVLogger &csv_logger) -> bool;
+    auto should_sell(const std::vector<double> &prices,
+                     double entry_price, CSVLogger &csv_logger) -> bool;
 
-    auto execute() -> void override;
+    auto execute() -> void;
 
-    static auto extract_prices(const std::vector<Candle> &) -> std::vector<double>;
+    auto execute(const std::vector<double> &, CSVLogger &) -> double;
 
-    auto execute(const std::vector<double> &, TradingParams, CSVLogger &) -> double;
+    auto wrapper_execute(size_t window_size, const std::vector<double> &prices,
+                         CSVLogger &logger) -> std::pair<double, double>;
 };

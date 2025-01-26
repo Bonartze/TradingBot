@@ -47,6 +47,7 @@ add_executable(backtesting
         ../Logger/src/CSVLogger.cpp
         ../TradingStrategies/Common/src/BinanceScalping.cpp
         ../TradingStrategies/Common/src/Common.cpp
+        ../TradingStrategies/Common/src/TradingStrategy.cpp
 )
 
 # Link libraries

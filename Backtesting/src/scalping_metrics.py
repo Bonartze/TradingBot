@@ -80,7 +80,7 @@ def plot_metrics_over_time(df, metrics, year, output_folder):
 def analyze_backtesting_results(input_files, output_folder):
     overall_metrics = []
     for file in input_files:
-        year = file.split("_")[-1].split(".")[0]
+        year = file.split("/")[-1].split(".")[0]
         print(f"Processing file: {file}")
         df = pd.read_csv(file)
 
@@ -110,13 +110,13 @@ def analyze_backtesting_results(input_files, output_folder):
 
 
 input_files = [
-    "../data/scalping_metrics_2020.csv",
-    "../data/scalping_metrics_2021.csv",
-    "/../data/scalping_metrics_2022.csv",
-    "/../data/scalping_metrics_2023.csv",
-    "/../data/scalping_metrics_2024.csv"
+    "../data/scalping/2020.csv",
+    "../data/scalping/2021.csv",
+    "../data/scalping/2022.csv",
+    "../data/scalping/2023.csv",
+    "../data/scalping/2024.csv"
 ]
 
-output_folder = "../data/scalping_results"
+output_folder = "../data/Scalping_results/"
 
 analyze_backtesting_results(input_files, output_folder)

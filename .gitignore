@@ -5,6 +5,7 @@ build
 Data_extracted
 Data_zips
 StatisticsPlots
+scalping
 venv/
 TradingStrategies/*/*/build
 */cmake-build-debug
@@ -12,4 +13,6 @@ TradingStrategies/*/*/build
 bin
 Backtesting/scalping_results
 *.png
+*.jpg
 CMakeFiles
+ScalpingResults
