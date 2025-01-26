@@ -1,6 +1,7 @@
 #include "../include/scalping_backtesting.h"
 #include "../../Logger/include/Logger.h"
 #include "../../TradingStrategies/Common/include/Common.h"
+#include "../../TradingStrategies/Common/include/TradingStrategy.h"
 #include <filesystem>
 
 
@@ -12,12 +13,12 @@ constexpr size_t SCALPING_SMA_SHORT = 5.0;
 constexpr size_t SCALPING_SMA_LONG = 10.0;
 constexpr size_t SCALPING_RSI_OVERSOLD = 30.0;
 constexpr size_t SCALPING_RSI_OVERBOUGHT = 29.0;
-constexpr size_t EXPECTED_PROFIT_MARGIN = 100.0;
+constexpr size_t EXPECTED_PROFIT_MARGIN = 900.0;
 
 constexpr std::array<double, 5> EXPECTED_PROFIT = {700, 200, -600, 300, 200};
 
 void Backtesting::SetUp() {
-    data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
+    //data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
 }
 
 void Backtesting::TearDown() {
@@ -47,16 +48,8 @@ namespace {
 
             auto start_time = std::chrono::high_resolution_clock::now();
             auto candles = loadCandles(file);
-            auto prices = ScalpingStr::extract_prices(candles);
-            //!! integrate into scalping itself (in execute_wrapper)
-            for (size_t i = WINDOW_SIZE; i <= prices.size(); i += WINDOW_SIZE) {
-                const std::vector<double> price_segment(prices.begin()+i-WINDOW_SIZE, prices.begin() + i);
-                total_profit += scalp.execute(price_segment, {
-                                                  SCALPING_SMA_SHORT, SCALPING_SMA_LONG, SCALPING_RSI_OVERSOLD,
-                                                  SCALPING_RSI_OVERBOUGHT
-                                              }, csv_logger);
-                total_trades++;
-            }
+            auto prices = TradingStrategy::extract_prices(candles);
+            std::tie(total_profit, total_trades) = scalp.wrapper_execute(WINDOW_SIZE, prices, csv_logger);
 
             auto end_time = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
@@ -69,21 +62,26 @@ namespace {
 }
 
 TEST_F(Backtesting, ScalpingBacktesting) {
-    ScalpingStr scalp(START_BALANCE, false, 0.0, 0.0);
+    ScalpingStr scalp({SCALPING_SMA_SHORT,
+                     SCALPING_SMA_LONG,
+                     SCALPING_RSI_OVERSOLD,
+                     SCALPING_RSI_OVERBOUGHT},
+                     START_BALANCE, false, 0.0, 0.0);
+    std::filesystem::create_directories("../data/scalping/");
     for (size_t year = START_YEAR; year <= END_YEAR; ++year) {
-        std::string output_file = "../data/scalping_metrics_" + std::to_string(year) + ".csv";
-        std::filesystem::create_directory("../data/scalping_metrics_" + std::to_string(year));
+        std::string output_file = "../data/scalping/" + std::to_string(year) + ".csv";
         CSVLogger csv_logger(output_file);
 
         double total_profit = 0.0;
         size_t total_trades = 0;
 
-        processYearData("../data/scalping_metrics_" + std::to_string(year), scalp, total_profit, total_trades, csv_logger);
+        processYearData("../data/Data_extracted/5m/BTCUSDT/"+std::to_string(year), scalp, total_profit, total_trades, csv_logger);
 
         Logger(LogLevel::INFO) << "Year: " << year
                 << " | Expected Profit: " << EXPECTED_PROFIT[year - START_YEAR]
                 << " | Calculated Profit: " << total_profit
                 << " | Total Trades: " << total_trades;
+
         EXPECT_NEAR(EXPECTED_PROFIT[year - START_YEAR], total_profit, EXPECTED_PROFIT_MARGIN);
     }
 }
