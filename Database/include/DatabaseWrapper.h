@@ -9,7 +9,7 @@
 #include <vector>
 #include <sstream>
 #include <optional>
-#include "../Logger/Logger.h"
+#include "../../Logger/include/Logger.h"
 
 #define CHECK_SQLITE_EXEC(db, query)                                     \
     do {                                                                 \
