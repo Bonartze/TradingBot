@@ -3,7 +3,7 @@ name: trading_bot_ci.yml
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
 
 jobs:
