@@ -7,14 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-# Fetch Google Test
 FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
 )
 FetchContent_MakeAvailable(googletest)
 
-# Fetch jsoncpp
 FetchContent_Declare(
         jsoncpp
         GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
@@ -22,7 +20,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(jsoncpp)
 
-# Fetch simdjson
 FetchContent_Declare(
         simdjson
         GIT_REPOSITORY https://github.com/simdjson/simdjson.git
@@ -31,13 +28,13 @@ FetchContent_Declare(
 set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(simdjson)
 
-# Find Boost
+set(BOOST_INCLUDE_ONLY "system;filesystem" CACHE STRING "Specify Boost libraries to build")
+set(BOOST_ENABLE_CMAKE ON CACHE INTERNAL "")
+
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
-# Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# Add executable
 add_executable(backtesting
         ./src/scalping_backtesting.cpp
         ../TradingStrategies/Scalping/src/ScalpingStr.cpp
@@ -50,7 +47,6 @@ add_executable(backtesting
         ../TradingStrategies/Common/src/TradingStrategy.cpp
 )
 
-# Link libraries
 target_link_libraries(backtesting PRIVATE
         gtest
         gtest_main
@@ -62,12 +58,11 @@ target_link_libraries(backtesting PRIVATE
         OpenSSL::Crypto
 )
 
-# Include directories
 target_include_directories(backtesting PRIVATE
-        ${Boost_INCLUDE_DIRS}
+        ${boost_SOURCE_DIR}
         ${simdjson_SOURCE_DIR}/include
+        ${OpenSSL_INCLUDE_DIR}
 )
 
 enable_testing()
-
 add_test(NAME BacktestingTest COMMAND backtesting)

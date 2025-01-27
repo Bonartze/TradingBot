@@ -1,4 +1,4 @@
-#include "test_databaseWrapper.h"
+#include "../include/test_databaseWrapper.h"
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
