@@ -1,8 +1,12 @@
 name: trading_bot_ci.yml
 ## first pipeline version without docker images
 on:
-  push
-  pull_request
+  push:
+    branches:
+      "*"
+  pull_request:
+    branches:
+      "*"
 
 jobs:
   stock_market_availability:
