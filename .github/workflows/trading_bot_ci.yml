@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential gcc g++ zlib1g-dev libbz2-dev python3-dev
-          wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz
+          wget https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.gz
           tar -xvzf boost_1_86_0.tar.gz
           cd boost_1_86_0
           ./bootstrap.sh || { echo "Bootstrap failed"; cat bootstrap.log; exit 1; }
