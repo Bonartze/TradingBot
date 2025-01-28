@@ -39,7 +39,7 @@ jobs:
           tar -xvzf boost_1_86_0.tar.gz
           cd boost_1_86_0
           ./bootstrap.sh || { echo "Bootstrap failed"; cat bootstrap.log; exit 1; }
-          ./b2 install --prefix=~/boost || { echo "B2 install failed"; exit 1; }
+          ./b2 install || { echo "B2 install failed"; exit 1; }
 
       - name: Install Python dependencies
         run: |
