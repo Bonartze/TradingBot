@@ -16,3 +16,4 @@ Backtesting/scalping_results
 *.jpg
 CMakeFiles
 ScalpingResults
+Backtesting/data

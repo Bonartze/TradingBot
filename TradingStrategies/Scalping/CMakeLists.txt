@@ -52,6 +52,8 @@ set(SOURCE_FILES
         src/LiveBinanceScalpingCurrency.cpp
         ../Common/src/Common.cpp
         ../Common/src/TradingStrategy.cpp
+        ../../Backtesting/src/mean_reverse_backtesting.cpp
+        ../../Backtesting/include/mean_reverse_backtesting.h
 )
 
 # Создание исполняемого файла

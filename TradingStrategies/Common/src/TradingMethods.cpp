@@ -42,12 +42,13 @@ auto TradingMethods::ema(const std::vector<double> &prices, size_t window_size) 
         throw std::invalid_argument("Not enough data to calculate EMA.");
     }
 
-    double k = 2.0 / (window_size + 1);
+    const double koef = 2.0 / (static_cast<double>(window_size) + 1);
 
-    double ema_prev = prices.back();
+    double ema_prev = std::accumulate(prices.begin(), prices.begin() + static_cast<double>(window_size), 0.0) /
+                      static_cast<double>(window_size);
 
-    for (size_t i = prices.size() - 2; i != static_cast<size_t>(-1); --i) {
-        ema_prev = (prices[i] * k) + (ema_prev * (1 - k));
+    for (size_t i = window_size; i < prices.size(); ++i) {
+        ema_prev = (prices[i] * koef) + (ema_prev * (1 - koef));
     }
 
     return ema_prev;

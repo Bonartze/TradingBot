@@ -10,24 +10,24 @@ auto MeanReverseStrategy::calculate_fee(double amount) -> double {
     return std::max(amount * 0.01, 0.01);
 }
 
-bool MeanReverseStrategy::should_buy(const std::vector<double>& prices, const TradingParams& trading_params,
-                                     CSVLogger& csv_logger) {
+bool MeanReverseStrategy::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) {
     double ema_short = TradingMethods::ema(prices, trading_params.sma_short);
     double ema_long = TradingMethods::ema(prices, trading_params.sma_long);
+
     double current_price = prices.back();
 
     bool buy_signal = ema_short < ema_long && current_price < ema_long;
-
+    std::cerr << "Params: " << buy_signal << ' ' << ema_short << ' ' << ema_long << ' ' << current_price << std::endl;
     Logger(LogLevel::DEBUG) << "Buy check: EMA Short = " << ema_short
-                            << ", EMA Long = " << ema_long
-                            << ", Current Price = " << current_price
-                            << ", Signal: " << buy_signal;
+            << ", EMA Long = " << ema_long
+            << ", Current Price = " << current_price
+            << ", Signal: " << buy_signal;
 
     return buy_signal;
 }
 
-bool MeanReverseStrategy::should_sell(const std::vector<double>& prices, const TradingParams& trading_params,
-                                      const double& entry_price, CSVLogger& csv_logger) {
+bool MeanReverseStrategy::should_sell(const std::vector<double> &prices, double entry_price,
+                                      CSVLogger &csv_logger) {
     double ema_short = TradingMethods::ema(prices, trading_params.sma_short);
     double ema_long = TradingMethods::ema(prices, trading_params.sma_long);
     double current_price = prices.back();
@@ -35,29 +35,30 @@ bool MeanReverseStrategy::should_sell(const std::vector<double>& prices, const T
     bool sell_signal = ema_short > ema_long && current_price > ema_long;
 
     Logger(LogLevel::DEBUG) << "Sell check: EMA Short = " << ema_short
-                            << ", EMA Long = " << ema_long
-                            << ", Current Price = " << current_price
-                            << ", Signal: " << sell_signal;
+            << ", EMA Long = " << ema_long
+            << ", Current Price = " << current_price
+            << ", Signal: " << sell_signal;
 
     return sell_signal;
 }
 
-auto MeanReverseStrategy::execute(const std::vector<double>& prices, const TradingParams& trading_params,
-                                  CSVLogger& csv_logger) -> double {
+auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &csv_logger) -> double {
     const double current_price = prices.back();
     double profit = 0.0;
 
-    if (!position_open && should_buy(prices, trading_params, csv_logger)) {
-        const double max_quantity = balance / current_price;
+    std::cerr << "Should buy? " << should_buy(prices, csv_logger) << std::endl;
+
+    if (!position_open && should_buy(prices, csv_logger)) {
+        const double max_quantity = (balance - calculate_fee(balance)) / current_price;
         if (balance >= max_quantity * current_price + calculate_fee(max_quantity)) {
             asset_quantity = max_quantity;
             entry_price = current_price;
             balance -= asset_quantity * entry_price + calculate_fee(asset_quantity);
             position_open = true;
-
+            std::cerr << "In buy\n";
             Logger(LogLevel::INFO) << "BUY: Price = " << entry_price
-                                   << ", Quantity = " << asset_quantity
-                                   << ", Balance = " << balance;
+                    << ", Quantity = " << asset_quantity
+                    << ", Balance = " << balance;
 
             csv_logger.logRow({
                 "BUY", std::to_string(entry_price), std::to_string(asset_quantity),
@@ -66,7 +67,8 @@ auto MeanReverseStrategy::execute(const std::vector<double>& prices, const Tradi
         } else {
             Logger(LogLevel::WARNING) << "Insufficient balance. Current balance: " << balance;
         }
-    } else if (position_open && should_sell(prices, trading_params, entry_price, csv_logger)) {
+    } else if (position_open && should_sell(prices, entry_price, csv_logger)) {
+        std::cerr << "In sell\n";
         const double exit_price = current_price;
         profit = asset_quantity * (exit_price - entry_price) - calculate_fee(asset_quantity);
         balance += asset_quantity * exit_price - calculate_fee(asset_quantity);
@@ -74,8 +76,8 @@ auto MeanReverseStrategy::execute(const std::vector<double>& prices, const Tradi
         position_open = false;
 
         Logger(LogLevel::INFO) << "SELL: Price = " << exit_price
-                               << ", Profit = " << profit
-                               << ", Balance = " << balance;
+                << ", Profit = " << profit
+                << ", Balance = " << balance;
 
         csv_logger.logRow({
             "SELL", std::to_string(exit_price), "0.0",
@@ -83,7 +85,7 @@ auto MeanReverseStrategy::execute(const std::vector<double>& prices, const Tradi
         });
     } else {
         Logger(LogLevel::DEBUG) << "HOLD: Position Open = " << position_open
-                                << ", Current Price = " << current_price;
+                << ", Current Price = " << current_price;
 
         csv_logger.logRow({
             "HOLD", std::to_string(current_price), std::to_string(asset_quantity),
@@ -92,4 +94,20 @@ auto MeanReverseStrategy::execute(const std::vector<double>& prices, const Tradi
     }
 
     return profit;
+}
+
+
+auto MeanReverseStrategy::wrapper_execute(size_t window_size, const std::vector<double> &prices,
+                                          CSVLogger &logger) -> std::pair<double, double> {
+    double total_profit = 0.0;
+    size_t trades_count = 0;
+
+    for (size_t i = window_size; i <= prices.size(); i += window_size) {
+        std::vector<double> price_segment(prices.begin() + i - window_size, prices.begin() + i);
+        total_profit += execute(price_segment, logger);
+        std::cerr << "||| Total profit: " << total_profit << std::endl;
+        trades_count++;
+    }
+
+    return {total_profit, trades_count};
 }
