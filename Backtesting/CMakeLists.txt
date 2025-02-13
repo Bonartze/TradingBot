@@ -31,12 +31,12 @@ FetchContent_MakeAvailable(simdjson)
 set(BOOST_INCLUDE_ONLY "system;filesystem" CACHE STRING "Specify Boost libraries to build")
 set(BOOST_ENABLE_CMAKE ON CACHE INTERNAL "")
 
-find_package(Boost REQUIRED COMPONENTS system filesystem)
-
 find_package(OpenSSL REQUIRED)
 
 add_executable(backtesting
-        ./src/scalping_backtesting.cpp
+        #./src/scalping_backtesting.cpp
+        ./src/mean_reverse_backtesting.cpp
+        ../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
         ../TradingStrategies/Scalping/src/ScalpingStr.cpp
         ./src/run_backtesting.cpp
         ../Logger/src/Logger.cpp
@@ -52,8 +52,6 @@ target_link_libraries(backtesting PRIVATE
         gtest_main
         jsoncpp_object
         simdjson
-        Boost::system
-        Boost::filesystem
         OpenSSL::SSL
         OpenSSL::Crypto
 )

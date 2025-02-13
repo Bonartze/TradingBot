@@ -1,6 +1,5 @@
 #include "../include/BinanceScalping.h"
 #include <boost/beast/version.hpp>
-#include <boost/json.hpp>
 #include <simdjson.h>
 
 BinanceScalping::BinanceScalping(int8_t version, std::string host_, std::string port_,
