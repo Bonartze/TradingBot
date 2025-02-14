@@ -5,62 +5,38 @@ project(Arbitrage)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_NO_SYSTEM_PATHS OFF)
+
+set(BOOST_ROOT "/usr/lib/x86_64-linux-gnu")
+set(BOOST_INCLUDEDIR "/usr/include")
+set(BOOST_LIBRARYDIR "/usr/lib/x86_64-linux-gnu")
+
 
 include(FetchContent)
+find_package(OpenSSL REQUIRED)
 
-# Fetch simdjson
 FetchContent_Declare(
         simdjson
         GIT_REPOSITORY https://github.com/simdjson/simdjson.git
-        GIT_TAG v0.4.7
-        GIT_SHALLOW TRUE)
-
-set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
-set(SIMDJSON_BUILD_STATIC ON CACHE INTERNAL "")
-
-FetchContent_MakeAvailable(simdjson)
-
-# Fetch nlohmann/json
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
-FetchContent_MakeAvailable(json)
-
-# Fetch jsoncpp
-FetchContent_Declare(
-        jsoncpp
-        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
         GIT_TAG master
 )
-
-FetchContent_MakeAvailable(jsoncpp)
-
-# Find Boost components (excluding json)
-find_package(Boost REQUIRED COMPONENTS beast asio container)
-
-# Find OpenSSL and CURL
-find_package(OpenSSL REQUIRED)
-find_package(CURL REQUIRED)
-
-include_directories(
-        ${Boost_INCLUDE_DIRS}
-)
+FetchContent_MakeAvailable(simdjson)
 
 set(SOURCE_FILES
-        FetchData.cpp
+        src/KrakenAPI.cpp
+        ../Common/src/BinanceScalping.cpp
 )
 
-add_executable(run_arbitrage ${SOURCE_FILES})
+add_executable(int_ar ${SOURCE_FILES})
 
-target_link_libraries(run_arbitrage
-        PRIVATE Boost::beast
-        PRIVATE Boost::asio
-        PRIVATE Boost::container
-        PRIVATE OpenSSL::SSL
-        PRIVATE OpenSSL::Crypto
-        PRIVATE simdjson
-        PRIVATE jsoncpp_lib
-        CURL::libcurl
+target_link_libraries(int_ar PRIVATE
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        simdjson
 )
 
-message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
-message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
+target_include_directories(int_ar PRIVATE
+        ${Boost_INCLUDE_DIRS}
+        ${simdjson_SOURCE_DIR}/include
+        ${OpenSSL_INCLUDE_DIR}
+)

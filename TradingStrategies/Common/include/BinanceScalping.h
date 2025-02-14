@@ -25,6 +25,7 @@ protected:
     net::io_context ioc;
     ssl::context ctx;
     beast::ssl_stream<beast::tcp_stream> stream;
+    bool is_connected = false;
     // NOLINTEND
 
 public:
@@ -43,4 +44,6 @@ public:
     virtual void fetch_raw_data(size_t scalping_data_point) = 0;
 
     virtual ~BinanceScalping() = default;
+
+    void connect();
 };
