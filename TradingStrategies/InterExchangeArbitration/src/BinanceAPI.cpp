@@ -4,7 +4,10 @@
 #include <iostream>
 #include <boost/beast/version.hpp>
 
-void BinanceAPI::fetch_raw_data(size_t scalping_data_point) {
+
+
+
+void BinanceAPI::fetch_raw_data(std::vector<OrderBookEntry> &r_order) {
     connect();
 
     http::request<http::string_body> req{http::verb::get, target, m_version};
@@ -23,14 +26,12 @@ void BinanceAPI::fetch_raw_data(size_t scalping_data_point) {
     simdjson::ondemand::parser parser;
     simdjson::ondemand::document doc = parser.iterate(padded_json);
 
-    local_price = std::stod(std::string(doc["price"].get_string().value()));
-
-
-    std::cout << std::fixed << std::setprecision(10) << local_price << std::endl;
-}
-
-
-int main() {
-    BinanceAPI b("BTCUSDT", 11, "api.binance.com", "443", "/api/v3/ticker/price");
-    b.fetch_raw_data();
+    order.bid_price = std::stod(std::string(doc["bidPrice"].get_string().value()));
+    order.ask_price = std::stod(std::string(doc["askPrice"].get_string().value()));
+    order.bid_qty = std::stod(std::string(doc["bidQty"].get_string().value()));
+    order.ask_qty = std::stod(std::string(doc["askQty"].get_string().value()));
+    r_order.emplace_back(order);
+    std::cout << std::fixed << std::setprecision(10)
+            << "Bid Price: " << order.bid_price << " (Qty: " << order.bid_qty << ")\n"
+            << "Ask Price: " << order.ask_price << " (Qty: " << order.ask_qty << ")\n";
 }

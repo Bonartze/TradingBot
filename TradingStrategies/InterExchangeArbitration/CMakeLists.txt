@@ -23,8 +23,11 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(simdjson)
 
 set(SOURCE_FILES
-        src/KrakenAPI.cpp
         ../Common/src/BinanceScalping.cpp
+        src/OKXAPI.cpp
+        src/BinanceAPI.cpp
+        src/KrakenAPI.cpp
+        src/ExchangeAPI.cpp
 )
 
 add_executable(int_ar ${SOURCE_FILES})

@@ -1,19 +1,18 @@
 #pragma once
 #include "../../Common/include/BinanceScalping.h"
 
-class BinanceAPI : BinanceScalping {
+class BinanceAPI : public BinanceScalping {
 private:
-    std::string currency_name;
-    double local_price;
+    OrderBookEntry order;
 
 public:
     //! Getting access to API to extract price of the particular cryptocurrency
-    BinanceAPI(const std::string &currency_name_, const int8_t &version, const std::string &host_,
+    BinanceAPI(const std::string &symbol, const int8_t &version, const std::string &host_,
                const std::string &port_,
-               const std::string &target_) : currency_name(currency_name_),
+               const std::string &target_) : order(OrderBookEntry(symbol, Market::BINANCE)),
                                              BinanceScalping(version, host_, port_,
-                                                             target_ + "?symbol=" + currency_name_), local_price(0) {
+                                                             target_ + "?symbol=" + symbol) {
     };
 
-    void fetch_raw_data(size_t scalping_data_point = 1) override;
+    void fetch_raw_data(std::vector<OrderBookEntry> &r_order) final;
 };
