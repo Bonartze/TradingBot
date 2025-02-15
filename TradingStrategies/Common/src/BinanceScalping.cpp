@@ -14,3 +14,13 @@ BinanceScalping::BinanceScalping(int8_t version, std::string host_, std::string 
         throw beast::system_error{er_code};
     }
 }
+
+void BinanceScalping::connect() {
+    if (!is_connected) {
+        tcp::resolver resolver(ioc);
+        auto const results = resolver.resolve(host, port);
+        beast::get_lowest_layer(stream).connect(results);
+        stream.handshake(ssl::stream_base::client);
+        is_connected = true;
+    }
+}
