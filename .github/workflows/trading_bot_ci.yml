@@ -1,12 +1,12 @@
-name: trading_bot_ci.yml
-## first pipeline version without docker images
+name: trading_bot_ci
+
 on:
   push:
     branches:
-      "*"
+      - "*"
   pull_request:
     branches:
-      "*"
+      - "*"
 
 jobs:
   stock_market_availability:
@@ -21,80 +21,32 @@ jobs:
       - name: Check stock market availability
         run: ./Scripts/availability_check.sh
 
-  backtesting:
+  autotests:
     runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install required dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake python3 python3-dev python3-pip
-      - name: Install boost from archive
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential gcc g++ zlib1g-dev libbz2-dev python3-dev
-          wget https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.gz
-          tar -xvzf boost_1_86_0.tar.gz
-          cd boost_1_86_0
-          ./bootstrap.sh || { echo "Bootstrap failed"; cat bootstrap.log; exit 1; }
-          ./b2 install || { echo "B2 install failed"; exit 1; }
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r ./requirements.txt
-
-      - name: Extract data for backtesting
-        run: |
-          set -e
-          cd Backtesting/src
-          mkdir -p ../data/Data_extracted/5m/BTCUSDT/
-          for year in {2020..2024}
-          do
-            if [ ! -f "../data/Data_extracted/5m/BTCUSDT/${year}.csv" ]; then
-              echo "Extracting data for year $year..."
-              python3 binance_stats.py BTCUSDT 5m $year >> data_extraction.log 2>&1 || echo "Error extracting data for year $year" >> data_extraction.log
-            else
-              echo "Data for year $year already exists. Skipping."
-            fi
-          done
-          echo "Data extraction completed. Check data_extraction.log for details."
-
-      - name: Build and run backtesting
-        run: |
-          set -e
-          cd Backtesting
-          rm -rf build && mkdir build && cd build
-          cmake ../ || { echo "CMake configuration failed"; exit 1; }
-          make -j`nproc` || { echo "Build failed"; exit 1; }
-          ./backtesting >> backtesting_results.log 2>&1
-          echo "Backtesting completed."
-
-      - name: Notify completion
-        run: echo "Backtesting workflow completed successfully."
-
-
-
-  autotest:
-    runs-on: ubuntu-22.04
+    needs: stock_market_availability
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake
-
-      - name: Build autotests
         run: |
-          cd Autotests && mkdir -p build && cd build
-          cmake ../
-          make -j`nproc`
+          sudo apt-get update && \
+          sudo apt-get install -y ca-certificates curl gnupg lsb-release
 
-      - name: Run autotests
-        run: |
-          cd Autotests/build && ./test_ || { echo "Tests failed"; exit 1; }
+          sudo install -m 0755 -d /etc/apt/keyrings
 
-      - name: Notify completion
-        run: echo "Autotest workflow completed successfully."
+          curl -fsSL https://download.docker.com/linux/debian/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+                https://download.docker.com/linux/debian $(lsb_release -cs) stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          sudo apt-get update && \
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Start Docker service
+        run: sudo systemctl start docker
+
+      - name: Verify Docker installation
+        run: docker --version
