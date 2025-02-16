@@ -51,3 +51,8 @@ jobs:
 
       - name: Verify Docker installation
         run: docker --version
+
+      - name: Run autotest
+        run: |
+          sudo docker build -f Dockerfile.test -t testing .
+          sudo docker run --rm testing
