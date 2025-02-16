@@ -1,0 +1,21 @@
+FROM debian:12
+
+WORKDIR /testing
+
+COPY . .
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    curl \
+    unzip \
+    pkg-config
+
+RUN mkdir -p /testing/build
+
+WORKDIR /testing/Autotests/build
+
+RUN cmake .. && make -j$(nproc)
+CMD ["./test_"]
