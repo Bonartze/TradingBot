@@ -30,9 +30,11 @@ find_package(Boost 1.86.0 REQUIRED)
 
 # Укажите пути к исходным файлам
 set(SOURCES
-        TradingServer.cpp
-        OrderManager.cpp
-        ../Logger/Logger.cpp
+        src/KrakenOrderManager.cpp
+        src/OKXOrderManager.cpp
+        src/TradingServer.cpp
+        src/BinanceOrderManager.cpp
+        #../Logger/Logger.cpp
 )
 
 # Создаем библиотеку OrderManager
