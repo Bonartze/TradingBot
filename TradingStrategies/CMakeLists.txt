@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(jsoncpp)
 
 add_library(StrategiesAPI SHARED
         ../Logger/src/Logger.cpp
-        ../TradingEngine/src/OrderManager.cpp
+        ../TradingEngine/src/BinanceOrderManager.cpp
         Common/src/BinanceScalping.cpp
         Common/src/Common.cpp Common/src/TradingMethods.cpp
         Common/src/TradingStrategy.cpp
