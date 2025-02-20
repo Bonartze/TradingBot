@@ -46,7 +46,6 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
     const double current_price = prices.back();
     double profit = 0.0;
 
-    std::cerr << "Should buy? " << should_buy(prices, csv_logger) << std::endl;
 
     if (!position_open && should_buy(prices, csv_logger)) {
         const double max_quantity = (balance - calculate_fee(balance)) / current_price;
@@ -98,16 +97,18 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
 
 
 auto MeanReverseStrategy::wrapper_execute(size_t window_size, const std::vector<double> &prices,
-                                          CSVLogger &logger) -> std::pair<double, double> {
+                                          CSVLogger &csv_logger) -> std::pair<double, double> {
     double total_profit = 0.0;
     size_t trades_count = 0;
 
     for (size_t i = window_size; i <= prices.size(); i += window_size) {
         std::vector<double> price_segment(prices.begin() + i - window_size, prices.begin() + i);
-        total_profit += execute(price_segment, logger);
-        std::cerr << "||| Total profit: " << total_profit << std::endl;
+        total_profit += execute(price_segment, csv_logger);
+       // std::cerr << "||| Total profit: " << total_profit << std::endl;
         trades_count++;
     }
+
+    csv_logger.logRow({ "FINAL PROFIT", std::to_string(total_profit), std::to_string(trades_count) });
 
     return {total_profit, trades_count};
 }

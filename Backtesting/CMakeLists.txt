@@ -34,9 +34,9 @@ set(BOOST_ENABLE_CMAKE ON CACHE INTERNAL "")
 find_package(OpenSSL REQUIRED)
 
 add_executable(backtesting
-        #./src/scalping_backtesting.cpp
-        ./src/mean_reverse_backtesting.cpp
-        ../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
+        ./src/scalping_backtesting.cpp
+        #./src/mean_reverse_backtesting.cpp
+        #../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
         ../TradingStrategies/Scalping/src/ScalpingStr.cpp
         ./src/run_backtesting.cpp
         ../Logger/src/Logger.cpp
@@ -45,6 +45,8 @@ add_executable(backtesting
         ../TradingStrategies/Common/src/BinanceScalping.cpp
         ../TradingStrategies/Common/src/Common.cpp
         ../TradingStrategies/Common/src/TradingStrategy.cpp
+        #../TradingStrategies/BayesianSignalFiltering/src/BayesianSignalFiltering.cpp
+        #./src/bayes_filtering_backtesting.cpp
 )
 
 target_link_libraries(backtesting PRIVATE
