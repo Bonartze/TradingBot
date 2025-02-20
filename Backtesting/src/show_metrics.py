@@ -2,125 +2,60 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-
-def calculate_profit(df):
-    profit = []
-    last_buy_price = None
-
-    for _, row in df.iterrows():
-        if row["Check Type"] == "BUY":
-            last_buy_price = row["Current Price"]
-            profit.append(0)
-        elif row["Check Type"] == "SELL" and last_buy_price is not None:
-            current_profit = row["Current Price"] - last_buy_price
-            profit.append(current_profit)
-            last_buy_price = None
-        else:
-            profit.append(0)
-
-    df["Profit"] = profit
-    return df
-
-
-def calculate_metrics(df):
-    df["Cumulative Profit"] = df["Profit"].cumsum()
-
-    cumulative_max = df["Cumulative Profit"].cummax()
-    drawdown = cumulative_max - df["Cumulative Profit"]
-    max_drawdown = drawdown.max()
-
-    total_trades = len(df[df["Check Type"].isin(["BUY", "SELL"])])
-
-    total_profit = df["Profit"].sum()
-    avg_profit_per_trade = total_profit / total_trades if total_trades > 0 else 0
-
-    profit_std = df["Profit"].std()
-
-    sharpe_ratio = total_profit / profit_std if profit_std > 0 else 0
-
-    metrics = {
-        "Total Profit": total_profit,
-        "Total Trades": total_trades,
-        "Average Profit per Trade": avg_profit_per_trade,
-        "Max Drawdown": max_drawdown,
-        "Sharpe Ratio": sharpe_ratio
-    }
-
-    return metrics
-
-
-def plot_metrics_over_time(df, metrics, year, strategy_name, output_folder):
-    os.makedirs(output_folder, exist_ok=True)
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(df.index, df["Cumulative Profit"], label="Cumulative Profit")
-    plt.title(f"Cumulative Profit Over Time ({strategy_name} - {year})")
-    plt.xlabel("Time")
-    plt.ylabel("Profit")
-    plt.grid()
-    plt.legend()
-    plt.savefig(os.path.join(output_folder, f"cumulative_profit_{year}.jpg"))
-    plt.close()
-
-    plt.figure(figsize=(10, 6))
-    plt.bar(df.index, df["Profit"], label="Profit per Trade")
-    plt.title(f"Profit per Trade ({strategy_name} - {year})")
-    plt.xlabel("Time")
-    plt.ylabel("Profit")
-    plt.grid()
-    plt.legend()
-    plt.savefig(os.path.join(output_folder, f"profit_per_trade_{year}.jpg"))
-    plt.close()
-
-    print(f"Metrics for {strategy_name} ({year}):")
-    for key, value in metrics.items():
-        print(f"{key}: {value}")
-
-
 def analyze_backtesting_results(strategy_files, output_root):
-    overall_metrics = {}
+    """
+    Для каждой стратегии:
+    1) Считываем CSV-файл.
+    2) Фильтруем строки, где Check Type == 'FINAL PROFIT'.
+    3) Берём последнее значение из столбца "Current Price" как итоговый профит за год.
+    4) Строим диаграммы и выводим результаты.
+    """
+    overall_results = {}
 
     for strategy_name, input_files in strategy_files.items():
         print(f"\n--- Processing {strategy_name} ---")
-        strategy_metrics = []
-
+        yearly_profits = []
         strategy_output_folder = os.path.join(output_root, strategy_name)
         os.makedirs(strategy_output_folder, exist_ok=True)
 
-        for file in input_files:
-            year = file.split("/")[-1].split(".")[0]
-            print(f"Processing file: {file}")
-            df = pd.read_csv(file)
+        for file_path in input_files:
+            filename = os.path.basename(file_path)  # например, "2021.csv"
+            year = os.path.splitext(filename)[0]    # "2021"
+            print(f"Processing file: {file_path}")
 
-            df["Current Price"] = pd.to_numeric(df["Current Price"], errors="coerce")
-            df = calculate_profit(df)
+            df = pd.read_csv(file_path)
+            # Фильтруем строки с FINAL PROFIT
+            df_final = df[df["Check Type"] == "FINAL PROFIT"]
 
-            metrics = calculate_metrics(df)
+            if not df_final.empty:
+                # Берём последнее значение профита и преобразуем его к числовому типу
+                total_profit_for_year = pd.to_numeric(df_final["Current Price"].iloc[-1], errors="coerce")
+            else:
+                total_profit_for_year = 0
 
-            plot_metrics_over_time(df, metrics, year, strategy_name, strategy_output_folder)
+            yearly_profits.append((year, total_profit_for_year))
 
-            metrics["Year"] = year
-            strategy_metrics.append(metrics)
+        df_results = pd.DataFrame(yearly_profits, columns=["Year", "Total Profit"])
+        overall_results[strategy_name] = df_results
 
-        overall_df = pd.DataFrame(strategy_metrics)
-        overall_metrics[strategy_name] = overall_df
+        print(f"\nOverall results for {strategy_name}:")
+        print(df_results)
 
-        print(f"\nOverall Metrics for {strategy_name}:")
-        print(overall_df)
-
+        # Построение графика
         plt.figure(figsize=(10, 6))
-        plt.bar(overall_df["Year"], overall_df["Total Profit"], label="Total Profit")
+        plt.bar(df_results["Year"], df_results["Total Profit"], label="Total Profit")
         plt.title(f"Total Profit by Year ({strategy_name})")
         plt.xlabel("Year")
         plt.ylabel("Profit")
-        plt.grid()
+        plt.grid(True)
         plt.legend()
+        plt.tight_layout()
         plt.savefig(os.path.join(strategy_output_folder, "total_profit_by_year.jpg"))
         plt.close()
 
-    return overall_metrics
+    return overall_results
 
-
+# Пример использования:
 strategy_files = {
     "scalping": [
         "../data/scalping/2020.csv",
@@ -135,9 +70,15 @@ strategy_files = {
         "../data/mean_reversion/2022.csv",
         "../data/mean_reversion/2023.csv",
         "../data/mean_reversion/2024.csv"
+    ],
+    "bayesian": [
+        "../data/bayesian/2020.csv",
+        "../data/bayesian/2021.csv",
+        "../data/bayesian/2022.csv",
+        "../data/bayesian/2023.csv",
+        "../data/bayesian/2024.csv"
     ]
 }
 
 output_root = "../data/backtesting_results/"
-
-analyze_backtesting_results(strategy_files, output_root)
+all_results = analyze_backtesting_results(strategy_files, output_root)

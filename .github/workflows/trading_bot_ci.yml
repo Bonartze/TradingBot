@@ -46,7 +46,7 @@ jobs:
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
 
-      - name: Start Docker service
+      - name: Star Docker service
         run: sudo systemctl start docker
 
       - name: Verify Docker installation
