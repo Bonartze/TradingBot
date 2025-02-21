@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "../../TradingStrategies/BayesianSignalFiltering/include/BayesianSignalFiltering.h"
 
-class Backtesting : public ::testing::Test {
+class BayesianBacktesting : public ::testing::Test {
 public:
     std::string data_dir;
     BayesianSignalFiltering bayes_filter;

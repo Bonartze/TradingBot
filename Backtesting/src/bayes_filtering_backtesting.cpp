@@ -10,12 +10,12 @@ constexpr size_t END_YEAR = 2024;
 constexpr size_t EXPECTED_PROFIT_MARGIN = 900.0;
 constexpr std::array<double, 5> EXPECTED_PROFIT = {700, 200, -600, 300, 200};
 
-void Backtesting::SetUp() {
+void BayesianBacktesting::SetUp() {
     //data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
 }
 
 
-void Backtesting::TearDown() {
+void BayesianBacktesting::TearDown() {
 }
 
 namespace {
@@ -56,7 +56,7 @@ namespace {
     }
 }
 
-TEST_F(Backtesting, bayesianingBacktesting) {
+TEST_F(BayesianBacktesting, bayesianingBacktesting) {
     BayesianSignalFiltering bayesian = BayesianSignalFiltering();
     std::filesystem::create_directories("../data/bayesian/");
     for (size_t year = START_YEAR; year <= END_YEAR; ++year) {

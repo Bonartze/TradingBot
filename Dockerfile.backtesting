@@ -1,0 +1,40 @@
+FROM debian:12
+
+WORKDIR /backtesting
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    curl \
+    unzip \
+    pkg-config \
+    python3 \
+    python3-pip \
+    python3-venv \
+    libboost-all-dev \
+    libssl-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY ./requirements.txt /backtesting/requirements.txt
+RUN pip install --no-cache-dir -r /backtesting/requirements.txt || echo "No requirements.txt found"
+
+COPY . .
+
+RUN python3 Backtesting/src/load_data_some_years.py
+
+RUN mkdir -p /backtesting/Backtesting/build
+WORKDIR /backtesting/Backtesting/build
+
+RUN rm -rf CMakeCache.txt CMakeFiles
+
+RUN cmake ../ && make -j$(nproc)
+
+RUN chmod +x backtesting
+
+CMD ["./backtesting"]

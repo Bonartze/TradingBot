@@ -16,10 +16,10 @@ constexpr size_t MEAN_REV_EXPECTED_PROFIT_MARGIN = 900.0;
 
 constexpr std::array<double, 5> MEAN_REV_EXPECTED_PROFIT = {500, 150, -300, 200, 250};
 
-void Backtesting::SetUp() {
+void MeanReverseBacktesting::SetUp() {
 }
 
-void Backtesting::TearDown() {
+void MeanReverseBacktesting::TearDown() {
 }
 
 namespace {
@@ -60,7 +60,7 @@ namespace {
     }
 }
 
-TEST_F(Backtesting, MeanReversionBacktesting) {
+TEST_F(MeanReverseBacktesting, MeanReversionBacktesting) {
     MeanReverseStrategy mvs({
                                 MEAN_REV_SMA_SHORT,
                                 MEAN_REV_SMA_LONG,
