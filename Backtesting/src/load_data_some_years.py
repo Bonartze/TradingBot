@@ -6,6 +6,3 @@ for year in range(2020, 2026):
         capture_output=True,
         text=True
     )
-    print(f"Output for {year}:")
-    print(result.stdout)
-    print("=" * 50)

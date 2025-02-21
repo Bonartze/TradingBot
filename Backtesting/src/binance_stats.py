@@ -52,4 +52,4 @@ df.set_index('timestamp', inplace=True)
 mpf.plot(df, type='candle', style='charles', volume=True,
          title=f'{crypto_pair} Candlestick Chart ({time_interval})',
          ylabel='Price', ylabel_lower='Volume', mav=(3, 6, 9),
-         savefig=f'../data//StatisticsPlots/{crypto_pair}/{time_interval}/{crypto_pair}_{time_interval}_candlestick_chart.png')
+         savefig=f'../data/StatisticsPlots/{crypto_pair}/{time_interval}/{crypto_pair}_{time_interval}_candlestick_chart.png')
