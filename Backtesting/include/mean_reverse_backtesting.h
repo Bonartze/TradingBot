@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "../../TradingStrategies/MeanReversionStrategy/include/MeanReverseStr.h"
 
-class Backtesting : public ::testing::Test {
+class MeanReverseBacktesting : public ::testing::Test {
 public:
     std::string data_dir;
     MeanReverseStrategy mvs;

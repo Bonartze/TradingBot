@@ -17,11 +17,11 @@ constexpr size_t EXPECTED_PROFIT_MARGIN = 900.0;
 
 constexpr std::array<double, 5> EXPECTED_PROFIT = {700, 200, -600, 300, 200};
 
-void Backtesting::SetUp() {
+void ScalpingBacktesting::SetUp() {
     //data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
 }
 
-void Backtesting::TearDown() {
+void ScalpingBacktesting::TearDown() {
 }
 
 namespace {
@@ -61,7 +61,7 @@ namespace {
     }
 }
 
-TEST_F(Backtesting, ScalpingBacktesting) {
+TEST_F(ScalpingBacktesting, ScalpingBacktesting) {
     ScalpingStr scalp({SCALPING_SMA_SHORT,
                      SCALPING_SMA_LONG,
                      SCALPING_RSI_OVERSOLD,

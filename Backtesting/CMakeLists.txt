@@ -28,15 +28,14 @@ FetchContent_Declare(
 set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(simdjson)
 
-set(BOOST_INCLUDE_ONLY "system;filesystem" CACHE STRING "Specify Boost libraries to build")
-set(BOOST_ENABLE_CMAKE ON CACHE INTERNAL "")
+find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 find_package(OpenSSL REQUIRED)
 
 add_executable(backtesting
         ./src/scalping_backtesting.cpp
-        #./src/mean_reverse_backtesting.cpp
-        #../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
+        ./src/mean_reverse_backtesting.cpp
+        ../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
         ../TradingStrategies/Scalping/src/ScalpingStr.cpp
         ./src/run_backtesting.cpp
         ../Logger/src/Logger.cpp
@@ -45,8 +44,8 @@ add_executable(backtesting
         ../TradingStrategies/Common/src/BinanceScalping.cpp
         ../TradingStrategies/Common/src/Common.cpp
         ../TradingStrategies/Common/src/TradingStrategy.cpp
-        #../TradingStrategies/BayesianSignalFiltering/src/BayesianSignalFiltering.cpp
-        #./src/bayes_filtering_backtesting.cpp
+        ../TradingStrategies/BayesianSignalFiltering/src/BayesianSignalFiltering.cpp
+        ./src/bayes_filtering_backtesting.cpp
 )
 
 target_link_libraries(backtesting PRIVATE
@@ -59,7 +58,7 @@ target_link_libraries(backtesting PRIVATE
 )
 
 target_include_directories(backtesting PRIVATE
-        ${boost_SOURCE_DIR}
+        ${Boost_INCLUDE_DIRS}
         ${simdjson_SOURCE_DIR}/include
         ${OpenSSL_INCLUDE_DIR}
 )
