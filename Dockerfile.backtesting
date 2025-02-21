@@ -26,7 +26,9 @@ RUN pip install --no-cache-dir -r /backtesting/requirements.txt || echo "No requ
 
 COPY . .
 
-RUN python3 Backtesting/src/load_data_some_years.py
+WORKDIR Backtesting/src/
+
+RUN python3 load_data_some_years.py
 
 RUN mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
