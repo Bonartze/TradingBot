@@ -51,7 +51,7 @@ jobs:
     needs: stock_market_availability
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # ✅ Обновлено с v3 на v4
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -70,8 +70,8 @@ jobs:
         run: |
           docker build -f Dockerfile.backtesting -t backtesting_image .
           docker run --rm -v ${{ github.workspace }}/Backtesting/data/backtesting_results:/Backtesting/data/backtesting_results backtesting_image
-          ls -la Backtesting/data/backtesting_results  # Проверка файлов
-          chmod -R 777 Backtesting/data/backtesting_results  # Разрешения на файлы
+          ls -la Backtesting/data/backtesting_results  
+          sudo chmod -R 777 Backtesting/data/backtesting_results 
 
 
       - name: Check generated files
