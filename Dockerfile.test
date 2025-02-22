@@ -18,4 +18,4 @@ RUN mkdir -p /testing/build
 WORKDIR /testing/Autotests/build
 
 RUN cmake .. && make -j$(nproc)
-CMD ["./test_"]
+CMD ["./tests"]
