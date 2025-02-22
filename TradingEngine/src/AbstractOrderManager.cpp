@@ -1,6 +1,6 @@
 #include "../include/AbstractOrderManager.h"
 
-std::string AbstractOrderManager::bhmac(const std::string &key, const std::string &data, const EVP_MD *(*hash_func)()) {
+std::string AbstractOrderManager::hmac(const std::string &key, const std::string &data, const EVP_MD *(*hash_func)()) {
     unsigned char digest[EVP_MAX_MD_SIZE];
     unsigned int len = 0;
 
