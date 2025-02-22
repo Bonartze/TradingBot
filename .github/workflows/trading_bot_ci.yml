@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  #
 
       - name: Set permissions for availability script
         run: chmod +x ./Scripts/availability_check.sh
@@ -26,66 +26,42 @@ jobs:
     needs: stock_market_availability
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # ✅ Обновлено с v3 на v4
 
       - name: Install dependencies
         run: |
-          sudo apt-get update &&  apt-get install -y ca-certificates curl gnupg lsb-release
-          
-          install -m 0755 -d /etc/apt/keyrings
-          
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg |  tee /etc/apt/keyrings/docker.asc > /dev/null
-          chmod a+r /etc/apt/keyrings/docker.asc
-          
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-          https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-          tee /etc/apt/sources.list.d/docker.list > /dev/null
-          
           sudo apt-get update
-          
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo apt-get install -y \
+            ca-certificates curl gnupg lsb-release \
+            docker-ce docker-ce-cli containerd.io
 
-
-      - name: Star Docker service
-        run: systemctl start docker
+      - name: Start Docker service
+        run: sudo systemctl start docker
 
       - name: Verify Docker installation
         run: docker --version
 
       - name: Run autotest
         run: |
-          sudo docker build -f Dockerfile.test -t testing .
-          sudo docker run --rm testing
-
-
+          docker build -f Dockerfile.test -t testing .
+          docker run --rm testing
 
   backtests:
     runs-on: ubuntu-22.04
     needs: stock_market_availability
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # ✅ Обновлено с v3 на v4
 
       - name: Install dependencies
         run: |
-          sudo apt-get update &&  apt-get install -y ca-certificates curl gnupg lsb-release
-          
-          install -m 0755 -d /etc/apt/keyrings
-
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg |  tee /etc/apt/keyrings/docker.asc > /dev/null
-          chmod a+r /etc/apt/keyrings/docker.asc
-
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-          https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-          tee /etc/apt/sources.list.d/docker.list > /dev/null
-          
           sudo apt-get update
-          
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo apt-get install -y \
+            ca-certificates curl gnupg lsb-release \
+            docker-ce docker-ce-cli containerd.io
 
-
-      - name: Star Docker service
-        run: systemctl start docker
+      - name: Start Docker service
+        run: sudo systemctl start docker
 
       - name: Verify Docker installation
         run: docker --version
@@ -96,9 +72,7 @@ jobs:
           docker run --rm -v ${{ github.workspace }}/Backtesting/data/backtesting_results:/Backtesting/data/backtesting_results backtesting_image
 
       - name: Upload backtesting results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backtesting-results
           path: Backtesting/data/backtesting_results/
-
-
