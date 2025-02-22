@@ -67,20 +67,28 @@ jobs:
         run: docker --version
 
       - name: Ensure data directory exists
-        run: mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results
+        run: mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results && ls -la ${{ github.workspace }}/Backtesting/data
 
-      - name:
-          Debug: Show directory before running backtest
-        run: ls -la ${{ github.workspace }}/Backtesting/data
+      - name: Build backtesting container
+        run: docker build -f Dockerfile.backtesting -t backtesting_image .
 
       - name: Run backtesting
         run: |
-          docker build -f Dockerfile.backtesting -t backtesting_image .
-          docker run --name backtesting_container -v ${{ github.workspace }}/Backtesting/data:/Backtesting/data backtesting_image
+          CONTAINER_ID=$(docker run -d backtesting_image)
+          echo "Running container: $CONTAINER_ID"
+          
+          docker wait $CONTAINER_ID
+          
+          docker exec $CONTAINER_ID ls -la /Backtesting/data/backtesting_results
 
-      - name:
-          Debug: Show directory after running backtest
-        run: ls -la ${{ github.workspace }}/Backtesting/data/backtesting_results
+          docker cp $CONTAINER_ID:/Backtesting/data/backtesting_results ${{ github.workspace }}/Backtesting/data/
+
+          docker rm $CONTAINER_ID
+
+      - name: Check files
+        run: |
+          sync 
+          ls -la ${{ github.workspace }}/Backtesting/data/backtesting_results
 
       - name: Ensure files exist
         run: |
