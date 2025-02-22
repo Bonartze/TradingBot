@@ -75,15 +75,7 @@ jobs:
       - name: Run backtesting in Docker
         run: |
           docker build -f Dockerfile.backtesting -t backtesting_image .
-          CONTAINER_ID=$(docker run -d -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data backtesting_image)
-          
-          docker wait $CONTAINER_ID
-
-          docker exec $CONTAINER_ID ls -la /backtesting/Backtesting/data/backtesting_results
-
-          docker cp $CONTAINER_ID:/backtesting/Backtesting/data/backtesting_results ${{ github.workspace }}/Backtesting/data/
-
-          docker rm $CONTAINER_ID
+          docker run --rm -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data backtesting_image
 
       - name: Debug after backtesting
         run: ls -la ${{ github.workspace }}/Backtesting/data/backtesting_results
