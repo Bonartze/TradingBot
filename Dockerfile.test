@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     pkg-config \
-    openssl
+    openssl \
+    python3 \
+    python3-pip
 
 RUN mkdir -p /testing/Autotests/build
 
