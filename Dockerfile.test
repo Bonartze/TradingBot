@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     pkg-config
 
-RUN mkdir -p /testing/build
+RUN mkdir -p /testing/Autotests/build
 
 WORKDIR /testing/Autotests/build
 
