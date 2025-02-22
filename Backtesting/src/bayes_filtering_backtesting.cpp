@@ -11,7 +11,6 @@ constexpr size_t EXPECTED_PROFIT_MARGIN = 1200.0;
 constexpr std::array<double, 5> EXPECTED_PROFIT = {700, 200, -600, 300, 200};
 
 void BayesianBacktesting::SetUp() {
-    //data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
 }
 
 
