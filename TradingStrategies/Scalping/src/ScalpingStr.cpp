@@ -111,5 +111,9 @@ auto ScalpingStr::wrapper_execute(size_t window_size, const std::vector<double> 
         total_profit += execute(price_segment, logger);
         trades_count++;
     }
+
+    logger.logRow({ "FINAL PROFIT", std::to_string(total_profit) });
+
     return {total_profit, trades_count};
 }
+

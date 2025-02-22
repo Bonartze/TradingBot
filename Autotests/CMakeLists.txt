@@ -1,37 +1,63 @@
 include(FetchContent)
 
-message(STATUS "Fetching Gtest.....")
+message(STATUS "Fetching GTest.....")
 
-# Fetch Google Test
 FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
 )
 FetchContent_MakeAvailable(googletest)
 
-# Fetch SQLite
+message(STATUS "Fetching nlohmann json.....")
+
 FetchContent_Declare(
-        sqlite3
-        URL https://www.sqlite.org/2023/sqlite-amalgamation-3420000.zip
+        nlohmann_json
+        URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
 )
-FetchContent_MakeAvailable(sqlite3)
+FetchContent_MakeAvailable(nlohmann_json)
 
-# Create the sqlite3 library
-add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
-target_include_directories(sqlite3 PUBLIC ${sqlite3_SOURCE_DIR})
+find_package(OpenSSL REQUIRED)
+find_package(CURL REQUIRED)
 
-# Link DatabaseWrapper library or add its source files
-add_library(DatabaseWrapper STATIC ../Database/src/DatabaseWrapper.cpp ../Logger/src/Logger.cpp)  # Укажите правильный путь
-target_include_directories(DatabaseWrapper PUBLIC ../Database/include)
-target_link_libraries(DatabaseWrapper PRIVATE sqlite3)
+add_library(TradingEngine STATIC
+        ../TradingEngine/src/AbstractOrderManager.cpp
+        ../TradingStrategies/IntraExchangeArbitration/src/Bellman_Ford.cpp
+)
 
-# Create the test executable
-add_executable(test_ src/Run_all_tests.cpp src/test_databaseWrapper.cpp)
+target_include_directories(TradingEngine PRIVATE
+        ${nlohmann_json_SOURCE_DIR}/include
+        ${OPENSSL_INCLUDE_DIR}
+        ${CURL_INCLUDE_DIRS}
+)
 
-# Link test executable to required libraries
-target_link_libraries(test_ PRIVATE DatabaseWrapper sqlite3 gtest gtest_main)
+target_link_libraries(TradingEngine PRIVATE nlohmann_json::nlohmann_json)
 
-# Enable testing
+add_library(TESTING STATIC ../Logger/src/Logger.cpp)
+
+add_executable(tests
+        src/Run_all_tests.cpp
+        src/test_tradingEngine.cpp
+        src/test_BellmanFord.cpp
+)
+
+target_link_libraries(tests PRIVATE
+        TradingEngine
+        TESTING
+        gtest
+        gtest_main
+        nlohmann_json::nlohmann_json
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        CURL::libcurl
+)
+
+target_include_directories(tests PRIVATE
+        ${nlohmann_json_SOURCE_DIR}/include
+        ${OPENSSL_INCLUDE_DIR}
+        ${CURL_INCLUDE_DIRS}
+        ../TradingEngine/include
+)
+
 enable_testing()
 
-add_test(NAME DatabaseWrapperTest COMMAND test_)
+add_test(NAME TESTING COMMAND tests)

@@ -8,7 +8,7 @@
 constexpr double START_BALANCE = 1000.0;
 constexpr size_t START_YEAR = 2020;
 constexpr size_t END_YEAR = 2024;
-constexpr size_t WINDOW_SIZE = 100;
+constexpr size_t WINDOW_SIZE = 10;
 constexpr size_t SCALPING_SMA_SHORT = 5.0;
 constexpr size_t SCALPING_SMA_LONG = 10.0;
 constexpr size_t SCALPING_RSI_OVERSOLD = 30.0;
@@ -17,11 +17,11 @@ constexpr size_t EXPECTED_PROFIT_MARGIN = 900.0;
 
 constexpr std::array<double, 5> EXPECTED_PROFIT = {700, 200, -600, 300, 200};
 
-void Backtesting::SetUp() {
+void ScalpingBacktesting::SetUp() {
     //data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
 }
 
-void Backtesting::TearDown() {
+void ScalpingBacktesting::TearDown() {
 }
 
 namespace {
@@ -61,7 +61,7 @@ namespace {
     }
 }
 
-TEST_F(Backtesting, ScalpingBacktesting) {
+TEST_F(ScalpingBacktesting, ScalpingBacktesting) {
     ScalpingStr scalp({SCALPING_SMA_SHORT,
                      SCALPING_SMA_LONG,
                      SCALPING_RSI_OVERSOLD,

@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "../../TradingStrategies/Scalping/include/ScalpingStr.h"
 
-class Backtesting : public ::testing::Test {
+class ScalpingBacktesting : public ::testing::Test {
 public:
     std::string data_dir;
     ScalpingStr scalp;
