@@ -5,6 +5,15 @@ boost::beast::http<beast::http::string_body> handle_http_request(
     beast::http::request<beast::http::string_body> const &request) {
     if (request.method() == beast::http::verb::post && request.target() == "/execute_strategy") {
         auto json_request = nlohmann::json::parse(request.body());
+        std::string strategy = json_request["strategy"];
+
+        if (strategy == "Scalping") {
+
+        } else if (strategy == "MeanReverse") {
+        } else if (strategy == "IntraExchangeArbitrage") {
+        } else if (strategy == "InterExchangeArbitrage") {
+        } else {
+        }
 
         /*
          * call method for handling json_request
