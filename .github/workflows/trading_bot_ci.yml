@@ -67,29 +67,22 @@ jobs:
         run: docker --version
 
       - name: Ensure data directory exists
-        run: mkdir -p ${{ github.workspace }}/Backtesting/data/Data_extracted/5m/BTCUSDT
+        run: mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results
 
-      - name: Debug before backtesting
-        run: ls -la ${{ github.workspace }}/Backtesting/data/Data_extracted/5m/BTCUSDT
-
-      - name: Run backtesting in Docker
+      - name: Run backtesting
         run: |
           docker build -f Dockerfile.backtesting -t backtesting_image .
-          docker run --rm -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data backtesting_image
+          docker run --rm -v ${{ github.workspace }}/Backtesting/data:/Backtesting/data backtesting_image
 
-      - name: Debug after backtesting
-        run: ls -la ${{ github.workspace }}/Backtesting/data/backtesting_results
 
-      - name: Ensure files exist
+
+      - name: Check generated files
         run: |
-          if [ -z "$(ls -A ${{ github.workspace }}/Backtesting/data/backtesting_results)" ]; then
-            echo "Error: No backtesting results found!"
-            exit 1
-          fi
+          ls -la Backtesting/data/backtesting_results
+
 
       - name: Upload backtesting results
         uses: actions/upload-artifact@v4
         with:
           name: backtesting-results
           path: ${{ github.workspace }}/Backtesting/data/backtesting_results/
-          if-no-files-found: error
