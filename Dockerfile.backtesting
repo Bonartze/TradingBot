@@ -37,6 +37,8 @@ RUN cmake ../ && make -j$(nproc)
 
 RUN chmod +x backtesting && ./backtesting
 
+WORKDIR /backtesting/Backtesting/src
+
 RUN python3 show_metrics.py
 
 CMD ["./backtesting"]

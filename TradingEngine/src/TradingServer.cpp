@@ -1,9 +1,11 @@
 #include "../include/TradingServer.h"
+#include <nlohmann/json.hpp>
 
 boost::beast::http<beast::http::string_body> handle_http_request(
     beast::http::request<beast::http::string_body> const &request) {
-    if (request.method() == beast::http::verb::post && request.target() == "/application/json") {
+    if (request.method() == beast::http::verb::post && request.target() == "/execute_strategy") {
         auto json_request = nlohmann::json::parse(request.body());
+
         /*
          * call method for handling json_request
          *

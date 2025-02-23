@@ -3,7 +3,6 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/beast.hpp>
-#include <nlohmann/json.hpp>
 namespace asio = boost::asio;
 namespace beast = boost::beast;
 
