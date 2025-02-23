@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /opt/venv
-
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY ./requirements.txt /backtesting/requirements.txt
@@ -26,17 +25,18 @@ RUN pip install --no-cache-dir -r /backtesting/requirements.txt || echo "No requ
 
 COPY . .
 
-WORKDIR Backtesting/src/
+WORKDIR /backtesting/Backtesting/src/
 
 RUN python3 load_data_some_years.py
 
-RUN mkdir -p /backtesting/Backtesting/build
+RUN mkdir -p /backtesting/Backtesting/data/backtesting_results
+
 WORKDIR /backtesting/Backtesting/build
-
 RUN rm -rf CMakeCache.txt CMakeFiles
-
 RUN cmake ../ && make -j$(nproc)
 
 RUN chmod +x backtesting && ./backtesting
 
 RUN python3 show_metrics.py
+
+CMD ["./backtesting"]
