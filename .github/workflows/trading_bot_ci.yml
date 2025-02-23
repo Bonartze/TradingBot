@@ -72,8 +72,8 @@ jobs:
       - name: Run backtesting
         run: |
           docker build -f Dockerfile.backtesting -t backtesting_image .
-          docker run --rm -v ${{ github.workspace }}/Backtesting/data:/Backtesting/data backtesting_image
-
+          docker run --rm -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data backtesting_image
+      
 
 
       - name: Check generated files
