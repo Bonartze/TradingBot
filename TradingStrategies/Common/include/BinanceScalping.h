@@ -75,9 +75,9 @@ public:
 
     BinanceScalping() = delete;
 
-    virtual void fetch_raw_data(std::vector<OrderBookEntry> &) = 0;
+    virtual void fetch_raw_data(std::vector<OrderBookEntry> &);
 
-    void fetch_raw_data() {
+    virtual void fetch_raw_data() {
         std::vector<OrderBookEntry> ord;
         fetch_raw_data(ord);
     }

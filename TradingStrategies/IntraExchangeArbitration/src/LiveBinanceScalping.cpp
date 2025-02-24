@@ -2,12 +2,12 @@
 #include <iostream>
 #include "../../Common/include/Common.h"
 
-LiveBinanceScalping::LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
-                                         const std::string &target_): BinanceScalping(version, host_, port_, target_)
+LiveBinanceScalping::LiveBinanceScalping(int8_t version, std::string host_, std::string port_,
+                                         std::string target_): BinanceScalping(version, host_, port_, target_)
 {
 }
 
-void LiveBinanceScalping::fetch_raw_data(size_t scalping_data_point) {
+void LiveBinanceScalping::fetch_raw_data() {
     tcp::resolver resolver(ioc);
     auto const results = resolver.resolve(host, port);
     if (!beast::get_lowest_layer(stream).connect(results).data()) {

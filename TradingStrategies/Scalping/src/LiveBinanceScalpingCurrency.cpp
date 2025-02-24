@@ -13,11 +13,11 @@ LiveBinanceScalpingCurrency::LiveBinanceScalpingCurrency(int8_t version, const s
     version, host_, port_, target_) {
 }
 
-void LiveBinanceScalpingCurrency::fetch_raw_data(size_t scalping_data_point) {
+void LiveBinanceScalpingCurrency::fetch_raw_data() {
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    for (size_t i = 0; i < scalping_data_point; ++i) {
+    for (size_t i = 0; i < 1; ++i) {
         tcp::resolver resolver(ioc);
         beast::ssl_stream<beast::tcp_stream> stream(ioc, ctx);
 

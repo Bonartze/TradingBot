@@ -13,5 +13,5 @@ public:
     LiveBinanceScalpingCurrency(int8_t version, const std::string &host_, const std::string &port_,
                                 const std::string &target_);
 
-    void fetch_raw_data(size_t scalping_data_point) override;
+    void fetch_raw_data() override;
 };

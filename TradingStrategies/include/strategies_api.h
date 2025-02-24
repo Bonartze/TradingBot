@@ -25,7 +25,7 @@
 
 class STRATEGIES_API Arbitrage {
 private:
-    std::unique_ptr<OrderManager> order_manager;
+    std::unique_ptr<BinanceOrderManager> order_manager;
     std::unique_ptr<LiveBinanceScalping> binance_scalping;
     std::unique_ptr<Graph> order_graph;
     void do_order_sequence(const std::vector<std::string> &, const double);

@@ -1,1 +1,3 @@
-Backtesting/data
+Backtesting/data/
+cmake-build-debug
+.venv

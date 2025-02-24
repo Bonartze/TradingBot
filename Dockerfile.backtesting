@@ -27,9 +27,9 @@ COPY . .
 
 WORKDIR /backtesting/Backtesting/src/
 
-RUN python3 load_data_some_years.py
+RUN mkdir -p /backtesting/Backtesting/data/scalping
 
-RUN mkdir -p /backtesting/Backtesting/data/backtesting_results
+RUN python3 load_data_some_years.py && ls -lah /backtesting/Backtesting/data
 
 WORKDIR /backtesting/Backtesting/build
 RUN rm -rf CMakeCache.txt CMakeFiles
@@ -37,7 +37,8 @@ RUN cmake ../ && make -j$(nproc)
 
 RUN chmod +x backtesting && ./backtesting
 
+RUN ls -lah /backtesting/Backtesting/data/
+
 WORKDIR /backtesting/Backtesting/src
 
 CMD ["python3", "show_metrics.py"]
-

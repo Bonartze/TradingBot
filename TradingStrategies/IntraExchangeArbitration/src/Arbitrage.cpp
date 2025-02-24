@@ -19,7 +19,7 @@ Arbitrage::Arbitrage(const std::unordered_set<std::string> &user_symbols, const 
         binance_scalping = std::make_unique<LiveBinanceScalping>(version, host, port, target);
         binance_scalping->fetch_raw_data();
         order_graph = std::make_unique<Graph>(binance_scalping->generate_order_graph(user_symbols));
-        order_manager->init(api_key, secret_key);
+        //order_manager->init(api_key, secret_key);
     } catch (const std::exception &e) {
         Logger(LogLevel::ERROR) << "Error during Arbitrage initialization: " << e.what();
         throw;
@@ -35,9 +35,9 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
     auto send_order_wrapper = [&](const std::string &from_currency, const std::string &to_currency,
                                   double amount, const std::string &order_type, const std::string &order_id,
                                   Json::Value &json_result) {
-        order_manager->send_order(from_currency.c_str(), order_type.c_str(), "LIMIT", "GTC",
+        /* order_manager->здф(from_currency.c_str(), order_type.c_str(), "LIMIT", "GTC",
                                   amount, binance_scalping->get_price(from_currency + to_currency),
-                                  order_id.c_str(), 0, 0, 0, json_result);
+                                  order_id.c_str(), 0, 0, 0, json_result); */
     };
 
     for (size_t i = 1; i < cycle.size(); i++) {

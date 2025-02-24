@@ -33,11 +33,11 @@ public:
     }
 
     // constructor, necessary to clarify the version of the API
-    explicit LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
-                                 const std::string &target_);
+    explicit LiveBinanceScalping(int8_t version, std::string host_, std::string port_,
+                                 std::string target_);
 
     // fetch raw data from Binance API
-    void fetch_raw_data(size_t scalping_data_points = 1) override;
+    void fetch_raw_data() override;
 
     // just getting the price map
     const std::unordered_map<std::string, double> &get_price_map();
