@@ -1,0 +1,7 @@
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/include/simdjson.h
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/lib/libsimdjson.a
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/lib/cmake/simdjson/simdjson-config.cmake
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/lib/cmake/simdjson/simdjson-config-version.cmake
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/lib/cmake/simdjson/simdjsonTargets.cmake
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/lib/cmake/simdjson/simdjsonTargets-release.cmake
+/home/ivan/CLionProjects/TradingBot/third_party/simdjson_install/lib/pkgconfig/simdjson.pc
