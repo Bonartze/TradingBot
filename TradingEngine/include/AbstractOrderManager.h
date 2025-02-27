@@ -5,7 +5,7 @@
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 #include <openssl/buffer.h>
-#include <nlohmann/json.hpp>
+#include "../../third_party/nlohmann_json/json.hpp"
 
 class AbstractOrderManager {
 protected:
@@ -13,7 +13,8 @@ protected:
     std::string api_secret;
 
     AbstractOrderManager(const std::string &key, const std::string &secret)
-        : api_key(key), api_secret(secret) {}
+        : api_key(key), api_secret(secret) {
+    }
 
     std::string hmac(const std::string &key, const std::string &data, const EVP_MD *(*hash_func)());
 

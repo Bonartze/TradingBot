@@ -6,6 +6,12 @@
 constexpr size_t SHORT_WINDOW_SIZE = 20;
 constexpr size_t LONG_WINDOW_SIZE = 30;
 
+MeanReverseStrategy::MeanReverseStrategy() : TradingStrategy({
+                                                5, 10, 30.0,
+                                                29.0
+                                            }, 1000.0, false, 0.0, 0.0) {
+};
+
 auto MeanReverseStrategy::calculate_fee(double amount) -> double {
     return std::max(amount * 0.01, 0.01);
 }

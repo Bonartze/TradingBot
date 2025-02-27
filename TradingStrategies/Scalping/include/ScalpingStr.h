@@ -15,11 +15,7 @@ constexpr double SMA_SHORT_LONG_RATIO_THRESHOLD = 1.0001;
 
 class ScalpingStr : public TradingStrategy {
 public:
-    ScalpingStr(): TradingStrategy({
-                                       5, 10, 30.0,
-                                       29.0
-                                   }, 1000.0, false, 0.0, 0.0) {
-    };
+    ScalpingStr();
 
     ScalpingStr(const TradingParams &trading_params, double balance_, bool position_open_, double entry_price_,
                 double asset_quantity_) : TradingStrategy(trading_params, balance_, position_open_, entry_price_,

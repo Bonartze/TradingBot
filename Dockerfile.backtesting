@@ -32,12 +32,11 @@ RUN mkdir -p /backtesting/Backtesting/data/scalping
 RUN python3 load_data_some_years.py && ls -lah /backtesting/Backtesting/data
 
 WORKDIR /backtesting/Backtesting/build
-RUN rm -rf CMakeCache.txt CMakeFiles
+
 RUN cmake ../ && make -j$(nproc)
 
 RUN chmod +x backtesting && ./backtesting
 
-RUN ls -lah /backtesting/Backtesting/data/
 
 WORKDIR /backtesting/Backtesting/src
 

@@ -14,11 +14,7 @@ private:
     auto should_sell(const std::vector<double> &prices, double entry_price, CSVLogger &csv_logger) -> bool override;
 
 public:
-    MeanReverseStrategy() : TradingStrategy({
-                                                5, 10, 30.0,
-                                                29.0
-                                            }, 1000.0, false, 0.0, 0.0) {
-    };
+    MeanReverseStrategy();
 
     MeanReverseStrategy(const TradingParams &trading_params, double balance_, bool position_open_, double entry_price_,
                         double asset_quantity_) : TradingStrategy(trading_params, balance_, position_open_,

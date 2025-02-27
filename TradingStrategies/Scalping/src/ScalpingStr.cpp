@@ -7,6 +7,9 @@
 #include <filesystem>
 #include <chrono>
 
+ScalpingStr::ScalpingStr()
+    : TradingStrategy({5, 10, 30.0, 29.0}, 1000.0, false, 0.0, 0.0) {}
+
 auto ScalpingStr::should_buy(const std::vector<double> &prices,
                              CSVLogger &csv_logger) -> bool {
     const double sma_short = TradingMethods::sma(prices, trading_params.sma_short);

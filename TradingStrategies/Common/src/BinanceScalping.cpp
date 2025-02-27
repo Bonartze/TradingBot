@@ -24,3 +24,5 @@ void BinanceScalping::connect() {
         is_connected = true;
     }
 }
+
+void BinanceScalping::fetch_raw_data(std::vector<OrderBookEntry> &v) {}
