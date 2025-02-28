@@ -10,13 +10,12 @@ set(THIRD_PARTY_DIR "${CMAKE_SOURCE_DIR}/../third_party")
 set(NLOHMANN_JSON_ROOT "${THIRD_PARTY_DIR}/nlohmann_json")
 set(NLOHMANN_JSON_INCLUDE_DIR "${NLOHMANN_JSON_ROOT}")
 
-set(GTEST_ROOT "${THIRD_PARTY_DIR}/googletest/install")
-set(GTEST_INCLUDE_DIR "${GTEST_ROOT}/include")
-set(GTEST_LIBRARY_DIR "${GTEST_ROOT}/lib")
-
-if (NOT EXISTS "${GTEST_LIBRARY_DIR}/libgtest.a")
-    message(FATAL_ERROR "GTest wasn't found in ${GTEST_LIBRARY_DIR}, firstly install it.")
-endif ()
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
+)
+FetchContent_MakeAvailable(googletest)
 
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
@@ -48,21 +47,16 @@ add_executable(tests
 
 target_include_directories(tests PRIVATE
         ${NLOHMANN_JSON_INCLUDE_DIR}
-        ${GTEST_INCLUDE_DIR}
         ${OPENSSL_INCLUDE_DIR}
         ${CURL_INCLUDE_DIRS}
         ../TradingEngine/include
 )
 
-target_link_directories(tests PRIVATE
-        ${GTEST_LIBRARY_DIR}
-)
-
 target_link_libraries(tests PRIVATE
         TradingEngine
         TESTING
-        ${GTEST_LIBRARY_DIR}/libgtest.a
-        ${GTEST_LIBRARY_DIR}/libgtest_main.a
+        gtest
+        gtest_main
         nlohmann_json
         OpenSSL::SSL
         OpenSSL::Crypto
