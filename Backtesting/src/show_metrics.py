@@ -3,13 +3,6 @@ import matplotlib.pyplot as plt
 import os
 
 def analyze_backtesting_results(strategy_files, output_root):
-    """
-    Для каждой стратегии:
-    1) Считываем CSV-файл.
-    2) Фильтруем строки, где Check Type == 'FINAL PROFIT'.
-    3) Берём последнее значение из столбца "Current Price" как итоговый профит за год.
-    4) Строим диаграммы и выводим результаты.
-    """
     overall_results = {}
 
     for strategy_name, input_files in strategy_files.items():
@@ -55,7 +48,6 @@ def analyze_backtesting_results(strategy_files, output_root):
 
     return overall_results
 
-# Пример использования:
 strategy_files = {
     "scalping": [
         "../data/scalping/2020.csv",
