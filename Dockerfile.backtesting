@@ -26,15 +26,14 @@ RUN pip install --no-cache-dir -r /backtesting/requirements.txt || echo "No requ
 COPY . .
 
 WORKDIR /backtesting/Backtesting/src/
+RUN python3 load_data_some_years.py && ls -lah /backtesting/Backtesting/data/scalping
 
-RUN python3 load_data_some_years.py
-
+WORKDIR /backtesting/Backtesting
+RUN rm -rf build && mkdir build
 WORKDIR /backtesting/Backtesting/build
-
 RUN cmake ../ && make -j$(nproc)
 
-RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data && ls -lah /backtesting/Backtesting/data/scalping
+RUN chmod +x backtesting && ./backtesting
 
 WORKDIR /backtesting/Backtesting/src
-
 CMD ["python3", "show_metrics.py"]
