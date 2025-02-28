@@ -33,7 +33,7 @@ WORKDIR /backtesting/Backtesting/build
 
 RUN cmake ../ && make -j$(nproc)
 
-RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data
+RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data && ls -lah /backtesting/Backtesting/data/scalping
 
 WORKDIR /backtesting/Backtesting/src
 

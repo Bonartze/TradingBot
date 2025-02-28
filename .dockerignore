@@ -1,3 +1,4 @@
 Backtesting/data/
 cmake-build-debug
 .venv
+third_party
