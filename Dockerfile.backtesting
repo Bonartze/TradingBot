@@ -27,7 +27,14 @@ COPY . .
 
 WORKDIR /backtesting/Backtesting/src/
 
+# Проверяем, что скрипт есть
 RUN ls -lah /backtesting/Backtesting/src/
+
+# Запускаем генерацию данных
+RUN python3 load_data_some_years.py
+
+# Проверяем, создались ли файлы
+RUN ls -lah /backtesting/Backtesting/data/scalping
 
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
@@ -36,7 +43,29 @@ RUN cmake ../ && make -j$(nproc)
 
 RUN chmod +x backtesting && ./backtesting
 
-RUN ls -lah /backtesting/Backtesting/src/
+# Проверяем, что файлы все еще на месте после тестов
+RUN ls -lah /backtesting/Backtesting/data/scalping
+
+WORKDIR /backtesting
+
+# Копируем все данные в финальный образ
+FROM debian:12
+
+WORKDIR /backtesting
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build-env /backtesting/Backtesting .
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Проверяем, что данные есть перед запуском Python-скрипта
+RUN ls -lah /backtesting/Backtesting/data/scalping
 
 WORKDIR /backtesting/Backtesting/src/
 
