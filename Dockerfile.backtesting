@@ -51,6 +51,7 @@ COPY --from=build-env /backtesting/Backtesting .
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN ls data/scalping
+RUN pwd
 WORKDIR /backtesting/Backtesting/src/
 RUN pwd
 
