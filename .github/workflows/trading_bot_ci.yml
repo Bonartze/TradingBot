@@ -58,7 +58,9 @@ jobs:
       - name: Build backtesting image
         run: |
           sudo docker build -f Dockerfile.backtesting -t backtesting .
-
+      - name: Create backtesting results
+        run: |
+          mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results
       - name: Run backtesting container in detached mode
         id: run_container
         run: |
