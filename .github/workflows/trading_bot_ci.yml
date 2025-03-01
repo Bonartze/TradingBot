@@ -57,7 +57,7 @@ jobs:
       - name: Run backtesting
         run: |
           sudo docker build -f Dockerfile.backtesting -t backtesting .
-          sudo docker run --rm -v ${{ github.workspace }}/data:/backtesting/Backtesting/data backtesting
+          sudo docker run --rm -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data backtesting
       - name: Upload Backtesting Results
         uses: actions/upload-artifact@v4
         with:
