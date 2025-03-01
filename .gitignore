@@ -7,8 +7,6 @@ bin
 *.iml
 venv/
 .venv/
-Data_extracted/
-Data_zips/
 StatisticsPlots/
 Backtesting/scalping_results/
 Backtesting/data/mean_reversion
