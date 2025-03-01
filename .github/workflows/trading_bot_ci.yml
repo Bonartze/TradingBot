@@ -61,10 +61,19 @@ jobs:
       - name: Run backtesting
         run: |
           sudo docker build -f Dockerfile.backtesting -t backtesting .
-          sudo docker run --rm -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data backtesting
+          # Монтируем хостовую папку Backtesting/data в /backtesting/Backtesting/data внутри контейнера
+          sudo docker run --rm \
+            -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data \
+            backtesting
+
+      # Шаг отладки: проверяем, что контейнер действительно создал файлы
+      - name: Debug check on host
+        run: ls -R Backtesting/data
+
       - name: Upload Backtesting Results
         uses: actions/upload-artifact@v4
         with:
           name: backtesting-results
           path: Backtesting/data/backtesting_results/
           retention-days: 7
+
