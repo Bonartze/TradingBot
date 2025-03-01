@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-venv \
     libboost-all-dev \
-    libssl-dev && \
+    libssl-dev \
+    tree && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Создаем виртуальное окружение и устанавливаем Python-зависимости
@@ -43,4 +44,6 @@ WORKDIR /backtesting/Backtesting/src/
 RUN ls ../data/scalping
 
 RUN python3 show_metrics.py
+
+RUN tree ../data
 
