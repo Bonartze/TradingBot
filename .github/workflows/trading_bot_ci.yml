@@ -62,5 +62,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backtesting-results
-          path: data/backtesting_results/
+          path: Backtesting/data/backtesting_results/
           retention-days: 7
