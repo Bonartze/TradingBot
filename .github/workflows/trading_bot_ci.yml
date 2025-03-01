@@ -39,7 +39,7 @@ jobs:
 
   autotests:
     runs-on: ubuntu-22.04
-    needs: [stock_market_availability, setup-docker]
+    needs: [ stock_market_availability, setup-docker ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -50,10 +50,14 @@ jobs:
 
   backtests:
     runs-on: ubuntu-22.04
-    needs: [stock_market_availability, setup-docker]
+    needs: [ stock_market_availability, setup-docker ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Ensure data directory exists
+        run: mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results
+
       - name: Run backtesting
         run: |
           sudo docker build -f Dockerfile.backtesting -t backtesting .
