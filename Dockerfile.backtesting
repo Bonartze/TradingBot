@@ -33,17 +33,13 @@ WORKDIR /backtesting/Backtesting/src/
 # Запускаем скрипт, который генерирует данные (файлы CSV должны сохраняться в data/scalping, data/backtesting_results и т.д.)
 RUN python3 load_data_some_years.py
 # Проверяем, что данные созданы
-RUN ls -lah /backtesting/Backtesting/data/scalping
-
 # Убираем старую папку сборки и создаем новую
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
 
-# Собираем проект (например, тестовую часть)
 RUN cmake ../ && make -j$(nproc)
 RUN chmod +x backtesting && ./backtesting
 
-# Проверяем, что файлы с результатами присутствуют
 RUN ls -lah /backtesting/Backtesting/data/backtesting_results
 
 # Финальный образ – копируем всё из build-env
