@@ -50,8 +50,8 @@ COPY --from=build-env /backtesting/Backtesting .
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN ls data
+RUN ls data/scalping
 WORKDIR /backtesting/Backtesting/src/
-RUN ls
+RUN pwd
 
 ENTRYPOINT ["python3", "show_metrics.py"]
