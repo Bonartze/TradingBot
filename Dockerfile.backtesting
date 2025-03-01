@@ -27,7 +27,7 @@ COPY . .
 
 WORKDIR /backtesting/Backtesting/src/
 
-RUN python3 load_data_some_years.py && ls -lah /backtesting/Backtesting/data/
+#RUN python3 load_data_some_years.py && ls -lah /backtesting/Backtesting/data/
 
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
