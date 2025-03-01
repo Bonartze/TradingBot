@@ -38,10 +38,11 @@ RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/b
 WORKDIR /backtesting/Backtesting/build
 
 RUN cmake ../ && make -j$(nproc)
-RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data/
-
+RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data/scalping
+RUN ls -lah /backtesting/Backtesting/data/scalping
 #RUN ls -lah /backtesting/Backtesting/data/backtesting_results
 
 WORKDIR /backtesting/Backtesting/src/
+RUN ls ../data/scalping
 
-ENTRYPOINT ["python3", "show_metrics.py"]
+CMD ["python3", "show_metrics.py"]
