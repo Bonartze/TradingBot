@@ -31,7 +31,7 @@ COPY . .
 WORKDIR /backtesting/Backtesting/src/
 
 # Запускаем скрипт, который генерирует данные (файлы CSV должны сохраняться в data/scalping, data/backtesting_results и т.д.)
-RUN python3 load_data_some_years.py
+#RUN python3 load_data_some_years.py
 # Проверяем, что данные созданы
 # Убираем старую папку сборки и создаем новую
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
