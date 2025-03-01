@@ -17,56 +17,59 @@ RUN apt-get update && apt-get install -y \
     libssl-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Создаем виртуальное окружение и устанавливаем Python-зависимости
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY ./requirements.txt /backtesting/requirements.txt
 RUN test -f /backtesting/requirements.txt && pip install --no-cache-dir -r /backtesting/requirements.txt || true
 
+# Копируем весь проект
 COPY . .
 
+# Переходим в папку с исходниками Backtesting
 WORKDIR /backtesting/Backtesting/src/
 
-# Проверяем, что скрипт есть
-RUN ls -lah /backtesting/Backtesting/src/
-
-# Запускаем генерацию данных
+# Запускаем скрипт, который генерирует данные (файлы CSV должны сохраняться в data/scalping, data/backtesting_results и т.д.)
 RUN python3 load_data_some_years.py
-
-# Проверяем, создались ли файлы
+# Проверяем, что данные созданы
 RUN ls -lah /backtesting/Backtesting/data/scalping
 
+# Убираем старую папку сборки и создаем новую
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
 
+# Собираем проект (например, тестовую часть)
 RUN cmake ../ && make -j$(nproc)
-
 RUN chmod +x backtesting && ./backtesting
 
-# Проверяем, что файлы все еще на месте после тестов
-RUN ls -lah /backtesting/Backtesting/data/scalping
+# Проверяем, что файлы с результатами присутствуют
+RUN ls -lah /backtesting/Backtesting/data/backtesting_results
 
-WORKDIR /backtesting
-
-# Копируем все данные в финальный образ
+# Финальный образ – копируем всё из build-env
 FROM debian:12
 
 WORKDIR /backtesting
 
+# Устанавливаем Python в финальном образе
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-venv && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Копируем всю директорию Backtesting из образа сборки
 COPY --from=build-env /backtesting/Backtesting .
 
+# Создаем виртуальное окружение в финальном образе
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Проверяем, что данные есть перед запуском Python-скрипта
-RUN ls -lah /backtesting/Backtesting/data/scalping
+# Проверяем, что каталог с данными существует
+RUN ls -lah /backtesting/Backtesting/data/backtesting_results
 
+# Устанавливаем рабочую директорию для запуска Python-скрипта
 WORKDIR /backtesting/Backtesting/src/
 
+# Запускаем скрипт, который анализирует данные и генерирует итоговые артефакты
 ENTRYPOINT ["python3", "show_metrics.py"]
