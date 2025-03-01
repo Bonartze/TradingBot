@@ -1,4 +1,5 @@
-FROM debian:12
+# Используем базовый образ Debian 12
+FROM debian:12 AS build-env
 
 WORKDIR /backtesting
 
@@ -18,25 +19,31 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /opt/venv
-
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY ./requirements.txt /backtesting/requirements.txt
-RUN pip install --no-cache-dir -r /backtesting/requirements.txt || echo "No requirements.txt found"
+RUN test -f /backtesting/requirements.txt && pip install --no-cache-dir -r /backtesting/requirements.txt || true
 
 COPY . .
 
-WORKDIR Backtesting/src/
+WORKDIR /backtesting/Backtesting/src/
 
-RUN python3 load_data_some_years.py
+RUN python3 load_data_some_years.py && ls -lah /backtesting/Backtesting/data/
 
-RUN mkdir -p /backtesting/Backtesting/build
+RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
 
-RUN rm -rf CMakeCache.txt CMakeFiles
+RUN cmake ../ && make -j$(nproc) && ls -lah /backtesting/Backtesting/data/
 
-RUN cmake ../ && make -j$(nproc)
+RUN chmod +x backtesting && ./backtesting
 
-RUN chmod +x backtesting
+FROM debian:12
 
-CMD ["./backtesting"]
+WORKDIR /backtesting
+
+COPY --from=build-env /backtesting/Backtesting .
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+ENTRYPOINT ["python3", "Backtesting/src/show_metrics.py"]
