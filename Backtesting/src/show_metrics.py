@@ -2,14 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+print("Current working directory:", os.getcwd())
+
 def analyze_backtesting_results(strategy_files, output_root):
-    """
-    Для каждой стратегии:
-    1) Считываем CSV-файл.
-    2) Фильтруем строки, где Check Type == 'FINAL PROFIT'.
-    3) Берём последнее значение из столбца "Current Price" как итоговый профит за год.
-    4) Строим диаграммы и выводим результаты.
-    """
     overall_results = {}
 
     for strategy_name, input_files in strategy_files.items():
@@ -20,7 +15,7 @@ def analyze_backtesting_results(strategy_files, output_root):
 
         for file_path in input_files:
             filename = os.path.basename(file_path)  # например, "2021.csv"
-            year = os.path.splitext(filename)[0]    # "2021"
+            year = os.path.splitext(filename)[0]  # "2021"
             print(f"Processing file: {file_path}")
 
             df = pd.read_csv(file_path)
@@ -54,6 +49,7 @@ def analyze_backtesting_results(strategy_files, output_root):
         plt.close()
 
     return overall_results
+
 
 # Пример использования:
 strategy_files = {
