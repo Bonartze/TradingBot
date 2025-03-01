@@ -61,11 +61,8 @@ COPY --from=build-env /backtesting/Backtesting .
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Проверяем, что каталог с данными существует
-RUN ls -lah /backtesting/Backtesting/data/backtesting_results
+RUN ls -lah /backtesting/Backtesting/data/
 
-# Устанавливаем рабочую директорию для запуска Python-скрипта
 WORKDIR /backtesting/Backtesting/src/
 
-# Запускаем скрипт, который анализирует данные и генерирует итоговые артефакты
 ENTRYPOINT ["python3", "show_metrics.py"]
