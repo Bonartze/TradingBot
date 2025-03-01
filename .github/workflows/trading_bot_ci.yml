@@ -63,10 +63,9 @@ jobs:
           sudo docker build -f Dockerfile.backtesting -t backtesting .
           # Монтируем хостовую папку Backtesting/data в /backtesting/Backtesting/data внутри контейнера
           sudo docker run --rm \
-            -v ${{ github.workspace }}/Backtesting/data:/backtesting/Backtesting/data \
+            -v ${{ github.workspace }}/Backtesting/data/backtesting_results:/backtesting/Backtesting/data/backtesting_results \
             backtesting
 
-      # Шаг отладки: проверяем, что контейнер действительно создал файлы
       - name: Debug check on host
         run: ls -R Backtesting/data
 
