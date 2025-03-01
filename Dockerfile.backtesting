@@ -40,7 +40,7 @@ WORKDIR /backtesting/Backtesting/build
 RUN cmake ../ && make -j$(nproc)
 RUN chmod +x backtesting && ./backtesting
 
-RUN ls -lah /backtesting/Backtesting/data/backtesting_results
+#RUN ls -lah /backtesting/Backtesting/data/backtesting_results
 
 # Финальный образ – копируем всё из build-env
 FROM debian:12
