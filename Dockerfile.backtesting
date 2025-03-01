@@ -50,5 +50,7 @@ COPY --from=build-env /backtesting/Backtesting .
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+RUN ls
+WORKDIR Backtesting/src/
 
-ENTRYPOINT ["python3", "Backtesting/src/show_metrics.py"]
+ENTRYPOINT ["python3", "show_metrics.py"]
