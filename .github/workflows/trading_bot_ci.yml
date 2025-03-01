@@ -55,24 +55,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Ensure data directory exists
-        run: mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results
-
-      - name: Run backtesting
+      - name: Build backtesting image
         run: |
           sudo docker build -f Dockerfile.backtesting -t backtesting .
-          # Монтируем хостовую папку Backtesting/data в /backtesting/Backtesting/data внутри контейнера
-          sudo docker run --rm \
-            -v ${{ github.workspace }}/Backtesting/data/backtesting_results:/backtesting/Backtesting/data/backtesting_results \
-            backtesting
 
-      - name: Debug check on host
-        run: ls -R Backtesting/data
+      - name: Run backtesting container in detached mode
+        id: run_container
+        run: |
+          CONTAINER_ID=$(sudo docker create backtesting)
+          echo "::set-output name=id::$CONTAINER_ID"
+          sudo docker start $CONTAINER_ID
+          sudo docker wait $CONTAINER_ID
+          sudo docker cp $CONTAINER_ID:/backtesting/Backtesting/data/backtesting_results ${{ github.workspace }}/Backtesting/data/backtesting_results
+          sudo docker rm $CONTAINER_ID
+
+      - name: Debug
+        run: ls -R Backtesting/data/backtesting_results
 
       - name: Upload Backtesting Results
         uses: actions/upload-artifact@v4
         with:
           name: backtesting-results
-          path: Backtesting/data/backtesting_results/
+          path: Backtesting/data/backtesting_results
           retention-days: 7
+
 
