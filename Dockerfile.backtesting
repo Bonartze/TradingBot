@@ -18,20 +18,17 @@ RUN apt-get update && apt-get install -y \
     tree && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Создаем виртуальное окружение и устанавливаем Python-зависимости
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY ./requirements.txt /backtesting/requirements.txt
 RUN test -f /backtesting/requirements.txt && pip install --no-cache-dir -r /backtesting/requirements.txt || true
 
-# Копируем весь проект
 COPY . .
 
-# Переходим в папку с исходниками Backtesting
 WORKDIR /backtesting/Backtesting/src/
 
-#RUN python3 load_data_some_years.py
+RUN python3 load_data_some_years.py
 
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
@@ -39,7 +36,7 @@ WORKDIR /backtesting/Backtesting/build
 RUN cmake ../ && make -j$(nproc)
 RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data/scalping
 RUN ls -lah /backtesting/Backtesting/data/scalping
-#RUN ls -lah /backtesting/Backtesting/data/backtesting_results
+
 WORKDIR /backtesting/Backtesting/src/
 RUN ls ../data/scalping
 
