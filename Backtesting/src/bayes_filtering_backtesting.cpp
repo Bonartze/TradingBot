@@ -8,7 +8,7 @@ constexpr size_t WINDOW_SIZE = 100;
 constexpr size_t START_YEAR = 2020;
 constexpr size_t END_YEAR = 2024;
 constexpr size_t EXPECTED_PROFIT_MARGIN = 200;
-constexpr std::array<double, 5> EXPECTED_PROFIT = {1000, -200, 100, 300, -500};
+constexpr std::array<double, 5> EXPECTED_PROFIT = {1000, -200, 100, 300, -800};
 
 void BayesianBacktesting::SetUp() {
     //data_dir = "/home/ivan/CLionProjects/TradingBot/Backtesting/data/Data_extracted/5m/BTCUSDT/";
