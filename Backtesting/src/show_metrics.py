@@ -10,42 +10,90 @@ def analyze_backtesting_results(strategy_files, output_root):
     for strategy_name, input_files in strategy_files.items():
         print(f"\n--- Processing {strategy_name} ---")
         yearly_profits = []
+        yearly_trade_counts = []
+        yearly_avg_trade_prices = []
+
+        # Создаем выходную папку для графиков метрик этой стратегии
         strategy_output_folder = os.path.join(output_root, strategy_name)
         os.makedirs(strategy_output_folder, exist_ok=True)
 
         for file_path in input_files:
             filename = os.path.basename(file_path)  # например, "2021.csv"
-            year = os.path.splitext(filename)[0]  # "2021"
+            year = os.path.splitext(filename)[0]    # "2021"
             print(f"Processing file: {file_path}")
 
+            # Считываем данные из CSV
             df = pd.read_csv(file_path)
-            # Фильтруем строки с FINAL PROFIT
+
+            # Расчет итогового профита
             df_final = df[df["Check Type"] == "FINAL PROFIT"]
-
             if not df_final.empty:
-                # Берём последнее значение профита и преобразуем его к числовому типу
-                total_profit_for_year = pd.to_numeric(df_final["Current Price"].iloc[-1], errors="coerce")
+                total_profit = pd.to_numeric(df_final["Current Price"].iloc[-1], errors="coerce")
             else:
-                total_profit_for_year = 0
+                total_profit = 0
 
-            yearly_profits.append((year, total_profit_for_year))
+            # Дополнительные метрики: количество торгов и средняя цена торгов
+            trade_rows = df[df["Check Type"].isin(["BUY", "SELL"])]
+            num_trades = len(trade_rows)
+            if num_trades > 0:
+                avg_trade_price = pd.to_numeric(trade_rows["Current Price"], errors="coerce").mean()
+            else:
+                avg_trade_price = 0
 
-        df_results = pd.DataFrame(yearly_profits, columns=["Year", "Total Profit"])
-        overall_results[strategy_name] = df_results
+            yearly_profits.append((year, total_profit))
+            yearly_trade_counts.append((year, num_trades))
+            yearly_avg_trade_prices.append((year, avg_trade_price))
+
+        # Формируем DataFrame'ы по каждой метрике
+        df_profit = pd.DataFrame(yearly_profits, columns=["Year", "Total Profit"])
+        df_trades = pd.DataFrame(yearly_trade_counts, columns=["Year", "Number of Trades"])
+        df_avg_price = pd.DataFrame(yearly_avg_trade_prices, columns=["Year", "Average Trade Price"])
+
+        overall_results[strategy_name] = {
+            "profit": df_profit,
+            "trades": df_trades,
+            "avg_price": df_avg_price
+        }
 
         print(f"\nOverall results for {strategy_name}:")
-        print(df_results)
+        print(df_profit)
+        print(df_trades)
+        print(df_avg_price)
 
-        # Построение графика
+        # График итогового профита
         plt.figure(figsize=(10, 6))
-        plt.bar(df_results["Year"], df_results["Total Profit"], label="Total Profit")
+        plt.bar(df_profit["Year"], df_profit["Total Profit"], label="Total Profit", color='skyblue')
         plt.title(f"Total Profit by Year ({strategy_name})")
         plt.xlabel("Year")
         plt.ylabel("Profit")
-        plt.grid(True)
+        plt.grid(True, linestyle='--', alpha=0.7)
         plt.legend()
         plt.tight_layout()
         plt.savefig(os.path.join(strategy_output_folder, "total_profit_by_year.jpg"))
+        plt.close()
+
+        # График количества торгов
+        plt.figure(figsize=(10, 6))
+        plt.plot(df_trades["Year"], df_trades["Number of Trades"], marker='o', linestyle='-', color='green', label="Number of Trades")
+        plt.title(f"Number of Trades by Year ({strategy_name})")
+        plt.xlabel("Year")
+        plt.ylabel("Trades")
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(os.path.join(strategy_output_folder, "number_of_trades_by_year.jpg"))
+        plt.close()
+
+        # График средней цены торгов
+        plt.figure(figsize=(10, 6))
+        plt.plot(df_avg_price["Year"], df_avg_price["Average Trade Price"], marker='o', linestyle='-', color='orange', label="Average Trade Price")
+        plt.title(f"Average Trade Price by Year ({strategy_name})")
+        plt.xlabel("Year")
+        plt.ylabel("Average Trade Price")
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(os.path.join(strategy_output_folder, "average_trade_price_by_year.jpg"))
         plt.close()
 
     return overall_results
