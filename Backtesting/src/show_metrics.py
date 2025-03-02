@@ -4,7 +4,6 @@ import os
 
 print("Current working directory:", os.getcwd())
 
-
 def analyze_backtesting_results(strategy_files, output_root):
     overall_results = {}
 
@@ -68,8 +67,7 @@ def analyze_backtesting_results(strategy_files, output_root):
         plt.close()
 
         plt.figure(figsize=(10, 6))
-        plt.plot(df_trades["Year"], df_trades["Number of Trades"], marker='o', linestyle='-', color='green',
-                 label="Number of Trades")
+        plt.plot(df_trades["Year"], df_trades["Number of Trades"], marker='o', linestyle='-', color='green', label="Number of Trades")
         plt.title(f"Number of Trades by Year ({strategy_name})")
         plt.xlabel("Year")
         plt.ylabel("Trades")
@@ -81,8 +79,7 @@ def analyze_backtesting_results(strategy_files, output_root):
 
         # График средней цены торгов
         plt.figure(figsize=(10, 6))
-        plt.plot(df_avg_price["Year"], df_avg_price["Average Trade Price"], marker='o', linestyle='-', color='orange',
-                 label="Average Trade Price")
+        plt.plot(df_avg_price["Year"], df_avg_price["Average Trade Price"], marker='o', linestyle='-', color='orange', label="Average Trade Price")
         plt.title(f"Average Trade Price by Year ({strategy_name})")
         plt.xlabel("Year")
         plt.ylabel("Average Trade Price")
