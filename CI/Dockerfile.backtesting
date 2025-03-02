@@ -43,4 +43,3 @@ RUN ls ../data/scalping
 RUN python3 show_metrics.py
 
 RUN tree ../data
-
