@@ -13,26 +13,22 @@ def analyze_backtesting_results(strategy_files, output_root):
         yearly_trade_counts = []
         yearly_avg_trade_prices = []
 
-        # Создаем выходную папку для графиков метрик этой стратегии
         strategy_output_folder = os.path.join(output_root, strategy_name)
         os.makedirs(strategy_output_folder, exist_ok=True)
 
         for file_path in input_files:
-            filename = os.path.basename(file_path)  # например, "2021.csv"
-            year = os.path.splitext(filename)[0]    # "2021"
+            filename = os.path.basename(file_path)
+            year = os.path.splitext(filename)[0]
             print(f"Processing file: {file_path}")
 
-            # Считываем данные из CSV
             df = pd.read_csv(file_path)
 
-            # Расчет итогового профита
             df_final = df[df["Check Type"] == "FINAL PROFIT"]
             if not df_final.empty:
                 total_profit = pd.to_numeric(df_final["Current Price"].iloc[-1], errors="coerce")
             else:
                 total_profit = 0
 
-            # Дополнительные метрики: количество торгов и средняя цена торгов
             trade_rows = df[df["Check Type"].isin(["BUY", "SELL"])]
             num_trades = len(trade_rows)
             if num_trades > 0:
@@ -44,7 +40,6 @@ def analyze_backtesting_results(strategy_files, output_root):
             yearly_trade_counts.append((year, num_trades))
             yearly_avg_trade_prices.append((year, avg_trade_price))
 
-        # Формируем DataFrame'ы по каждой метрике
         df_profit = pd.DataFrame(yearly_profits, columns=["Year", "Total Profit"])
         df_trades = pd.DataFrame(yearly_trade_counts, columns=["Year", "Number of Trades"])
         df_avg_price = pd.DataFrame(yearly_avg_trade_prices, columns=["Year", "Average Trade Price"])
@@ -60,7 +55,6 @@ def analyze_backtesting_results(strategy_files, output_root):
         print(df_trades)
         print(df_avg_price)
 
-        # График итогового профита
         plt.figure(figsize=(10, 6))
         plt.bar(df_profit["Year"], df_profit["Total Profit"], label="Total Profit", color='skyblue')
         plt.title(f"Total Profit by Year ({strategy_name})")
@@ -72,7 +66,6 @@ def analyze_backtesting_results(strategy_files, output_root):
         plt.savefig(os.path.join(strategy_output_folder, "total_profit_by_year.jpg"))
         plt.close()
 
-        # График количества торгов
         plt.figure(figsize=(10, 6))
         plt.plot(df_trades["Year"], df_trades["Number of Trades"], marker='o', linestyle='-', color='green', label="Number of Trades")
         plt.title(f"Number of Trades by Year ({strategy_name})")
@@ -99,7 +92,6 @@ def analyze_backtesting_results(strategy_files, output_root):
     return overall_results
 
 
-# Пример использования:
 strategy_files = {
     "scalping": [
         "../data/scalping/2020.csv",
