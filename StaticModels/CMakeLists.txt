@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.6)
 
 project(example_project)
 
 find_package(Eigen3 3.3 REQUIRED)
 
-set(sources src/ArimaModel.cpp)
+set(sources src/GarchModel.cpp src/ArimaModel.cpp)
 
 add_executable(example ${sources})
 

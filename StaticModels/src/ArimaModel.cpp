@@ -1,6 +1,5 @@
 #include "../include/ArimaModel.h"
 #include <numeric>
-#include <iostream>
 #include <cmath>
 #include <stdexcept>
 #include <Eigen/Dense>
@@ -11,7 +10,7 @@ ARIMAModel::ARIMAModel() {
     }
     params = arima_parameters_evaluation(close_prices);
     auto diff_close_prices = compute_first_diff(close_prices);
-    if(diff_close_prices.empty()) {
+    if (diff_close_prices.empty()) {
         throw std::runtime_error("Error: Not enough data to compute first difference.");
     }
     coefficients = estimate_coefficients(diff_close_prices, params.p, params.q);
@@ -122,7 +121,7 @@ auto ARIMAModel::Dickey_Fuller_test(const std::vector<double> &series) -> bool {
 }
 
 auto ARIMAModel::arima_parameters_evaluation(const std::vector<double> &series) -> ArimaParams {
-    if(series.empty()) {
+    if (series.empty()) {
         throw std::runtime_error("Error: Series is empty in arima_parameters_evaluation.");
     }
     int d = 0;
@@ -130,7 +129,7 @@ auto ARIMAModel::arima_parameters_evaluation(const std::vector<double> &series) 
     while (!Dickey_Fuller_test(diff_series)) {
         diff_series = compute_first_diff(diff_series);
         d++;
-        if(diff_series.empty()) {
+        if (diff_series.empty()) {
             throw std::runtime_error("Error: Differenced series became empty.");
         }
     }
@@ -203,7 +202,7 @@ auto ARIMAModel::update_errors(Eigen::MatrixXd &X, const std::vector<double> &di
 }
 
 ARIMACoefficients ARIMAModel::estimate_coefficients(const std::vector<double> &diff_series, int p, int q) {
-    if(diff_series.empty()) {
+    if (diff_series.empty()) {
         throw std::runtime_error("Error: diff_series is empty in estimate_coefficients.");
     }
     Eigen::MatrixXd X = build_regression_matrix(diff_series, p, q);
@@ -219,6 +218,35 @@ ARIMACoefficients ARIMAModel::estimate_coefficients(const std::vector<double> &d
 
     return {phi, theta};
 }
+
+auto ARIMAModel::get_residuals() -> std::vector<double> {
+    int start_index = std::max(params.p, params.q);
+    int n = static_cast<int>(close_prices.size());
+    if (n <= start_index) {
+        throw std::runtime_error("Not enough data to compute residuals.");
+    }
+
+    std::vector<double> residuals(n, 0.0);
+
+    double mu = std::accumulate(close_prices.begin(), close_prices.end(), 0.0) / n;
+
+    for (int t = start_index; t < n; ++t) {
+        double predicted = mu;
+
+        for (int i = 0; i < params.p; ++i) {
+            predicted += coefficients.phi[i] * close_prices[t - i - 1];
+        }
+
+        for (int j = 0; j < params.q; ++j) {
+            predicted += coefficients.theta[j] * residuals[t - j - 1];
+        }
+
+        residuals[t] = close_prices[t] - predicted;
+    }
+
+    return std::vector<double>(residuals.begin() + start_index, residuals.end());
+}
+
 
 auto ARIMAModel::forecast(int steps) -> std::vector<double> {
     if (close_prices.size() < static_cast<size_t>(params.p)) {

@@ -40,7 +40,9 @@ private:
 public:
     ARIMAModel();
 
-   // auto fill_data() -> void;
+    auto get_residuals() -> std::vector<double>;
+
+    // auto fill_data() -> void;
 
     auto forecast(int steps) -> std::vector<double>;
 
