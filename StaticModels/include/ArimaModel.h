@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <Eigen/Dense>
 
@@ -12,41 +11,58 @@ struct ArimaParams {
 struct ARIMACoefficients {
     std::vector<double> phi;
     std::vector<double> theta;
+    double intercept;
 };
 
-
 class ARIMAModel {
-private:
-    ArimaParams params;
-    ARIMACoefficients coefficients;
-    std::vector<double> close_prices;
-
-    auto compute_first_diff(const std::vector<double> &) -> std::vector<double>;
-
-    auto PACF(int) -> double;
-
-    auto PACF() -> std::vector<double>;
-
-    auto ACF() -> std::vector<double>;
-
-    auto build_regression_matrix(const std::vector<double> &, int, int) -> Eigen::MatrixXd;
-
-    auto build_target_vector(const std::vector<double> &diff_series, int p) -> Eigen::VectorXd;
-
-    auto estimate_coefficients(const std::vector<double> &diff_series, int p, int q) -> ARIMACoefficients;
-
-    auto update_errors(Eigen::MatrixXd &, const std::vector<double> &, int, int, const std::vector<double> &) -> void;
-
 public:
-    ARIMAModel();
+    explicit ARIMAModel(const std::vector<double> &data);
 
-    auto get_residuals() -> std::vector<double>;
 
-    // auto fill_data() -> void;
+    std::vector<double> forecast(int steps);
 
-    auto forecast(int steps) -> std::vector<double>;
 
-    auto Dickey_Fuller_test(const std::vector<double> &) -> bool;
+    std::vector<double> get_residuals();
 
-    auto arima_parameters_evaluation(const std::vector<double> &) -> ArimaParams;
+
+    ArimaParams get_params() const { return params; }
+    ARIMACoefficients get_coeffs() const { return coefficients; }
+
+private:
+    std::vector<double> close_prices;
+    ArimaParams params{};
+    ARIMACoefficients coefficients{};
+
+
+    void fill_data(const std::vector<double> &data);
+
+
+    static std::vector<double> compute_first_diff(const std::vector<double> &series);
+
+
+    static bool Dickey_Fuller_test(const std::vector<double> &series);
+
+
+    std::vector<double> PACF();
+
+    double PACF(int k);
+
+    std::vector<double> ACF();
+
+
+    ArimaParams arima_parameters_evaluation(const std::vector<double> &series);
+
+
+    static Eigen::MatrixXd build_regression_matrix(const std::vector<double> &diff_series, int p, int q);
+
+    static Eigen::VectorXd build_target_vector(const std::vector<double> &diff_series, int p, int q);
+
+    static void update_errors(Eigen::MatrixXd &X,
+                              const std::vector<double> &diff_series,
+                              int p, int q,
+                              const std::vector<double> &phi,
+                              double intercept);
+
+
+    ARIMACoefficients estimate_coefficients(const std::vector<double> &diff_series, int p, int q);
 };

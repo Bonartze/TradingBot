@@ -4,7 +4,7 @@ project(example_project)
 
 find_package(Eigen3 3.3 REQUIRED)
 
-set(sources src/GarchModel.cpp src/ArimaModel.cpp)
+set(sources src/GarchModel.cpp src/ArimaModel.cpp src/main.cpp)
 
 add_executable(example ${sources})
 

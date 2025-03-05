@@ -1,6 +1,6 @@
-#pragma once
+#include <vector>
 #include <memory>
-#include "../include/ArimaModel.h"
+#include "ArimaModel.h"
 
 struct GarchParams {
     double omega;
@@ -9,16 +9,29 @@ struct GarchParams {
 };
 
 class GarchModel {
-private:
-    GarchParams params;
-    std::unique_ptr<ARIMAModel> arima_model;
-
-    auto log_likelihood(const std::vector<double> &) -> double;
-
-    auto last_sigma2(const std::vector<double> &) -> double;
-
 public:
-    auto forecast(const std::vector<double> &, int) -> std::vector<double>;
+    explicit GarchModel(const ARIMAModel &arima);
 
-    auto combined_forecast(const std::vector<double> &, int) -> std::vector<double>;
+
+    void fit_garch_parameters(const std::vector<double> &residuals);
+
+
+    double log_likelihood(const std::vector<double> &residuals,
+                          double omega, double alpha, double beta);
+
+
+    double last_sigma2(const std::vector<double> &residuals);
+
+
+    std::vector<double> forecast(const std::vector<double> &residuals, int steps);
+
+
+    std::vector<double> combined_forecast(int steps);
+
+private:
+    std::unique_ptr<ARIMAModel> arima_model;
+    GarchParams params{0.1, 0.05, 0.90};
+
+
+    void naive_grid_search(const std::vector<double> &residuals);
 };
