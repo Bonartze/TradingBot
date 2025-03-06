@@ -16,7 +16,7 @@ struct ARIMACoefficients {
 
 class ARIMAModel {
 public:
-    explicit ARIMAModel(const std::vector<double> &data);
+    explicit ARIMAModel(const std::string &);
 
 
     std::vector<double> forecast(int steps);
@@ -27,15 +27,13 @@ public:
 
     ArimaParams get_params() const { return params; }
     ARIMACoefficients get_coeffs() const { return coefficients; }
+    std::vector<double> close_prices;
 
 private:
-    std::vector<double> close_prices;
     ArimaParams params{};
     ARIMACoefficients coefficients{};
 
-
-    void fill_data(const std::vector<double> &data);
-
+    auto fill_data(const std::string &) -> void;
 
     static std::vector<double> compute_first_diff(const std::vector<double> &series);
 

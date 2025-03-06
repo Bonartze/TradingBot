@@ -28,32 +28,22 @@ static double sample_standard_normal() {
 }
 
 
-
-
 GarchModel::GarchModel(const ARIMAModel &arima) {
     arima_model = std::make_unique<ARIMAModel>(arima);
 }
 
 
-
-
-
 void GarchModel::fit_garch_parameters(const std::vector<double> &residuals) {
-    
-    
     naive_grid_search(residuals);
 
-    
+
     std::cout << "[GARCH::fit_garch_parameters] best (omega, alpha, beta) = ("
             << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
 }
 
 
-
-
 double GarchModel::log_likelihood(const std::vector<double> &residuals,
                                   double omega, double alpha, double beta) {
-    
     if (residuals.empty()) return 0.0;
 
     double sigma2_prev = sample_variance(residuals);
@@ -67,8 +57,8 @@ double GarchModel::log_likelihood(const std::vector<double> &residuals,
             double e2 = residuals[t - 1] * residuals[t - 1];
             sigma2_t += alpha * e2 + beta * sigma2_prev;
         }
-        if (sigma2_t <= 0.0) return -1e15; 
-        
+        if (sigma2_t <= 0.0) return -1e15;
+
         double r2 = residuals[t] * residuals[t];
         double term = -0.5 * (std::log(2.0 * M_PI) + std::log(sigma2_t) + r2 / sigma2_t);
         ll += term;
@@ -76,8 +66,6 @@ double GarchModel::log_likelihood(const std::vector<double> &residuals,
     }
     return ll;
 }
-
-
 
 
 double GarchModel::last_sigma2(const std::vector<double> &residuals) {
@@ -93,8 +81,6 @@ double GarchModel::last_sigma2(const std::vector<double> &residuals) {
 }
 
 
-
-
 std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, int steps) {
     if (residuals.empty()) {
         throw std::runtime_error("Error: no residuals for GARCH forecast");
@@ -105,9 +91,11 @@ std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, i
 
     double last_res = residuals.back();
     for (int i = 0; i < steps; i++) {
-        
         double e2 = (i == 0 ? last_res * last_res : 0.0);
+        double max_volatility = 1e6;
         double sigma2_f = params.omega + params.alpha * e2 + params.beta * sigma2_prev;
+        sigma2_f = std::min(sigma2_f, max_volatility);
+
         if (sigma2_f <= 0.0) {
             throw std::runtime_error("Forecasted sigma2 is non-positive.");
         }
@@ -118,62 +106,49 @@ std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, i
 }
 
 
-
-
-
-
-
 std::vector<double> GarchModel::combined_forecast(int steps) {
-    
     auto arima_pred = arima_model->forecast(steps);
 
-    
+
     auto resid = arima_model->get_residuals();
 
-    
+
     fit_garch_parameters(resid);
     auto garch_pred = forecast(resid, steps);
 
-    
+
     std::vector<double> combined;
     combined.reserve(steps);
 
     for (int i = 0; i < steps; i++) {
+        std::cout << "Step: " << i << std::endl;
         double mu = arima_pred[i];
-        double sigma = std::sqrt(garch_pred[i]);  
-        double z = sample_standard_normal();      
+        double sigma = std::sqrt(garch_pred[i]);
+        double z = sample_standard_normal();
 
-        
-        double simulated_value = mu + 0.3 *sigma * z;
 
-        
+        double simulated_value = mu + 0.3 * sigma * z;
+
+
         combined.push_back(simulated_value);
 
-        
+
         std::cout << "[combined_forecast] Step=" << i
-                  << ", ARIMA=" << mu
-                  << ", GARCH_var=" << garch_pred[i]
-                  << ", shock=" << z
-                  << ", => " << simulated_value << std::endl;
+                << ", ARIMA=" << mu
+                << ", GARCH_var=" << garch_pred[i]
+                << ", shock=" << z
+                << ", => " << simulated_value << std::endl;
     }
 
     return combined;
 }
 
 
-
-
-
-
 void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
-    
-    
-    
-
     double best_omega = 0.1, best_alpha = 0.05, best_beta = 0.9;
     double best_ll = -std::numeric_limits<double>::infinity();
 
-    
+
     const double step_w = 0.05;
     const double step_a = 0.05;
     const double step_b = 0.05;
@@ -182,7 +157,7 @@ void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
         for (double a = 0.0; a < 1.0; a += step_a) {
             for (double b = 0.0; b < 1.0; b += step_b) {
                 if (a + b >= 0.999) {
-                    continue; 
+                    continue;
                 }
                 double ll = log_likelihood(residuals, w, a, b);
                 if (ll > best_ll) {
