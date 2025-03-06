@@ -27,20 +27,12 @@ static double sample_standard_normal() {
     return dist(gen);
 }
 
-
-GarchModel::GarchModel(const ARIMAModel &arima) {
-    arima_model = std::make_unique<ARIMAModel>(arima);
-}
-
-
 void GarchModel::fit_garch_parameters(const std::vector<double> &residuals) {
     naive_grid_search(residuals);
-
 
     std::cout << "[GARCH::fit_garch_parameters] best (omega, alpha, beta) = ("
             << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
 }
-
 
 double GarchModel::log_likelihood(const std::vector<double> &residuals,
                                   double omega, double alpha, double beta) {
@@ -67,7 +59,6 @@ double GarchModel::log_likelihood(const std::vector<double> &residuals,
     return ll;
 }
 
-
 double GarchModel::last_sigma2(const std::vector<double> &residuals) {
     if (residuals.empty()) {
         throw std::runtime_error("Error: residuals are empty");
@@ -79,7 +70,6 @@ double GarchModel::last_sigma2(const std::vector<double> &residuals) {
     }
     return sigma2_prev;
 }
-
 
 std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, int steps) {
     if (residuals.empty()) {
@@ -95,7 +85,7 @@ std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, i
         double max_volatility = 1e6;
         double sigma2_f = params.omega + params.alpha * e2 + params.beta * sigma2_prev;
         sigma2_f = std::min(sigma2_f, max_volatility);
-
+        
         if (sigma2_f <= 0.0) {
             throw std::runtime_error("Forecasted sigma2 is non-positive.");
         }
@@ -115,8 +105,6 @@ std::vector<double> GarchModel::combined_forecast(int steps) {
 
     fit_garch_parameters(resid);
     auto garch_pred = forecast(resid, steps);
-
-
     std::vector<double> combined;
     combined.reserve(steps);
 
@@ -147,7 +135,6 @@ std::vector<double> GarchModel::combined_forecast(int steps) {
 void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
     double best_omega = 0.1, best_alpha = 0.05, best_beta = 0.9;
     double best_ll = -std::numeric_limits<double>::infinity();
-
 
     const double step_w = 0.05;
     const double step_a = 0.05;

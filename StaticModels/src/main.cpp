@@ -5,7 +5,6 @@
 #include <cmath>
 #include <vector>
 
-
 static double sample_standard_normal() {
     static thread_local std::mt19937 gen(std::random_device{}());
     static thread_local std::normal_distribution<> dist(0.0, 1.0);

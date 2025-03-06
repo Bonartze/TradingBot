@@ -28,7 +28,6 @@ ARIMAModel::ARIMAModel(const std::string &data) {
     coefficients = estimate_coefficients(diff_close_prices, params.p, params.q);
 }
 
-
 std::vector<double> ARIMAModel::compute_first_diff(const std::vector<double> &series) {
     if (series.size() < 2) {
         throw std::runtime_error("Error: Series too short for differencing.");
@@ -253,7 +252,6 @@ ARIMACoefficients ARIMAModel::estimate_coefficients(const std::vector<double> &d
         throw std::runtime_error("Invalid p or q in estimate_coefficients");
     }
 
-
     ARIMACoefficients coefs;
     coefs.phi.resize(p, 0.0);
     coefs.theta.resize(q, 0.0);
@@ -273,7 +271,6 @@ ARIMACoefficients ARIMAModel::estimate_coefficients(const std::vector<double> &d
 
         Eigen::MatrixXd A = X.transpose() * X;
         Eigen::VectorXd b = X.transpose() * Y;
-
 
         Eigen::VectorXd beta = A.fullPivHouseholderQr().solve(b);
 
