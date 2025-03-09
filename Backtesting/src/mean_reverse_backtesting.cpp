@@ -12,9 +12,9 @@ constexpr size_t MEAN_REV_SMA_SHORT = 5;
 constexpr size_t MEAN_REV_SMA_LONG = 10;
 constexpr size_t MEAN_REV_RSI_OVERSOLD = 30;
 constexpr double MEAN_REV_RSI_OVERBOUGHT = 29;
-constexpr size_t MEAN_REV_EXPECTED_PROFIT_MARGIN = 900.0;
+constexpr size_t MEAN_REV_EXPECTED_PROFIT_MARGIN = 200.0;
 
-constexpr std::array<double, 5> MEAN_REV_EXPECTED_PROFIT = {500, 150, -300, 200, 250};
+constexpr std::array<double, 5> MEAN_REV_EXPECTED_PROFIT = {400, -100, 20, 100, 400};
 
 void MeanReverseBacktesting::SetUp() {
 }

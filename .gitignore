@@ -1,3 +1,4 @@
+
 build/
 cmake-build-debug/
 */build/
@@ -8,6 +9,7 @@ bin
 venv/
 .venv/
 Data_extracted/
+arima_garch
 Data_zips/
 StatisticsPlots/
 Backtesting/scalping_results/

@@ -210,7 +210,6 @@ auto BayesianSignalFiltering::wrapper_execute(size_t window_size, const std::vec
         });
     }
 
-    // 🔥 Логируем финальный профит за весь период
     csv_logger.logRow({"FINAL PROFIT", std::to_string(total_profit), std::to_string(trades_count)});
 
     return {total_profit, trades_count};

@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Run autotest
         run: |
-          sudo docker build -f Dockerfile.test -t testing .
+          sudo docker build -f CI/Dockerfile.autotesting -t testing .
           sudo docker run --rm testing
 
   backtests:
@@ -57,7 +57,7 @@ jobs:
 
       - name: Build backtesting image
         run: |
-          sudo docker build -f Dockerfile.backtesting -t backtesting .
+          sudo docker build -f CI/Dockerfile.backtesting -t backtesting .
       - name: Create backtesting results
         run: |
           mkdir -p ${{ github.workspace }}/Backtesting/data/backtesting_results
