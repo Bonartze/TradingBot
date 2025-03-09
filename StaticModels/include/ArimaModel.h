@@ -18,7 +18,6 @@ class ARIMAModel {
 public:
     explicit ARIMAModel(const std::string &);
 
-
     std::vector<double> forecast(int steps);
 
 
