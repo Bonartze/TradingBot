@@ -27,7 +27,6 @@ static double sample_standard_normal() {
     return dist(gen);
 }
 
-
 GarchModel::GarchModel(const ARIMAModel &arima) {
     arima_model = std::make_unique<ARIMAModel>(arima);
 }
@@ -35,7 +34,6 @@ GarchModel::GarchModel(const ARIMAModel &arima) {
 
 void GarchModel::fit_garch_parameters(const std::vector<double> &residuals) {
     naive_grid_search(residuals);
-
 
     std::cout << "[GARCH::fit_garch_parameters] best (omega, alpha, beta) = ("
             << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
@@ -58,7 +56,6 @@ double GarchModel::log_likelihood(const std::vector<double> &residuals,
             sigma2_t += alpha * e2 + beta * sigma2_prev;
         }
         if (sigma2_t <= 0.0) return -1e15;
-
         double r2 = residuals[t] * residuals[t];
         double term = -0.5 * (std::log(2.0 * M_PI) + std::log(sigma2_t) + r2 / sigma2_t);
         ll += term;
@@ -114,7 +111,6 @@ std::vector<double> GarchModel::combined_forecast(int steps) {
 
     fit_garch_parameters(resid);
     auto garch_pred = forecast(resid, steps);
-
 
     std::vector<double> combined;
     combined.reserve(steps);
@@ -172,5 +168,4 @@ void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
     std::cout << "Calculated params: "<<best_omega<<", "<<best_alpha<<", "<<best_beta<<std::endl;
     params = {best_omega, best_alpha, best_beta};
     std::cout << "[GARCH::grid_search] best log-likelihood=" << best_ll << std::endl;
-
 }
