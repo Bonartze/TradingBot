@@ -82,6 +82,7 @@ double GarchModel::last_sigma2(const std::vector<double> &residuals) {
 
 
 std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, int steps) {
+    fit_garch_parameters(residuals);
     if (residuals.empty()) {
         throw std::runtime_error("Error: no residuals for GARCH forecast");
     }
@@ -109,9 +110,7 @@ std::vector<double> GarchModel::forecast(const std::vector<double> &residuals, i
 std::vector<double> GarchModel::combined_forecast(int steps) {
     auto arima_pred = arima_model->forecast(steps);
 
-
     auto resid = arima_model->get_residuals();
-
 
     fit_garch_parameters(resid);
     auto garch_pred = forecast(resid, steps);
@@ -156,6 +155,7 @@ void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
     for (double w = 0.01; w < 1.0; w += step_w) {
         for (double a = 0.0; a < 1.0; a += step_a) {
             for (double b = 0.0; b < 1.0; b += step_b) {
+
                 if (a + b >= 0.999) {
                     continue;
                 }
@@ -169,9 +169,8 @@ void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
             }
         }
     }
-
-    params.omega = best_omega;
-    params.alpha = best_alpha;
-    params.beta = best_beta;
+    std::cout << "Calculated params: "<<best_omega<<", "<<best_alpha<<", "<<best_beta<<std::endl;
+    params = {best_omega, best_alpha, best_beta};
     std::cout << "[GARCH::grid_search] best log-likelihood=" << best_ll << std::endl;
+
 }
