@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libboost-all-dev \
     libssl-dev \
     tree && \
+    libeigen3-dev \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /opt/venv
