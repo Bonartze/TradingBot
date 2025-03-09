@@ -1,7 +1,7 @@
 [build]
+base = "trading-dashboard"
 command = "npm run build"
-public = "/build"
-base = "/"
+publish = "build"
 
 [[redirects]]
 from = "/*"
