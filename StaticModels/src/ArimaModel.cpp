@@ -1,37 +1,31 @@
 #include "../include/ArimaModel.h"
+#include "../../TradingStrategies/Common/include/Common.h"
 #include <numeric>
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
 #include <iostream>
 #include <Eigen/Dense>
+#include <fstream>
 
 
-ARIMAModel::ARIMAModel(const std::vector<double> &data) {
+ARIMAModel::ARIMAModel(const std::string &data) {
     fill_data(data);
-    if (close_prices.empty()) {
+    if (close_prices.empty())
         throw std::runtime_error("Error: close_prices is empty.");
-    }
-
 
     params = arima_parameters_evaluation(close_prices);
-
-
+    if (params.q > 5)
+        params.q = 5;
     auto diff_close_prices = close_prices;
     for (int i = 0; i < params.d; i++) {
         diff_close_prices = compute_first_diff(diff_close_prices);
-        if (diff_close_prices.empty()) {
+        if (diff_close_prices.empty())
             throw std::runtime_error("Error: Not enough data to compute difference.");
-        }
     }
 
 
     coefficients = estimate_coefficients(diff_close_prices, params.p, params.q);
-}
-
-
-void ARIMAModel::fill_data(const std::vector<double> &data) {
-    close_prices = data;
 }
 
 
@@ -401,4 +395,10 @@ std::vector<double> ARIMAModel::forecast(int steps) {
         }
     }
     return forecasts;
+}
+
+auto ARIMAModel::fill_data(const std::string &file_path) -> void {
+    auto candles = loadCandles(file_path);
+    for (auto &candle: candles)
+        close_prices.push_back(candle.close);
 }

@@ -9,6 +9,12 @@ struct GarchParams {
 };
 
 class GarchModel {
+private:
+    std::unique_ptr<ARIMAModel> arima_model;
+    GarchParams params{0.1, 0.05, 0.90};
+
+    void naive_grid_search(const std::vector<double> &residuals);
+
 public:
     explicit GarchModel(const ARIMAModel &arima);
 
@@ -27,11 +33,4 @@ public:
 
 
     std::vector<double> combined_forecast(int steps);
-
-private:
-    std::unique_ptr<ARIMAModel> arima_model;
-    GarchParams params{0.1, 0.05, 0.90};
-
-
-    void naive_grid_search(const std::vector<double> &residuals);
 };
