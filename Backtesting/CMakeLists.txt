@@ -35,7 +35,7 @@ find_package(Eigen3 REQUIRED)
 
 add_executable(backtesting
         ./src/arima_garch_adaptive_backtesting.cpp
-        ./include/arima_garch_adaptive_backtesting.h
+        #./include/arima_garch_adaptive_backtesting.h
         #        /TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
         #        ../TradingStrategies/Scalping/src/ScalpingStr.cpp
         ./src/run_backtesting.cpp
