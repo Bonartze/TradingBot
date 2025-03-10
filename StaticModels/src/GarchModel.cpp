@@ -35,8 +35,8 @@ GarchModel::GarchModel(const ARIMAModel &arima) {
 void GarchModel::fit_garch_parameters(const std::vector<double> &residuals) {
     naive_grid_search(residuals);
 
-    std::cout << "[GARCH::fit_garch_parameters] best (omega, alpha, beta) = ("
-            << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
+    //std:: << "[GARCH::fit_garch_parameters] best (omega, alpha, beta) = ("
+     //       << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
 }
 
 
@@ -165,7 +165,6 @@ void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
             }
         }
     }
-    std::cout << "Calculated params: "<<best_omega<<", "<<best_alpha<<", "<<best_beta<<std::endl;
     params = {best_omega, best_alpha, best_beta};
-    std::cout << "[GARCH::grid_search] best log-likelihood=" << best_ll << std::endl;
+    //std::cout << "[GARCH::grid_search] best log-likelihood=" << best_ll << std::endl;
 }

@@ -179,7 +179,7 @@ ArimaParams ARIMAModel::arima_parameters_evaluation(const std::vector<double> &s
         }
     }
 
-    std::cout << "[ARIMA] Automatic guess => p=" << p << " d=" << d << " q=" << q << std::endl;
+   // std::cout << "[ARIMA] Automatic guess => p=" << p << " d=" << d << " q=" << q << std::endl;
     return {p, d, q};
 }
 

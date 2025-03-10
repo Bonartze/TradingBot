@@ -61,9 +61,9 @@ auto ArimaGarchAdaptive::execute(const std::vector<double> &prices, CSVLogger &c
     double profit = 0.0;
 
     csv_logger.logRow({"Executing strategy", std::to_string(current_price)});
-    Logger(LogLevel::DEBUG) << "Position open: " << position_open
-            << " | Should buy: " << should_buy(prices, csv_logger)
-            << " | Should sell: " << should_sell(prices, entry_price, csv_logger);
+//    Logger(LogLevel::DEBUG) << "Position open: " << position_open
+//            << " | Should buy: " << should_buy(prices, csv_logger)
+//            << " | Should sell: " << should_sell(prices, entry_price, csv_logger);
 
     if (!position_open && should_buy(prices, csv_logger)) {
         const double max_quantity = balance / current_price;
