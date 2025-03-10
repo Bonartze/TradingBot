@@ -35,6 +35,7 @@ RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/b
 WORKDIR /backtesting/Backtesting/build
 
 RUN cmake ../ && make -j$(nproc)
+RUN ls ../data/Data_extracted/5m/BTCUSDT/2020/
 RUN chmod +x backtesting && ./backtesting
 
 WORKDIR /backtesting/Backtesting/src/

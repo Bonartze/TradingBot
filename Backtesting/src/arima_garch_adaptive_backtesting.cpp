@@ -99,7 +99,7 @@ TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarch2020Backtesting) {
         double profit = pair.second;
         size_t trades = monthly_trades[month];
         ss << "Month " << month << ": Profit = " << profit << ", Trades = " << trades << "\n";
-        EXPECT_NEAR(EXPECTED_PROFIT[month], profit, EXPECTED_PROFIT_MARGIN);
+        EXPECT_NEAR(EXPECTED_PROFIT[month-1], profit, EXPECTED_PROFIT_MARGIN);
     }
     Logger(LogLevel::INFO) << ss.str();
 }
