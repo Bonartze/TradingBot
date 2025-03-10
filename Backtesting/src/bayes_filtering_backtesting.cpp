@@ -7,7 +7,7 @@
 constexpr size_t WINDOW_SIZE = 100;
 constexpr size_t START_YEAR = 2020;
 constexpr size_t END_YEAR = 2024;
-constexpr size_t EXPECTED_PROFIT_MARGIN = 150;
+constexpr size_t EXPECTED_PROFIT_MARGIN = 300;
 constexpr std::array<double, 5> EXPECTED_PROFIT = {1100, -300, -50, 300, -400};
 
 void BayesianBacktesting::SetUp() {
