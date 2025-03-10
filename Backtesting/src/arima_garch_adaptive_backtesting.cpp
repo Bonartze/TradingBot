@@ -54,7 +54,6 @@ TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarch2020Backtesting) {
               });
 
     Logger(LogLevel::INFO) << "Year: " << year << " | Total files: " << files.size();
-    int month = 0;
     for (const auto &file: files) {
         Logger(LogLevel::INFO) << "Processing file: " << file.string();
         auto start_time = std::chrono::high_resolution_clock::now();
@@ -98,7 +97,7 @@ TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarch2020Backtesting) {
         double profit = pair.second;
         size_t trades = monthly_trades[month];
         ss << "Month " << month << ": Profit = " << profit << ", Trades = " << trades << "\n";
-        EXPECT_NEAR(EXPECTED_PROFIT[month-1], monthly_profit[month], EXPECTED_PROFIT_MARGIN);
+        EXPECT_NEAR(EXPECTED_PROFIT[month-1], profit, EXPECTED_PROFIT_MARGIN);
     }
     Logger(LogLevel::INFO) << ss.str();
 }
