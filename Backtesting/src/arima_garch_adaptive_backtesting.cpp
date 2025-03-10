@@ -54,9 +54,14 @@ TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarch2020Backtesting) {
               });
 
     Logger(LogLevel::INFO) << "Year: " << year << " | Total files: " << files.size();
-    int i = 0;
+
     for (const auto &file: files) {
-        Logger(LogLevel::INFO) << "Processing file: " << file.string();
+        int month = extractMonth(file.filename().string());
+        if (month == 0) {
+            Logger(LogLevel::WARNING) << "Warning: Could not extract month from file " << file.string();
+            continue;
+        }
+        Logger(LogLevel::INFO) << "Processing file: " << file.string() << " | Month: " << month;
         auto start_time = std::chrono::high_resolution_clock::now();
 
         auto candles = loadCandles(file.string());
@@ -73,18 +78,14 @@ TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarch2020Backtesting) {
         total_profit += profit;
         total_trades += trades;
 
-        int month = i++;
-        if (month > 0) {
-            monthly_profit[month] += profit;
-            monthly_trades[month] += trades;
-        }
+        monthly_profit[month] += profit;
+        monthly_trades[month] += trades;
 
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
         Logger(LogLevel::INFO) << "File Processed: " << file.string()
                 << " | Trades: " << trades
                 << " | Duration: " << duration << " ms";
-        Logger(LogLevel::INFO) << monthly_profit[month];
     }
 
     Logger(LogLevel::INFO) << "Year: " << year

@@ -88,7 +88,6 @@ def plot_bar(data: dict, title: str, xlabel: str, ylabel: str, output_path: str,
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.tight_layout()
     plt.savefig(output_path)
-    plt.show()
 
 
 def analyze_backtesting_results(strategy_files: dict, output_root: str):
