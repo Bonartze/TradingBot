@@ -35,12 +35,8 @@ RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/b
 WORKDIR /backtesting/Backtesting/build
 
 RUN cmake ../ && make -j$(nproc)
-RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data/scalping
-RUN ls -lah /backtesting/Backtesting/data/scalping
+RUN chmod +x backtesting && ./backtesting
 
 WORKDIR /backtesting/Backtesting/src/
-RUN ls ../data/scalping
 
 RUN python3 show_metrics.py
-
-RUN tree ../data
