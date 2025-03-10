@@ -36,7 +36,7 @@ void GarchModel::fit_garch_parameters(const std::vector<double> &residuals) {
     naive_grid_search(residuals);
 
     //std:: << "[GARCH::fit_garch_parameters] best (omega, alpha, beta) = ("
-     //       << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
+    //       << params.omega << ", " << params.alpha << ", " << params.beta << ")\n";
 }
 
 
@@ -151,7 +151,6 @@ void GarchModel::naive_grid_search(const std::vector<double> &residuals) {
     for (double w = 0.01; w < 1.0; w += step_w) {
         for (double a = 0.0; a < 1.0; a += step_a) {
             for (double b = 0.0; b < 1.0; b += step_b) {
-
                 if (a + b >= 0.999) {
                     continue;
                 }

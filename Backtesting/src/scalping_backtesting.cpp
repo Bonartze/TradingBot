@@ -13,7 +13,7 @@ constexpr size_t SCALPING_SMA_SHORT = 5.0;
 constexpr size_t SCALPING_SMA_LONG = 10.0;
 constexpr size_t SCALPING_RSI_OVERSOLD = 30.0;
 constexpr size_t SCALPING_RSI_OVERBOUGHT = 29.0;
-constexpr size_t EXPECTED_PROFIT_MARGIN = 10;
+constexpr size_t EXPECTED_PROFIT_MARGIN = 30;
 
 constexpr std::array<double, 5> EXPECTED_PROFIT = {40, 2, -20, 60, -80};
 
