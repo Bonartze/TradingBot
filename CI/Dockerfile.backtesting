@@ -29,18 +29,15 @@ COPY . .
 
 WORKDIR /backtesting/Backtesting/src/
 
-RUN python3 load_data_some_years.py
+#RUN python3 load_data_some_years.py
 
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
 
 RUN cmake ../ && make -j$(nproc)
-RUN chmod +x backtesting && ./backtesting && ls -lah /backtesting/Backtesting/data/scalping
-RUN ls -lah /backtesting/Backtesting/data/scalping
+RUN ls ../data/Data_extracted/5m/BTCUSDT/2020/
+RUN chmod +x backtesting && ./backtesting
 
 WORKDIR /backtesting/Backtesting/src/
-RUN ls ../data/scalping
 
 RUN python3 show_metrics.py
-
-RUN tree ../data
