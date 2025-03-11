@@ -47,7 +47,7 @@ add_executable(backtesting
         ../TradingStrategies/Common/src/Common.cpp
         ../TradingStrategies/Common/src/TradingStrategy.cpp
         ../TradingStrategies/BayesianSignalFiltering/src/BayesianSignalFiltering.cpp
-cd         ./src/scalping_backtesting.cpp
+        ./src/scalping_backtesting.cpp
         ./src/mean_reverse_backtesting.cpp
         ./src/bayes_filtering_backtesting.cpp
         ./src/arima_garch_adaptive_backtesting.cpp

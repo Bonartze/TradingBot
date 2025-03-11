@@ -62,11 +62,13 @@ namespace {
 }
 
 TEST_F(ScalpingBacktesting, ScalpingBacktesting) {
-    ScalpingStr scalp({SCALPING_SMA_SHORT,
-                     SCALPING_SMA_LONG,
-                     SCALPING_RSI_OVERSOLD,
-                     SCALPING_RSI_OVERBOUGHT},
-                     START_BALANCE, false, 0.0, 0.0);
+    ScalpingStr scalp({
+                          SCALPING_SMA_SHORT,
+                          SCALPING_SMA_LONG,
+                          SCALPING_RSI_OVERSOLD,
+                          SCALPING_RSI_OVERBOUGHT
+                      },
+                      START_BALANCE, false, 0.0, 0.0);
     std::filesystem::create_directories("../data/scalping/");
     for (size_t year = START_YEAR; year <= END_YEAR; ++year) {
         std::string output_file = "../data/scalping/" + std::to_string(year) + ".csv";
@@ -75,7 +77,8 @@ TEST_F(ScalpingBacktesting, ScalpingBacktesting) {
         double total_profit = 0.0;
         size_t total_trades = 0;
 
-        processYearData("../data/Data_extracted/5m/BTCUSDT/"+std::to_string(year), scalp, total_profit, total_trades, csv_logger);
+        processYearData("../data/Data_extracted/5m/BTCUSDT/" + std::to_string(year), scalp, total_profit, total_trades,
+                        csv_logger);
 
         Logger(LogLevel::INFO) << "Year: " << year
                 << " | Expected Profit: " << EXPECTED_PROFIT[year - START_YEAR]
