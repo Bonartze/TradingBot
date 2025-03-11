@@ -34,15 +34,14 @@ find_package(OpenSSL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 add_executable(backtesting
-        # ./src/arima_garch_adaptive_backtesting.cpp
         ../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
         ../TradingStrategies/Scalping/src/ScalpingStr.cpp
         ./src/run_backtesting.cpp
         ../Logger/src/Logger.cpp
         ../TradingStrategies/Common/src/TradingMethods.cpp
-        #../TradingStrategies/ArimaGarchAdaptiveTrading/src/ArimaGarchAdaptive.cpp
-        #../StaticModels/src/GarchModel.cpp
-        #../StaticModels/src/ArimaModel.cpp
+        ../TradingStrategies/ArimaGarchAdaptiveTrading/src/ArimaGarchAdaptive.cpp
+        ../StaticModels/src/GarchModel.cpp
+        ../StaticModels/src/ArimaModel.cpp
         ../Logger/src/CSVLogger.cpp
         ../TradingStrategies/Common/src/BinanceScalping.cpp
         ../TradingStrategies/Common/src/Common.cpp
@@ -51,6 +50,7 @@ add_executable(backtesting
         ./src/scalping_backtesting.cpp
         ./src/mean_reverse_backtesting.cpp
         ./src/bayes_filtering_backtesting.cpp
+        ./src/arima_garch_adaptive_backtesting.cpp
 )
 
 target_link_libraries(backtesting PRIVATE

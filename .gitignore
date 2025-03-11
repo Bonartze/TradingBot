@@ -8,7 +8,7 @@ bin
 *.iml
 venv/
 .venv/
-Data_extracted/
+#Data_extracted/
 arima_garch
 Data_zips/
 StatisticsPlots/
