@@ -18,8 +18,21 @@ private:
     auto should_sell(const std::vector<double> &, double entry_price, CSVLogger &) -> bool override;
 
 public:
-    ArimaGarchAdaptive(const std::string &filepath): TradingStrategy({}, 1000, false, 0.0, 0.0),
+    ArimaGarchAdaptive(const std::string &filepath): TradingStrategy({}, 1000, false, 0.0, 0.0, "", "", ""),
                                                      arima_model(std::make_unique<ARIMAModel>(filepath)) {
+        garch_model = std::make_unique<GarchModel>(*arima_model);
+    }
+
+    ArimaGarchAdaptive(const std::string &filepath, const TradingParams &trading_params, double balance,
+                       bool is_position_open, double entry_price, double asset_quantity, const std::string &key,
+                       const std::string &secret, const std::string &symbol) : TradingStrategy(
+                                                                                   trading_params, balance,
+                                                                                   is_position_open, entry_price,
+                                                                                   asset_quantity, key, secret, symbol),
+                                                                               arima_model(
+                                                                                   // another way -> at first gather data, then fill it out
+                                                                                   std::make_unique<ARIMAModel>(
+                                                                                       filepath)) {
         garch_model = std::make_unique<GarchModel>(*arima_model);
     }
 

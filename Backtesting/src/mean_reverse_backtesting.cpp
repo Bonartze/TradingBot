@@ -61,13 +61,7 @@ namespace {
 }
 
 TEST_F(MeanReverseBacktesting, MeanReversionBacktesting) {
-    MeanReverseStrategy mvs({
-                                MEAN_REV_SMA_SHORT,
-                                MEAN_REV_SMA_LONG,
-                                MEAN_REV_RSI_OVERSOLD,
-                                MEAN_REV_RSI_OVERBOUGHT
-                            },
-                            MEAN_REV_START_BALANCE, false, 0.0, 0.0);
+    MeanReverseStrategy mvs;
     std::filesystem::create_directories("../data/mean_reversion/");
     for (size_t year = MEAN_REV_START_YEAR; year <= MEAN_REV_END_YEAR; ++year) {
         std::string output_file = "../data/mean_reversion/" + std::to_string(year) + ".csv";

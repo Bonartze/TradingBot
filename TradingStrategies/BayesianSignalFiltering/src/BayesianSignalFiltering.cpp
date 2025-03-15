@@ -2,6 +2,7 @@
 
 #include "../../Common/include/TradingMethods.h"
 
+
 auto BayesianSignalFiltering::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) -> bool {
     if (prices.size() < 20) {
         return false;
@@ -135,8 +136,10 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
     double profit = 0.0;
 
     csv_logger.logRow({"Executing strategy", std::to_string(current_price)});
-    Logger(LogLevel::DEBUG) << "Position open: " << position_open << " Should buy: " << should_buy(prices, csv_logger)
+    Logger(LogLevel::DEBUG) << "Position open: " << position_open
+            << " Should buy: " << should_buy(prices, csv_logger)
             << " Should sell: " << should_sell(prices, entry_price, csv_logger) << '\n';
+
     if (!position_open && should_buy(prices, csv_logger)) {
         const double max_quantity = balance / current_price;
         if (max_quantity > 0) {
@@ -144,7 +147,14 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
             entry_price = current_price;
             balance -= asset_quantity * entry_price;
             position_open = true;
-
+            const std::string buy_order_id = std::to_string(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()
+                ).count()
+            );
+            if (!is_backtesting)
+                binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
+                                                 asset_quantity, entry_price, buy_order_id, 0.0, 0.0, 5000);
             Logger(LogLevel::INFO) << "Buy at: " << entry_price
                     << " | Quantity: " << asset_quantity
                     << " | Remaining Balance: " << balance;
@@ -158,11 +168,19 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
         }
     } else if (position_open && should_sell(prices, entry_price, csv_logger)) {
         const double exit_price = current_price;
-        profit = asset_quantity * (exit_price - entry_price);
-        balance += asset_quantity * exit_price;
-        asset_quantity = 0.0;
+        const double sell_quantity = asset_quantity;
+        profit = sell_quantity * (exit_price - entry_price);
+        balance += sell_quantity * exit_price;
         position_open = false;
-
+        const std::string sell_order_id = std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+            ).count()
+        );
+        if (!is_backtesting)
+            binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
+                                             sell_quantity, exit_price, sell_order_id, 0.0, 0.0, 5000);
+        asset_quantity = 0.0;
         Logger(LogLevel::INFO) << "Sell at: " << exit_price
                 << " | Profit: " << profit
                 << " | Total Balance: " << balance;
@@ -183,6 +201,7 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
 
     return profit;
 }
+
 
 auto BayesianSignalFiltering::wrapper_execute(size_t window_size, const std::vector<double> &prices,
                                               CSVLogger &csv_logger) -> std::pair<double, double> {

@@ -37,7 +37,7 @@ public:
                                  const std::string &target_);
 
     // fetch raw data from Binance API
-    void fetch_raw_data(size_t scalping_data_points = 1) override;
+    void fetch_raw_data(size_t scalping_data_points = 1);
 
     // just getting the price map
     const std::unordered_map<std::string, double> &get_price_map();
@@ -46,4 +46,6 @@ public:
     Graph &generate_order_graph(const std::unordered_set<std::string> &);
 
     ~LiveBinanceScalping() = default;
+
+    void fetch_raw_data(std::vector<OrderBookEntry> &) override{}
 };
