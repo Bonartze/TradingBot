@@ -27,7 +27,14 @@ class BayesianSignalFiltering : public TradingStrategy {
                           double lower_band) -> double;
 
 public:
-    BayesianSignalFiltering(): TradingStrategy({}, 1000, false, 0.0, 0.0) {
+    BayesianSignalFiltering(): TradingStrategy({}, 1000, false, 0.0, 0.0, "key", "secret", "BTCUSDT") {
+    }
+
+    BayesianSignalFiltering(const TradingParams &trading_params, double balance_, bool is_position_open,
+                            double quantity,
+                            double entry_price, const std::string &key, const std::string &secret,
+                            const std::string &symbol_): TradingStrategy(
+        trading_params, balance_, is_position_open, entry_price, quantity, key, secret, symbol_) {
     }
 
     auto execute(const std::vector<double> &prices, CSVLogger &csv_logger) -> double override;

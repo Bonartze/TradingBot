@@ -17,13 +17,15 @@ public:
     MeanReverseStrategy() : TradingStrategy({
                                                 5, 10, 30.0,
                                                 29.0
-                                            }, 1000.0, false, 0.0, 0.0) {
+                                            }, 1000.0, false, 0.0, 0.0, "", "", "") {
     };
 
     MeanReverseStrategy(const TradingParams &trading_params, double balance_, bool position_open_, double entry_price_,
-                        double asset_quantity_) : TradingStrategy(trading_params, balance_, position_open_,
-                                                                  entry_price_,
-                                                                  asset_quantity_) {
+                        double asset_quantity_, const std::string &key, const std::string &secret,
+                        const std::string &symbol) : TradingStrategy(trading_params, balance_, position_open_,
+                                                                     entry_price_,
+                                                                     asset_quantity_, key, secret, symbol)
+    {
     }
 
     auto execute(const std::vector<double> &prices, CSVLogger &csv_logger) -> double override;

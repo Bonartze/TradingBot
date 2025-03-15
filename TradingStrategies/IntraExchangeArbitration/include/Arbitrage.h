@@ -1,16 +1,15 @@
 #pragma once
 #include "LiveBinanceScalping.h"
 #include "Bellman_Ford.h"
-#include "../../../TradingEngine/include/OrderManager.h"
+#include "../../../TradingEngine/include/BinanceOrderManager.h"
+#include "../../../Logger/include/Logger.h"
+#include "../../Common/include/Common.h"
 #include <memory>
 
-const std::string host = "api.binance.com";
-const std::string port = "443";
-const std::string target = "/api/v3/ticker/price";
-
 class Arbitrage {
+
 private:
-    std::unique_ptr<OrderManager> order_manager; // order manager
+    std::unique_ptr<BinanceOrderManager> order_manager; // order manager
     std::unique_ptr<LiveBinanceScalping> binance_scalping; // initial scalping
     std::unique_ptr<Graph> order_graph; // graph with possible orders for arbitrage opportunities
     void do_order_sequence(const std::vector<std::string> &, const double);

@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 #if defined(_WIN32) || defined(_WIN64)
     #ifdef STRATEGIES_API_EXPORT
@@ -12,63 +13,113 @@
     #define STRATEGIES_API
 #endif
 
-#include <memory>
-#include <vector>
-#include <string>
-#include <unordered_set>
-#include "../../TradingEngine/include/BinanceOrderManager.h"
-#include "../IntraExchangeArbitration/include/LiveBinanceScalping.h"
-#include "../Common/include/Graph.h"
-#include "../Common/include/Common.h"
-#include "../../Logger/include/CSVLogger.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stddef.h>
+#include <stdbool.h>
 
 
-class STRATEGIES_API Arbitrage {
-private:
-    std::unique_ptr<OrderManager> order_manager;
-    std::unique_ptr<LiveBinanceScalping> binance_scalping;
-    std::unique_ptr<Graph> order_graph;
-    void do_order_sequence(const std::vector<std::string> &, const double);
-
-    double apply_commission(double, double);
-
-    double calculate_potential_profit(double, double, size_t);
-
-public:
-    Arbitrage() = delete;
-
-    Arbitrage(int) = delete;
-
-    Arbitrage(const std::unordered_set<std::string> &, const int &version, const std::string &, const std::string &);
-
-    void find_arbitrage_opportunities(const std::string &source, const double);
-};
-
-class STRATEGIES_API ScalpingStr {
-private:
-    double balance;
-    bool position_open;
-    double entry_price;
-    double asset_quantity;
+typedef struct Arbitrage Arbitrage;
+typedef struct ScalpingStr ScalpingStr;
+typedef struct MeanReverseStrategy MeanReverseStrategy;
+typedef struct BayesianSignalFiltering BayesianSignalFiltering;
+typedef struct ArimaGarchAdaptive ArimaGarchAdaptive;
+typedef struct CSVLogger CSVLogger;
+typedef struct TradingParams TradingParams;
+typedef struct ExchangeAPI ExchangeAPI;
 
 
-    static auto should_buy(const std::vector<double> &, const TradingParams &, CSVLogger &) -> bool;
-
-    static auto should_sell(const std::vector<double> &, const TradingParams &, double, CSVLogger &) -> bool;
-
-public:
-    ScalpingStr();
-
-    ScalpingStr(double balance_, bool position_opened_, double entry_price_,
-                double asset_quantity_);
-
-    auto execute() -> void;
-
-    static auto extract_prices(const std::vector<Candle> &) -> std::vector<double>;
-
-    static auto loadCandles(const std::string &) -> std::vector<Candle>;
-
-    auto execute(const std::vector<double> &, TradingParams, CSVLogger &) -> double;
-};
 
 
+
+STRATEGIES_API Arbitrage* CreateArbitrage(const char** symbols, size_t symbol_count,
+                                          int version, const char* api_key, const char* secret_key);
+STRATEGIES_API void DestroyArbitrage(Arbitrage* instance);
+
+STRATEGIES_API void Arbitrage_FindOpportunities(Arbitrage* instance, const char* source, double amount);
+
+
+
+
+
+STRATEGIES_API ScalpingStr* CreateScalpingStr();
+
+STRATEGIES_API ScalpingStr* CreateScalpingStrEx(const TradingParams* params, double balance,
+                                               bool position_open, double entry_price,
+                                               double asset_quantity, const char* key,
+                                               const char* secret, const char* symbol);
+STRATEGIES_API void DestroyScalpingStr(ScalpingStr* instance);
+
+
+STRATEGIES_API double ScalpingStr_WrapperExecute(ScalpingStr* instance,size_t window_size,
+                                                   const double* prices, size_t count,
+                                                   CSVLogger* logger);
+
+STRATEGIES_API MeanReverseStrategy* CreateMeanReverseStrategy();
+
+STRATEGIES_API MeanReverseStrategy* CreateMeanReverseStrategyEx(const TradingParams* params, double balance,
+                                                               bool position_open, double entry_price,
+                                                               double asset_quantity, const char* key,
+                                                               const char* secret,const char* symbol);
+STRATEGIES_API void DestroyMeanReverseStrategy(MeanReverseStrategy* instance);
+
+STRATEGIES_API double MeanReverseStrategy_Execute(MeanReverseStrategy* instance,
+                                                  const double* prices, size_t count,
+                                                  CSVLogger* logger);
+
+STRATEGIES_API double MeanReverseStrategy_WrapperExecute(MeanReverseStrategy* instance, size_t window_size,
+                                                         const double* prices, size_t count,
+                                                         CSVLogger* logger);
+
+
+
+
+
+STRATEGIES_API BayesianSignalFiltering* CreateBayesianStrategy();
+
+STRATEGIES_API BayesianSignalFiltering* CreateBayesianStrategyEx(const TradingParams* params, double balance,
+                                                                bool position_open, double quantity,
+                                                                double entry_price, const char* key,
+                                                                const char* secret, const char* symbol);
+STRATEGIES_API void DestroyBayesianStrategy(BayesianSignalFiltering* instance);
+
+STRATEGIES_API double BayesianStrategy_Execute(BayesianSignalFiltering* instance,
+                                               const double* prices, size_t count,
+                                               CSVLogger* logger);
+
+STRATEGIES_API double BayesianStrategy_WrapperExecute(BayesianSignalFiltering* instance, size_t window_size,
+                                                      const double* prices, size_t count,
+                                                      CSVLogger* logger);
+
+
+
+
+
+STRATEGIES_API ArimaGarchAdaptive* CreateArimaGarchAdaptive(const char* filepath);
+
+STRATEGIES_API ArimaGarchAdaptive* CreateArimaGarchAdaptiveEx(const char* filepath, const TradingParams* params,
+                                                              double balance, bool position_open,
+                                                              double entry_price, double asset_quantity,
+                                                              const char* key, const char* secret,
+                                                              const char* symbol);
+STRATEGIES_API void DestroyArimaGarchAdaptive(ArimaGarchAdaptive* instance);
+
+STRATEGIES_API double ArimaGarchStrategy_Execute(ArimaGarchAdaptive* instance,
+                                                 const double* prices, size_t count,
+                                                 CSVLogger* logger);
+
+STRATEGIES_API double ArimaGarchStrategy_WrapperExecute(ArimaGarchAdaptive* instance, size_t window_size,
+                                                        const double* prices, size_t count,
+                                                        CSVLogger* logger);
+
+
+
+
+
+STRATEGIES_API void RunInterexchangeArbitrage(const char* crypto_pair);
+
+#ifdef __cplusplus
+}
+#endif

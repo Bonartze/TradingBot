@@ -83,7 +83,7 @@ void ExchangeAPI::run_interexchange_arbitrage(std::string crypto_pair) {
         std::cout << "\nNo valid arbitrage opportunity found.\n";
     }
 }
-
-int main() {
-    ExchangeAPI::run_interexchange_arbitrage("BTCUSDT");
-}
+//
+//int main() {
+//    ExchangeAPI::run_interexchange_arbitrage("BTCUSDT");
+//}
