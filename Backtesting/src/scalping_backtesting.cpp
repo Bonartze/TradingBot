@@ -56,7 +56,7 @@ TEST_F(ScalpingBacktesting, ScalpingBacktesting) {
                      SCALPING_SMA_LONG,
                      SCALPING_RSI_OVERSOLD,
                      SCALPING_RSI_OVERBOUGHT},
-                     START_BALANCE, false, 0.0, 0.0);
+                     START_BALANCE, false, 0.0, 0.0, "", "", "");
     std::filesystem::create_directories("../data/scalping/");
     for (size_t year = START_YEAR; year <= END_YEAR; ++year) {
         std::string output_file = "../data/scalping/" + std::to_string(year) + ".csv";

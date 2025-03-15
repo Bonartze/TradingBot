@@ -6,6 +6,7 @@
 
 class TradingStrategy {
 protected:
+    bool is_backtesting;
     std::unique_ptr<BinanceOrderManager> binanceOrderManager;
     std::string symbol;
     TradingParams trading_params;
@@ -24,7 +25,7 @@ public:
     static auto extract_prices(const std::vector<Candle> &) -> std::vector<double>;
 
     TradingStrategy(const TradingParams &trading_params, double balance, bool position_open_, double entry_price_,
-                    double asset_quantity_, const std::string &, const std::string &, const std::string &);
+                    double asset_quantity_, const std::string &, const std::string &, const std::string &, bool is_backtesting_ = true);
 
     virtual ~TradingStrategy() = default;
 };

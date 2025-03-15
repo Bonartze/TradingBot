@@ -79,7 +79,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
                 ).count()
             );
 
-            if (binanceOrderManager) {
+            if (binanceOrderManager && !is_backtesting) {
                 binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
                                                  asset_quantity, entry_price, buy_order_id,
                                                  0.0, 0.0, 5000);
@@ -112,7 +112,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
                 std::chrono::system_clock::now().time_since_epoch()
             ).count()
         );
-        if (binanceOrderManager) {
+        if (binanceOrderManager && !is_backtesting) {
             binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
                                              sell_quantity, exit_price, sell_order_id,
                                              0.0, 0.0, 5000);

@@ -152,8 +152,9 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
                     std::chrono::system_clock::now().time_since_epoch()
                 ).count()
             );
-            binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
-                                             asset_quantity, entry_price, buy_order_id, 0.0, 0.0, 5000);
+            if (!is_backtesting)
+                binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
+                                                 asset_quantity, entry_price, buy_order_id, 0.0, 0.0, 5000);
             Logger(LogLevel::INFO) << "Buy at: " << entry_price
                     << " | Quantity: " << asset_quantity
                     << " | Remaining Balance: " << balance;
@@ -176,8 +177,9 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
                 std::chrono::system_clock::now().time_since_epoch()
             ).count()
         );
-        binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
-                                         sell_quantity, exit_price, sell_order_id, 0.0, 0.0, 5000);
+        if (!is_backtesting)
+            binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
+                                             sell_quantity, exit_price, sell_order_id, 0.0, 0.0, 5000);
         asset_quantity = 0.0;
         Logger(LogLevel::INFO) << "Sell at: " << exit_price
                 << " | Profit: " << profit
