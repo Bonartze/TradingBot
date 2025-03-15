@@ -29,6 +29,7 @@ set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(simdjson)
 
 find_package(Boost REQUIRED COMPONENTS system filesystem)
+find_package(CURL REQUIRED)
 
 find_package(OpenSSL REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -58,6 +59,7 @@ target_link_libraries(backtesting PRIVATE
         gtest_main
         jsoncpp_object
         simdjson
+        CURL::libcurl
         OpenSSL::SSL
         OpenSSL::Crypto
         Eigen3::Eigen
