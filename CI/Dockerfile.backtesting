@@ -17,9 +17,8 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     tree \
     libeigen3-dev \
-    libcurl4-openssl-dev
-
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libcurl4-openssl-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
