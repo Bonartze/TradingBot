@@ -48,7 +48,7 @@ auto BayesianSignalFiltering::should_sell(const std::vector<double> &prices, dou
     const double p_b = signal_frequency(prices, rsi_values, upper_band);
     const double p_a_given_b = (p_b_given_a * p_a) / p_b;
 
-    // Используем вынесенный порог sellThreshold вместо 0.55
+    
     return p_a_given_b > sellThreshold;
 }
 
@@ -82,7 +82,7 @@ double BayesianSignalFiltering::signal_probability_given_up(const std::vector<do
     for (size_t i = 1; i < prices.size(); ++i) {
         if (prices[i] > prices[i - 1]) {
             up_count++;
-            // Вместо жесткого значения 60, можно при необходимости использовать rsiThreshold или другой параметр
+            
             if (rsi_values[i] < rsiThreshold && prices[i] < lower_band) {
                 signal_and_up++;
             }
