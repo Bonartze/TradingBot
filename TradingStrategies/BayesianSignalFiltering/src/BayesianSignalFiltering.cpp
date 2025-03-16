@@ -1,6 +1,7 @@
 #include "../include/BayesianSignalFiltering.h"
 #include "../../Common/include/TradingMethods.h"
 
+
 auto BayesianSignalFiltering::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) -> bool {
     if (prices.size() < 20) {
         return false;
