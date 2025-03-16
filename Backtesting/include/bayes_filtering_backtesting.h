@@ -8,7 +8,7 @@ public:
     std::string data_dir;
     BayesianSignalFiltering bayes_filter;
 protected:
-    void SetUp() override;
+    void SetUp() override {};
 
-    void TearDown() override;
+    void TearDown() override {};
 };

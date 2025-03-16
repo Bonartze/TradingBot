@@ -63,7 +63,7 @@ add_executable(backtesting
         ./src/scalping_backtesting.cpp
         ./src/mean_reverse_backtesting.cpp
         ./src/bayes_filtering_backtesting.cpp
-        ./src/arima_garch_adaptive_backtesting.cpp
+ #       ./src/arima_garch_adaptive_backtesting.cpp
 )
 
 target_link_libraries(backtesting PRIVATE

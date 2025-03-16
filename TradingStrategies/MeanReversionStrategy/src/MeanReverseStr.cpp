@@ -12,6 +12,17 @@ auto MeanReverseStrategy::calculate_fee(double amount) -> double {
     return std::max(amount * 0.01, 0.01);
 }
 
+auto MeanReverseStrategy::set_parameters(const std::vector<double> &params) -> void {
+    if (params.size() < 4) {
+        return;
+    }
+    trading_params = {
+        params[0], params[1],
+        params[2], params[3]
+    };
+}
+
+
 bool MeanReverseStrategy::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) {
     double ema_short = TradingMethods::ema(prices, trading_params.sma_short);
     double ema_long = TradingMethods::ema(prices, trading_params.sma_long);

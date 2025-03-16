@@ -7,8 +7,11 @@ class ScalpingBacktesting : public ::testing::Test {
 public:
     std::string data_dir;
     ScalpingStr scalp;
-protected:
-    void SetUp() override;
 
-    void TearDown() override;
+protected:
+    void SetUp() override {
+    };
+
+    void TearDown() override {
+    };
 };
