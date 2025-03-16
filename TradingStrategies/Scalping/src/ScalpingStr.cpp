@@ -9,6 +9,7 @@
 
 auto ScalpingStr::should_buy(const std::vector<double> &prices,
                              CSVLogger &csv_logger) -> bool {
+    std::cout <<"Pries sb: "<< prices.size() << std::endl;
     const double sma_short = TradingMethods::sma(prices, trading_params.sma_short);
     const double sma_long = TradingMethods::sma(prices, trading_params.sma_long);
     const double current_price = prices.back();
@@ -48,6 +49,17 @@ auto ScalpingStr::should_sell(const std::vector<double> &prices,
              current_price > entry_price) ||
             current_price < entry_price * PRICE_ABOVE_SMA_THRESHOLD);
 }
+
+void ScalpingStr::set_parameters(const std::vector<double> &params) {
+    if (params.size() < 4) {
+        return;
+    }
+    trading_params = {
+        params[0], params[1],
+        params[2], params[3]
+    };
+}
+
 
 auto ScalpingStr::execute(const std::vector<double> &prices,
                           CSVLogger &csv_logger) -> double {

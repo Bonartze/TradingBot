@@ -5,21 +5,23 @@
 #include <tuple>
 
 auto TradingMethods::sma(const std::vector<double> &prices, size_t period) -> double {
-    if (prices.size() < period) {
-        throw std::invalid_argument("Not enough prices provided");
+    if (prices.empty()) {
+        throw std::invalid_argument("No prices provided");
     }
-    const double sum = std::accumulate(prices.end() - static_cast<std::ptrdiff_t>(period), prices.end(), 0.0);
-    return sum / static_cast<double>(period);
+    size_t effective_period = std::min(prices.size(), period);
+    std::cout << "Prices sma: " << prices.size() << " Period: " << effective_period << std::endl;
+    const double sum = std::accumulate(prices.end() - effective_period, prices.end(), 0.0);
+    return sum / static_cast<double>(effective_period);
 }
 
-auto TradingMethods::rsi(const std::vector<double> &prices, int period) -> double {
-    if (prices.size() < period) {
-        throw std::invalid_argument("Not enough prices provided");
+auto TradingMethods::rsi(const std::vector<double> &prices, size_t period) -> double {
+    size_t effective_period = std::min(prices.size(), static_cast<size_t>(period));
+    if (effective_period < 2) {
+        throw std::invalid_argument("Not enough prices provided for RSI calculation");
     }
-
     double gain = 0.0;
     double loss = 0.0;
-    for (size_t i = 1; i < period; ++i) {
+    for (size_t i = 1; i < effective_period; ++i) {
         const double change = prices[i] - prices[i - 1];
         if (change > 0) {
             gain += change;
@@ -27,14 +29,11 @@ auto TradingMethods::rsi(const std::vector<double> &prices, int period) -> doubl
             loss -= change;
         }
     }
-
-    gain /= period;
-    loss /= period;
-
+    gain /= effective_period;
+    loss /= effective_period;
     if (loss == 0) {
         return 100.0;
     }
-
     const double rs_ = gain / loss;
     return 100.0 - (100.0 / (1.0 + rs_));
 }

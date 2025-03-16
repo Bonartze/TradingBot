@@ -23,11 +23,10 @@ void ExchangeAPI::run_interexchange_arbitrage(std::string crypto_pair) {
             api_thread.join();
     }
 
-    // Выбираем биржу с самой низкой ask_price (где покупать)
     double min_ask = std::numeric_limits<double>::max();
     int buy_index = -1;
 
-    // Выбираем биржу с самой высокой bid_price (где продавать)
+    
     double max_bid = std::numeric_limits<double>::lowest();
     int sell_index = -1;
 
@@ -65,7 +64,7 @@ void ExchangeAPI::run_interexchange_arbitrage(std::string crypto_pair) {
             double potential_profit = (spread * trade_volume) - total_fee * trade_volume;
 
             if (potential_profit > 0) {
-                // buying and selling logic (using appropriate managers)
+                
                 std::cout << "\n===== Arbitrage Opportunity Found! =====\n";
                 std::cout << "Buy from Exchange " << buy_index << " at: " << min_ask << "\n";
                 std::cout << "Sell to Exchange " << sell_index << " at: " << max_bid << "\n";
@@ -83,7 +82,6 @@ void ExchangeAPI::run_interexchange_arbitrage(std::string crypto_pair) {
         std::cout << "\nNo valid arbitrage opportunity found.\n";
     }
 }
-//
-//int main() {
-//    ExchangeAPI::run_interexchange_arbitrage("BTCUSDT");
-//}
+
+
+

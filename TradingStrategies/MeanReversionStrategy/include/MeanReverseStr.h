@@ -27,6 +27,8 @@ public:
                                                                      asset_quantity_, key, secret, symbol) {
     }
 
+    auto set_parameters(const std::vector<double> &newParams)->void;
+
     auto execute(const std::vector<double> &prices, CSVLogger &csv_logger) -> double override;
 
     auto wrapper_execute(size_t window_size, const std::vector<double> &prices,

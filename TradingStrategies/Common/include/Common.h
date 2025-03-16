@@ -23,8 +23,8 @@ struct Candle {
 };
 
 struct TradingParams {
-    size_t sma_short;
-    size_t sma_long;
+    double sma_short;
+    double sma_long;
     double rsi_value;
     double rsi_prev;
 };

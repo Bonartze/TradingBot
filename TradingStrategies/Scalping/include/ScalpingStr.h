@@ -27,6 +27,8 @@ public:
                                                              asset_quantity_, key, secret, symbol) {
     }
 
+    auto set_parameters(const std::vector<double>&) -> void;
+
     auto should_buy(const std::vector<double> &prices,
                     CSVLogger &csv_logger) -> bool;
 
