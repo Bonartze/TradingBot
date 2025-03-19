@@ -22,9 +22,9 @@ public:
 
     MeanReverseStrategy(const TradingParams &trading_params, double balance_, bool position_open_, double entry_price_,
                         double asset_quantity_, const std::string &key, const std::string &secret,
-                        const std::string &symbol) : TradingStrategy(trading_params, balance_, position_open_,
+                        const std::string &symbol, bool is_backtesting = true) : TradingStrategy(trading_params, balance_, position_open_,
                                                                      entry_price_,
-                                                                     asset_quantity_, key, secret, symbol) {
+                                                                     asset_quantity_, key, secret, symbol, is_backtesting) {
     }
 
     auto set_parameters(const std::vector<double> &newParams)->void;
