@@ -1,8 +1,22 @@
 #!/bin/bash
-mkdir -p ../TradingServer/build && cd ../TradingServer/build
-cmake ../ && make -j`nproc` || echo "Error while building server"
+mkdir -p ../TradingEngine/build && \
+cd ../TradingEngine/build
+cmake ../ && \
+make -j`nproc` || echo "Error while building server"
 
-nohup ./server > server.log 2>&1 & # run server as a demon process
+# generating trading strategy API
+
+mkdir -p ../TradingStrategies/build && cd ../TradingStrategies/build
+
+cmake ../ && \
+make -j`nproc` || echo "Error while generating strategy API" && \
+sudo make install
+
+echo "Strategy API is generated"
+
+# running server as a demon process
+
+nohup ./server > server.log 2>&1 &
 
 disown
 
