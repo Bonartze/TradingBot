@@ -1,14 +1,27 @@
 #!/bin/bash
 
-check_binance_status() {
-  url="https://api.binance.com/api/v3/ping"
+urls=(
+  "https://api.binance.com/api/v3/ping"
+  "https://api.kraken.com/0/public/SystemStatus"
+  "https://www.okx.com/api/v5/public/time"
+)
+
+check_exchange_status() {
+  local url="$1"
+
   response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
 
   if [ "$response" -eq 200 ]; then
-    echo "Binance API is available."
+    echo "$url API is available."
   else
-    echo "Binance API isn't available. Condition code: $response"
+    echo "$url API isn't available. Condition code: $response"
   fi
 }
 
-check_binance_status
+
+for url in "${urls[@]}"
+do
+  check_exchange_status "$url"
+done
+
+

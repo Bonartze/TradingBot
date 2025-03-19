@@ -25,10 +25,10 @@ public:
 
     ArimaGarchAdaptive(const std::string &filepath, const TradingParams &trading_params, double balance,
                        bool is_position_open, double entry_price, double asset_quantity, const std::string &key,
-                       const std::string &secret, const std::string &symbol) : TradingStrategy(
+                       const std::string &secret, const std::string &symbol, bool is_backtesting = true) : TradingStrategy(
                                                                                    trading_params, balance,
                                                                                    is_position_open, entry_price,
-                                                                                   asset_quantity, key, secret, symbol),
+                                                                                   asset_quantity, key, secret, symbol, is_backtesting),
                                                                                arima_model(
                                                                                    // another way -> at first gather data, then fill it out
                                                                                    std::make_unique<ARIMAModel>(

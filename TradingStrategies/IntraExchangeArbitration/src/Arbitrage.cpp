@@ -121,17 +121,3 @@ void Arbitrage::find_arbitrage_opportunities(const std::string &source, const do
         Logger(LogLevel::ERROR) << "Error during arbitrage search: " << e.what();
     }
 }
-
-//int main() {
-//    auto start = std::chrono::high_resolution_clock::now();
-//
-//
-//    Arbitrage arbitrage({"TON", "ADA", "LTC", "ATOM", "DOT", "BTC", "ETH", "BNB", "USDT", "SOL", "AVAX", "XRP", "UNI"},
-//                        11, "", "");
-//    arbitrage.find_arbitrage_opportunities("BTC", 100);
-//
-//    auto end = std::chrono::high_resolution_clock::now();
-//    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-//    Logger(LogLevel::INFO) << "Execution time: " << elapsed.count() << " milliseconds";
-//    return 0;
-//}

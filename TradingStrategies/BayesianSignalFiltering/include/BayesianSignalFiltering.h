@@ -38,8 +38,8 @@ public:
     BayesianSignalFiltering(const TradingParams &trading_params, double balance_, bool is_position_open,
                             double quantity,
                             double entry_price, const std::string &key, const std::string &secret,
-                            const std::string &symbol_): TradingStrategy(
-        trading_params, balance_, is_position_open, entry_price, quantity, key, secret, symbol_) {
+                            const std::string &symbol_, bool is_backtesting = true): TradingStrategy(
+        trading_params, balance_, is_position_open, entry_price, quantity, key, secret, symbol_, is_backtesting ) {
     }
 
     auto set_parameters(const std::vector<double> &) -> void;

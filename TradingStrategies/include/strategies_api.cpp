@@ -53,7 +53,7 @@ STRATEGIES_API ScalpingStr* CreateScalpingStrEx(const TradingParams* params, dou
                                                double asset_quantity, const char* key,
                                                const char* secret, const char* symbol) {
     if (params && key && secret && symbol) {
-        return new ScalpingStr(*params, balance, position_open, entry_price, asset_quantity, key, secret, symbol);
+        return new ScalpingStr(*params, balance, position_open, entry_price, asset_quantity, key, secret, symbol, false);
     }
     return nullptr;
 }
@@ -76,7 +76,6 @@ STRATEGIES_API double ScalpingStr_WrapperExecute(ScalpingStr* instance, size_t w
 
 // MeanReverseStrategy API
 
-
 STRATEGIES_API MeanReverseStrategy* CreateMeanReverseStrategy() {
     return new MeanReverseStrategy();
 }
@@ -85,7 +84,7 @@ STRATEGIES_API MeanReverseStrategy* CreateMeanReverseStrategyEx(const TradingPar
                                                                bool position_open, double entry_price,
                                                                double asset_quantity, const char* key, const char* secret, const char* symbol) {
     if (params) {
-        return new MeanReverseStrategy(*params, balance, position_open, entry_price, asset_quantity, key, secret, symbol);
+        return new MeanReverseStrategy(*params, balance, position_open, entry_price, asset_quantity, key, secret, symbol, false);
     }
     return nullptr;
 }
@@ -128,7 +127,7 @@ STRATEGIES_API BayesianSignalFiltering* CreateBayesianStrategyEx(const TradingPa
                                                                 double entry_price, const char* key,
                                                                 const char* secret, const char* symbol) {
     if (params && key && secret && symbol) {
-        return new BayesianSignalFiltering(*params, balance, position_open, quantity, entry_price, key, secret, symbol);
+        return new BayesianSignalFiltering(*params, balance, position_open, quantity, entry_price, key, secret, symbol, false);
     }
     return nullptr;
 }
@@ -175,7 +174,7 @@ STRATEGIES_API ArimaGarchAdaptive* CreateArimaGarchAdaptiveEx(const char* filepa
                                                               const char* key, const char* secret,
                                                               const char* symbol) {
     if (filepath && params && key && secret && symbol) {
-        return new ArimaGarchAdaptive(filepath, *params, balance, position_open, entry_price, asset_quantity, key, secret, symbol);
+        return new ArimaGarchAdaptive(filepath, *params, balance, position_open, entry_price, asset_quantity, key, secret, symbol, false);
     }
     return nullptr;
 }
