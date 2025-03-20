@@ -20,17 +20,20 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Создаем виртуальное окружение
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# Обновляем pip и устанавливаем зависимости из requirements.txt
 COPY ./requirements.txt /backtesting/requirements.txt
-RUN test -f /backtesting/requirements.txt && pip install --no-cache-dir -r /backtesting/requirements.txt || true
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r /backtesting/requirements.txt
 
+# Копируем весь проект
 COPY . .
 
+# Переходим в директорию сборки Backtesting
 WORKDIR /backtesting/Backtesting/src/
-
-#RUN python3 load_data_some_years.py
 
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
@@ -40,14 +43,8 @@ RUN ls ../data/Data_extracted/5m/BTCUSDT/2020/
 RUN chmod +x backtesting && ./backtesting
 
 WORKDIR /backtesting/Backtesting/src/
-
 RUN python3 show_metrics.py
 
-RUN mkdir -p /backtesting/StaticModels/build
-
 WORKDIR /backtesting/StaticModels/build
-
-RUN cmake ../ \
-    && make -j`nproc` || echo 'Error while building'
+RUN cmake ../ && make -j$(nproc)
 RUN ./metrics && python3 ../src/plot.py
-
