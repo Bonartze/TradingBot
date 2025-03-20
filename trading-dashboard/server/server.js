@@ -1,25 +1,23 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const settingsRoutes = require('./routes/settings'); // <-- Ваш роут для настроек, если есть
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = 5001;
 
 app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/settings', settingsRoutes); // <-- Подключаем роут
 
 mongoose
-    .connect('mongodb://localhost:27017/tradingbot', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
+    .connect('mongodb://127.0.0.1:27017/tradingbot')
     .then(() => {
-        console.log('Подключено к MongoDB');
-        app.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));
+        console.log('Connected to MongoDB');
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
-    .catch((err) => {
-        console.error('Ошибка подключения к MongoDB:', err);
-    });
+    .catch((err) => console.error('MongoDB connection error:', err));

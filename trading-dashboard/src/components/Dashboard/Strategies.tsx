@@ -16,7 +16,7 @@ const Strategies: React.FC = () => {
         <Container maxWidth="md" sx={{ mt: 4 }}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h4" gutterBottom>
-                    Выберите стратегию
+                    Select a Strategy
                 </Typography>
                 <List>
                     {strategies.map(strategy => (
