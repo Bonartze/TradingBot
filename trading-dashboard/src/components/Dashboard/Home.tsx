@@ -6,10 +6,10 @@ const Home: React.FC = () => {
         <Container maxWidth="md" sx={{ mt: 4 }}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h4" gutterBottom>
-                    Добро пожаловать в Trading Dashboard
+                    Welcome to Trading Dashboard
                 </Typography>
                 <Typography variant="body1">
-                    Здесь вы можете выбрать и настроить торговые стратегии, управлять аккаунтом и отслеживать аналитику.
+                    Here you can choose and configure trading strategies, manage your account, and track analytics.
                 </Typography>
             </Paper>
         </Container>
