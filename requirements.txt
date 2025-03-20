@@ -6,3 +6,4 @@ matplotlib
 statsmodels
 arch
 ccxt
+sklearn
