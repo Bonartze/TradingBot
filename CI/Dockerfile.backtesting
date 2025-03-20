@@ -42,3 +42,12 @@ RUN chmod +x backtesting && ./backtesting
 WORKDIR /backtesting/Backtesting/src/
 
 RUN python3 show_metrics.py
+
+mkdir -p /backtesting/StaticModels/build
+
+WORKDIR /backtesting/StaticModels/build
+
+RUN cmake ../ \
+    && make -j`nproc` || echo 'Error while building'
+RUN ./metrics && python3 ../src/plot.py
+

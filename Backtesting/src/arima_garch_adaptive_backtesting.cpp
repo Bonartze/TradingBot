@@ -31,7 +31,7 @@ namespace {
         return 0;
     }
 
-    TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarch2020Backtesting) {
+    TEST_F(ArimaGarchAdaptiveBacktesting, arimaGarchBacktesting) {
         std::filesystem::create_directories("../data/arima_garch/");
 
         const size_t year = 2020;

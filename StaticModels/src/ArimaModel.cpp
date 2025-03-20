@@ -28,6 +28,25 @@ ARIMAModel::ARIMAModel(const std::string &data) {
     coefficients = estimate_coefficients(diff_close_prices, params.p, params.q);
 }
 
+ARIMAModel::ARIMAModel(const std::vector<double>& data) {
+    close_prices = data;
+    if (close_prices.empty())
+        throw std::runtime_error("Error: close_prices is empty.");
+
+    params = arima_parameters_evaluation(close_prices);
+    if (params.q > 5)
+        params.q = 5;
+    auto diff_close_prices = close_prices;
+    for (int i = 0; i < params.d; i++) {
+        diff_close_prices = compute_first_diff(diff_close_prices);
+        if (diff_close_prices.empty())
+            throw std::runtime_error("Error: Not enough data to compute difference.");
+    }
+
+
+    coefficients = estimate_coefficients(diff_close_prices, params.p, params.q);
+}
+
 
 std::vector<double> ARIMAModel::compute_first_diff(const std::vector<double> &series) {
     if (series.size() < 2) {
