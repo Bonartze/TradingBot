@@ -43,7 +43,7 @@ WORKDIR /backtesting/Backtesting/src/
 
 RUN python3 show_metrics.py
 
-mkdir -p /backtesting/StaticModels/build
+RUN mkdir -p /backtesting/StaticModels/build
 
 WORKDIR /backtesting/StaticModels/build
 
