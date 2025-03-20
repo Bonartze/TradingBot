@@ -20,19 +20,15 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Создаем виртуальное окружение
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Обновляем pip и устанавливаем зависимости из requirements.txt
 COPY ./requirements.txt /backtesting/requirements.txt
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /backtesting/requirements.txt
 
-# Копируем весь проект
 COPY . .
 
-# Переходим в директорию сборки Backtesting
 WORKDIR /backtesting/Backtesting/src/
 
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
