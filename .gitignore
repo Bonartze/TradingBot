@@ -20,3 +20,5 @@ scalping/
 *.png
 *.jpg
 ModelsMetrics
+node_modules
+
