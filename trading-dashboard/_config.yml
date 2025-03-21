@@ -1,0 +1,3 @@
+exclude:
+  - node_modules
+  - trading-dashboard/server/node_modules
