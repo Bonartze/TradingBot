@@ -1,3 +1,9 @@
 urllib3
 pandas
 mplfinance
+numpy
+matplotlib
+statsmodels
+arch
+ccxt
+scikit-learn

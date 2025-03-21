@@ -1,56 +1,48 @@
+#include <vector>
+#include <fstream>
 #include "../include/ArimaModel.h"
 #include "../include/GarchModel.h"
-#include <iostream>
-#include <random>
-#include <cmath>
-#include <vector>
-
-
-static double sample_standard_normal() {
-    static thread_local std::mt19937 gen(std::random_device{}());
-    static thread_local std::normal_distribution<> dist(0.0, 1.0);
-    return dist(gen);
+#include "../../TradingStrategies/Common/include/Common.h"
+std::vector<double> split_data(const std::vector<double>& data, double train_ratio) {
+    size_t train_size = static_cast<size_t>(train_ratio * data.size());
+    return std::vector<double>(data.begin(), data.begin() + train_size);
 }
 
-std::vector<double> generateDummyData(int n) {
-    std::vector<double> data;
-    data.reserve(n);
-    for (int i = 0; i < n; ++i) {
-        double noise = sample_standard_normal();
-        data.push_back(
-            100.0 + 10.0 * std::sin(2 * M_PI * i / 50.0) + noise
-        );
+void save_forecast_to_csv(const std::vector<double>& forecast, const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return;
     }
-    return data;
+
+    for (const auto& value : forecast) {
+        file << value << "\n";
+    }
+
+    file.close();
+    std::cout << "Saved forecast to " << filename << std::endl;
 }
+
 
 int main() {
-    try {
-        ARIMAModel arimaModel("../../Backtesting/data/Data_extracted/5m/BTCUSDT/2020/BTCUSDT-5m-2020-01.csv");
+    auto d = loadCandles("../../Backtesting/data/Data_extracted/5m/BTCUSDT/2020/BTCUSDT-5m-2020-01.csv");
+    std::vector<double> full_data;
 
-
-        GarchModel garchModel(arimaModel);
-
-        int forecastSteps = 10;
-        auto combinedForecast = garchModel.combined_forecast(forecastSteps);
-
-        // for (auto d: dummyData) {
-        //     std::cout << d << ' ';
-        // }
-        // std::cout << std::endl;
-
-        for (size_t i = 0; i < forecastSteps; i++)
-            std::cout << arimaModel.close_prices[arimaModel.close_prices.size() - 1 - i] << ' ';
-        std::cout << std::endl;
-
-        std::cout << "Combined Forecast:\n";
-        for (int i = 0; i < forecastSteps; ++i) {
-            std::cout << "Step " << (i + 1)
-                    << ": " << combinedForecast[i] << std::endl;
-        }
-    } catch (const std::exception &ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
-        return EXIT_FAILURE;
+    for (auto& a : d) {
+      full_data.push_back(a.close);
     }
-    return EXIT_SUCCESS;
+
+    double train_ratio = 0.9;
+    std::vector<double> train_data = split_data(full_data, train_ratio);
+
+    ARIMAModel arimaModel(train_data);
+    auto arima_forecast = arimaModel.forecast(full_data.size() - train_data.size());
+
+    GarchModel garchModel(arimaModel);
+    auto combined_forecast = garchModel.combined_forecast(full_data.size() - train_data.size());
+
+    save_forecast_to_csv(arima_forecast, "arima_forecast.csv");
+    save_forecast_to_csv(combined_forecast, "combined_forecast.csv");
+
+    return 0;
 }

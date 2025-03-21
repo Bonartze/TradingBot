@@ -24,21 +24,20 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY ./requirements.txt /backtesting/requirements.txt
-RUN test -f /backtesting/requirements.txt && pip install --no-cache-dir -r /backtesting/requirements.txt || true
+RUN pip install --no-cache-dir -r /backtesting/requirements.txt
 
 COPY . .
 
 WORKDIR /backtesting/Backtesting/src/
-
-#RUN python3 load_data_some_years.py
-
 RUN rm -rf /backtesting/Backtesting/build && mkdir -p /backtesting/Backtesting/build
 WORKDIR /backtesting/Backtesting/build
-
 RUN cmake ../ && make -j$(nproc)
 RUN ls ../data/Data_extracted/5m/BTCUSDT/2020/
 RUN chmod +x backtesting && ./backtesting
 
 WORKDIR /backtesting/Backtesting/src/
-
 RUN python3 show_metrics.py
+
+WORKDIR /backtesting/StaticModels/build
+RUN cmake ../ && make -j$(nproc)
+RUN ./metrics && python3 ../src/plot.py

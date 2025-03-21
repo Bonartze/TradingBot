@@ -162,7 +162,6 @@ http::response<http::string_body> handle_http_request(
     }
 
 
-
     if (req.method() == http::verb::post && req.target() == "/application/json") {
         auto j = json::parse(req.body(), nullptr, false);
         if (j.is_discarded()) {

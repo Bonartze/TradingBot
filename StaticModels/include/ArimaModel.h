@@ -17,6 +17,7 @@ struct ARIMACoefficients {
 class ARIMAModel {
 public:
     explicit ARIMAModel(const std::string &);
+    explicit ARIMAModel(const std::vector<double>&);
 
     std::vector<double> forecast(int steps);
 
