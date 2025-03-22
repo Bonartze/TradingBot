@@ -1,0 +1,11 @@
+{
+  "strategy": "inter exchange arbitrage",
+  "exchange_api": {
+    "exchange": "Binance",
+    "api_key": "YOUR_API_KEY_HERE",
+    "secret_key": "YOUR_SECRET_KEY_HERE"
+  },
+  "symbol": "BTCUSDT",
+  "data_frame": "5m",
+  "balance": 1000.0
+}

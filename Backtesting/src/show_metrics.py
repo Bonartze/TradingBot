@@ -2,6 +2,7 @@ import os
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def extract_year(filename: str):
@@ -12,150 +13,174 @@ def extract_year(filename: str):
     return None
 
 
-def extract_month(filename: str):
-    pattern = r".*-(\d{4})-(\d{2})\.csv"
-    match = re.match(pattern, filename)
-    if match:
-        return int(match.group(2))
-    return None
-
-
-def aggregate_yearly(strategy_files: list):
+def aggregate_yearly(input_data):
     yearly_profit = {}
     yearly_trades = {}
 
-    for file_path in strategy_files:
+    if isinstance(input_data, list):
+        file_list = input_data
+    else:
+        file_list = [os.path.join(input_data, f) for f in os.listdir(input_data) if f.endswith(".csv")]
+
+    for file_path in file_list:
         filename = os.path.basename(file_path)
         year = extract_year(filename)
         if year is None:
             continue
-
         df = pd.read_csv(file_path)
         df_final = df[df["Check Type"] == "FINAL PROFIT"]
         if not df_final.empty:
             profit = pd.to_numeric(df_final["Current Price"].iloc[-1], errors="coerce")
         else:
             profit = 0
-
         trade_rows = df[df["Check Type"].isin(["BUY", "SELL"])]
         num_trades = len(trade_rows)
-
         yearly_profit[year] = yearly_profit.get(year, 0) + (profit if profit is not None else 0)
         yearly_trades[year] = yearly_trades.get(year, 0) + num_trades
-
     return yearly_profit, yearly_trades
 
 
-def aggregate_monthly(strategy_files: list):
+def aggregate_monthly(input_data):
+    """
+    Считывает CSV-файлы из каталога (если input_data - строка) или из списка файлов (если input_data - list)
+    и агрегирует прибыль и число сделок по месяцам.
+    """
     monthly_profit = {}
     monthly_trades = {}
+    pattern = r".*-(\d{4})-(\d{2})\.csv"
 
-    for file_path in strategy_files:
+    if isinstance(input_data, list):
+        file_list = input_data
+    else:
+        file_list = [os.path.join(input_data, f) for f in os.listdir(input_data) if f.endswith(".csv")]
+
+    for file_path in file_list:
         filename = os.path.basename(file_path)
-        month = extract_month(filename)
-        if month is None:
+        match = re.match(pattern, filename)
+        if match:
+            month = int(match.group(2))
+        else:
             continue
-
         df = pd.read_csv(file_path)
         df_final = df[df["Check Type"] == "FINAL PROFIT"]
         if not df_final.empty:
             profit = pd.to_numeric(df_final["Current Price"].iloc[-1], errors="coerce")
         else:
             profit = 0
-
         trade_rows = df[df["Check Type"].isin(["BUY", "SELL"])]
         num_trades = len(trade_rows)
-
         monthly_profit[month] = monthly_profit.get(month, 0) + (profit if profit is not None else 0)
         monthly_trades[month] = monthly_trades.get(month, 0) + num_trades
-
     return monthly_profit, monthly_trades
 
 
-def plot_bar(data: dict, title: str, xlabel: str, ylabel: str, output_path: str, kind="bar"):
-    keys = sorted(data.keys())
-    values = [data[k] for k in keys]
-
+def plot_comparison(x_labels, static_vals, adaptive_vals, title, ylabel, output_path):
+    """
+    Строит сравнительный график: для каждого элемента x_labels две группы столбцов – статические и адаптивные значения.
+    """
+    x = np.arange(len(x_labels))
+    width = 0.35
     plt.figure(figsize=(10, 6))
-    if kind == "bar":
-        plt.bar(keys, values, color='skyblue')
-    else:
-        plt.plot(keys, values, marker='o', linestyle='-', color='green')
-    plt.title(title)
-    plt.xlabel(xlabel)
+    plt.bar(x - width / 2, [static_vals.get(label, 0) for label in x_labels], width, label='Static', color='skyblue')
+    plt.bar(x + width / 2, [adaptive_vals.get(label, 0) for label in x_labels], width, label='Adaptive', color='salmon')
+    plt.xlabel("Period")
     plt.ylabel(ylabel)
-    plt.xticks(keys)
-    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.title(title)
+    plt.xticks(x, x_labels)
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.tight_layout()
     plt.savefig(output_path)
+    plt.close()
+
+
+def analyze_strategy(strategy_name: str, static_dir: str, adaptive_dir: str, output_root: str):
+    """
+    Для заданной стратегии агрегирует годовые показатели для статического и адаптивного тестирования,
+    строит сравнительные графики и возвращает итоговые результаты.
+    """
+    strategy_out = os.path.join(output_root, strategy_name)
+    os.makedirs(strategy_out, exist_ok=True)
+
+    static_profit, static_trades = aggregate_yearly(static_dir)
+    adaptive_profit, adaptive_trades = aggregate_yearly(adaptive_dir)
+
+    years = sorted(set(static_profit.keys()) | set(adaptive_profit.keys()))
+
+    plot_comparison(years, static_profit, adaptive_profit,
+                    f"Total Profit by Year ({strategy_name})",
+                    "Profit",
+                    os.path.join(strategy_out, "profit_comparison.jpg"))
+    plot_comparison(years, static_trades, adaptive_trades,
+                    f"Number of Trades by Year ({strategy_name})",
+                    "Number of Trades",
+                    os.path.join(strategy_out, "trades_comparison.jpg"))
+
+    return {
+        "profit": {"static": static_profit, "adaptive": adaptive_profit},
+        "trades": {"static": static_trades, "adaptive": adaptive_trades}
+    }
 
 
 def analyze_backtesting_results(strategy_files: dict, output_root: str):
-    os.makedirs(output_root, exist_ok=True)
     overall_results = {}
-
-    for strategy_name, input_files in strategy_files.items():
+    for strategy_name, input_data in strategy_files.items():
         print(f"\n--- Processing {strategy_name} ---")
-        strategy_output_folder = os.path.join(output_root, strategy_name)
-        os.makedirs(strategy_output_folder, exist_ok=True)
+
+        if strategy_name == "ArimaGarchAdaptive":
+
+            aggregated_profit, aggregated_trades = aggregate_monthly(input_data)
+            x_labels = sorted(aggregated_profit.keys())
+        else:
+            aggregated_profit, aggregated_trades = aggregate_yearly(input_data)
+            x_labels = sorted(aggregated_profit.keys())
+        overall_results[strategy_name] = {"profit": aggregated_profit, "trades": aggregated_trades}
+        print(f"Aggregated Profit for {strategy_name}:")
+        for label, profit in sorted(aggregated_profit.items()):
+            print(f"Period {label}: Profit = {profit}")
+        print(f"Aggregated Trades for {strategy_name}:")
+        for label, trades in sorted(aggregated_trades.items()):
+            print(f"Period {label}: Trades = {trades}")
 
         if strategy_name != "ArimaGarchAdaptive":
-            yearly_profit, yearly_trades = aggregate_yearly(input_files)
-            overall_results[strategy_name] = {"profit": yearly_profit, "trades": yearly_trades}
-
-            print(f"Yearly Profit for {strategy_name}:")
-            for year, profit in sorted(yearly_profit.items()):
-                print(f"Year {year}: Profit = {profit}")
-            print(f"\nYearly Trades for {strategy_name}:")
-            for year, trades in sorted(yearly_trades.items()):
-                print(f"Year {year}: Trades = {trades}")
-
-            plot_bar(yearly_profit, f"Total Profit by Year ({strategy_name})", "Year", "Profit",
-                     os.path.join(strategy_output_folder, "total_profit_by_year.jpg"), kind="bar")
-            plot_bar(yearly_trades, f"Number of Trades by Year ({strategy_name})", "Year", "Trades",
-                     os.path.join(strategy_output_folder, "number_of_trades_by_year.jpg"), kind="line")
+            plot_comparison(x_labels, aggregated_profit, aggregated_profit,
+                            f"Total Profit by Year ({strategy_name})", "Profit",
+                            os.path.join(output_root, strategy_name, "profit_comparison_overall.jpg"))
+            plot_comparison(x_labels, aggregated_trades, aggregated_trades,
+                            f"Total Trades by Year ({strategy_name})", "Number of Trades",
+                            os.path.join(output_root, strategy_name, "trades_comparison_overall.jpg"))
         else:
-            monthly_profit, monthly_trades = aggregate_monthly(input_files)
-            overall_results[strategy_name] = {"profit": monthly_profit, "trades": monthly_trades}
+            plt.figure(figsize=(10, 6))
+            plt.bar(x_labels, [aggregated_profit.get(label, 0) for label in x_labels], color='skyblue')
+            plt.xlabel("Month")
+            plt.ylabel("Profit")
+            plt.title("Total Profit by Month (ArimaGarchAdaptive)")
+            plt.xticks(x_labels)
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
+            plt.tight_layout()
+            plt.savefig(os.path.join(output_root, strategy_name, "profit_comparison.jpg"))
+            plt.close()
 
-            print(f"Monthly Profit for {strategy_name}:")
-            for month, profit in sorted(monthly_profit.items()):
-                print(f"Month {month}: Profit = {profit}")
-            print(f"\nMonthly Trades for {strategy_name}:")
-            for month, trades in sorted(monthly_trades.items()):
-                print(f"Month {month}: Trades = {trades}")
-
-            plot_bar(monthly_profit, f"Total Profit by Month (2020) ({strategy_name})", "Month", "Profit",
-                     os.path.join(strategy_output_folder, "total_profit_by_month.jpg"), kind="bar")
-            plot_bar(monthly_trades, f"Number of Trades by Month (2020) ({strategy_name})", "Month", "Trades",
-                     os.path.join(strategy_output_folder, "number_of_trades_by_month.jpg"), kind="line")
-
+            plt.figure(figsize=(10, 6))
+            plt.bar(x_labels, [aggregated_trades.get(label, 0) for label in x_labels], color='salmon')
+            plt.xlabel("Month")
+            plt.ylabel("Number of Trades")
+            plt.title("Total Trades by Month (ArimaGarchAdaptive)")
+            plt.xticks(x_labels)
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
+            plt.tight_layout()
+            plt.savefig(os.path.join(output_root, strategy_name, "trades_comparison.jpg"))
+            plt.close()
     return overall_results
 
 
 if __name__ == "__main__":
+
     strategy_files = {
-        "scalping": [
-            "../data/scalping/2020.csv",
-            "../data/scalping/2021.csv",
-            "../data/scalping/2022.csv",
-            "../data/scalping/2023.csv",
-            "../data/scalping/2024.csv"
-        ],
-        "mean_reversion": [
-            "../data/mean_reversion/2020.csv",
-            "../data/mean_reversion/2021.csv",
-            "../data/mean_reversion/2022.csv",
-            "../data/mean_reversion/2023.csv",
-            "../data/mean_reversion/2024.csv"
-        ],
-        "bayesian": [
-            "../data/bayesian/2020.csv",
-            "../data/bayesian/2021.csv",
-            "../data/bayesian/2022.csv",
-            "../data/bayesian/2023.csv",
-            "../data/bayesian/2024.csv"
-        ],
+        "scalping": "../data/scalping/",
+        "mean_reversion": "../data/mean_reversion/",
+        "bayesian": "../data/bayesian/",
+
         "ArimaGarchAdaptive": [
             "../data/arima_garch/2020_BTCUSDT-5m-2020-01.csv",
             "../data/arima_garch/2020_BTCUSDT-5m-2020-02.csv",
@@ -173,4 +198,63 @@ if __name__ == "__main__":
     }
 
     output_root = "../data/backtesting_results/"
-    overall_results = analyze_backtesting_results(strategy_files, output_root)
+    os.makedirs(output_root, exist_ok=True)
+
+    strategy_dirs = {
+        "scalping": {
+            "static": "../data/scalping/static/",
+            "adaptive": "../data/scalping/adaptive/"
+        },
+        "mean_reversion": {
+            "static": "../data/mean_reversion/static/",
+            "adaptive": "../data/mean_reversion/adaptive/"
+        },
+        "bayesian": {
+            "static": "../data/bayesian/static/",
+            "adaptive": "../data/bayesian/adaptive/"
+        },
+        "ArimaGarchAdaptive": {
+            "adaptive": "../data/arima_garch/"
+        }
+    }
+
+    overall_results = {}
+
+    for strat in ["scalping", "mean_reversion", "bayesian"]:
+        print(f"\nProcessing strategy: {strat}")
+        overall_results[strat] = analyze_strategy(strat, strategy_dirs[strat]["static"],
+                                                  strategy_dirs[strat]["adaptive"], output_root)
+
+    if "ArimaGarchAdaptive" in strategy_dirs:
+        monthly_profit, monthly_trades = aggregate_monthly(strategy_files["ArimaGarchAdaptive"])
+        overall_results["ArimaGarchAdaptive"] = {"profit": monthly_profit, "trades": monthly_trades}
+        arima_out = os.path.join(output_root, "ArimaGarchAdaptive")
+        os.makedirs(arima_out, exist_ok=True)
+        months = sorted(monthly_profit.keys())
+        plt.figure(figsize=(10, 6))
+        plt.bar(months, [monthly_profit.get(m, 0) for m in months], color='skyblue')
+        plt.xlabel("Month")
+        plt.ylabel("Profit")
+        plt.title("Total Profit by Month (ArimaGarchAdaptive)")
+        plt.xticks(months)
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.tight_layout()
+        plt.savefig(os.path.join(arima_out, "profit_comparison.jpg"))
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(months, [monthly_trades.get(m, 0) for m in months], color='salmon')
+        plt.xlabel("Month")
+        plt.ylabel("Number of Trades")
+        plt.title("Total Trades by Month (ArimaGarchAdaptive)")
+        plt.xticks(months)
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.tight_layout()
+        plt.savefig(os.path.join(arima_out, "trades_comparison.jpg"))
+        plt.close()
+
+    print("Overall Results:")
+    for strat, res in overall_results.items():
+        print(f"Strategy: {strat}")
+        print("Profit:", res["profit"])
+        print("Trades:", res["trades"])

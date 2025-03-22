@@ -1,12 +1,11 @@
 #include "../include/BayesianSignalFiltering.h"
-
 #include "../../Common/include/TradingMethods.h"
+
 
 auto BayesianSignalFiltering::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) -> bool {
     if (prices.size() < 20) {
         return false;
     }
-
     std::vector<double> rsi_values = TradingMethods::rsi_m(prices, 14);
     auto [lower_band, middle_band, upper_band] = TradingMethods::bollinger_bands(prices, 20, 2.0);
 
@@ -24,7 +23,7 @@ auto BayesianSignalFiltering::should_buy(const std::vector<double> &prices, CSVL
     const double p_b = signal_frequency(prices, rsi_values, lower_band);
     const double p_a_given_b = (p_b_given_a * p_a) / p_b;
 
-    return p_a_given_b > 0.55;
+    return p_a_given_b > buyThreshold;
 }
 
 auto BayesianSignalFiltering::should_sell(const std::vector<double> &prices, double entry_price,
@@ -32,7 +31,6 @@ auto BayesianSignalFiltering::should_sell(const std::vector<double> &prices, dou
     if (prices.size() < 20) {
         return false;
     }
-
     std::vector<double> rsi_values = TradingMethods::rsi_m(prices, 14);
     auto [lower_band, middle_band, upper_band] = TradingMethods::bollinger_bands(prices, 20, 2.0);
 
@@ -50,12 +48,12 @@ auto BayesianSignalFiltering::should_sell(const std::vector<double> &prices, dou
     const double p_b = signal_frequency(prices, rsi_values, upper_band);
     const double p_a_given_b = (p_b_given_a * p_a) / p_b;
 
-    return p_a_given_b > 0.55;
+    
+    return p_a_given_b > sellThreshold;
 }
 
-
 double BayesianSignalFiltering::historical_up_probability(const std::vector<double> &prices,
-                                                          [[maybe_unused]] CSVLogger &csv_logger) {
+                                                          CSVLogger &csv_logger) {
     int up_count = 0;
     for (size_t i = 1; i < prices.size(); ++i) {
         if (prices[i] > prices[i - 1]) {
@@ -66,7 +64,7 @@ double BayesianSignalFiltering::historical_up_probability(const std::vector<doub
 }
 
 double BayesianSignalFiltering::historical_down_probability(const std::vector<double> &prices,
-                                                            [[maybe_unused]] CSVLogger &csv_logger) {
+                                                            CSVLogger &csv_logger) {
     int down_count = 0;
     for (size_t i = 1; i < prices.size(); ++i) {
         if (prices[i] < prices[i - 1]) {
@@ -81,11 +79,11 @@ double BayesianSignalFiltering::signal_probability_given_up(const std::vector<do
                                                             double lower_band) {
     int signal_and_up = 0;
     int up_count = 0;
-
     for (size_t i = 1; i < prices.size(); ++i) {
         if (prices[i] > prices[i - 1]) {
             up_count++;
-            if (rsi_values[i] < 60 && prices[i] < lower_band) {
+            
+            if (rsi_values[i] < rsiThreshold && prices[i] < lower_band) {
                 signal_and_up++;
             }
         }
@@ -93,33 +91,28 @@ double BayesianSignalFiltering::signal_probability_given_up(const std::vector<do
     return up_count > 0 ? static_cast<double>(signal_and_up) / up_count : 0.0;
 }
 
-
 auto BayesianSignalFiltering::signal_probability_given_down(const std::vector<double> &prices,
                                                             const std::vector<double> &rsi_values,
                                                             double upper_band) -> double {
     int signal_and_down = 0;
     int down_count = 0;
-
     for (size_t i = 1; i < prices.size(); ++i) {
         if (prices[i] < prices[i - 1]) {
             down_count++;
-
-            if (rsi_values[i - 1] > 60 && prices[i - 1] > upper_band) {
+            if (rsi_values[i - 1] > rsiThreshold && prices[i - 1] > upper_band) {
                 signal_and_down++;
             }
         }
     }
-
     return down_count > 0 ? static_cast<double>(signal_and_down) / down_count : 0.0;
 }
-
 
 auto BayesianSignalFiltering::signal_frequency(const std::vector<double> &prices,
                                                const std::vector<double> &rsi_values,
                                                double lower_band) -> double {
     int signal_count = 0;
     for (size_t i = 0; i < prices.size(); ++i) {
-        if (rsi_values[i] < 60 && prices[i] < lower_band) {
+        if (rsi_values[i] < rsiThreshold && prices[i] < lower_band) {
             signal_count++;
         }
     }
@@ -135,8 +128,10 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
     double profit = 0.0;
 
     csv_logger.logRow({"Executing strategy", std::to_string(current_price)});
-    Logger(LogLevel::DEBUG) << "Position open: " << position_open << " Should buy: " << should_buy(prices, csv_logger)
+    Logger(LogLevel::DEBUG) << "Position open: " << position_open
+            << " Should buy: " << should_buy(prices, csv_logger)
             << " Should sell: " << should_sell(prices, entry_price, csv_logger) << '\n';
+
     if (!position_open && should_buy(prices, csv_logger)) {
         const double max_quantity = balance / current_price;
         if (max_quantity > 0) {
@@ -144,7 +139,14 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
             entry_price = current_price;
             balance -= asset_quantity * entry_price;
             position_open = true;
-
+            const std::string buy_order_id = std::to_string(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()
+                ).count()
+            );
+            if (!is_backtesting)
+                binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
+                                                 asset_quantity, entry_price, buy_order_id, 0.0, 0.0, 5000);
             Logger(LogLevel::INFO) << "Buy at: " << entry_price
                     << " | Quantity: " << asset_quantity
                     << " | Remaining Balance: " << balance;
@@ -158,11 +160,19 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
         }
     } else if (position_open && should_sell(prices, entry_price, csv_logger)) {
         const double exit_price = current_price;
-        profit = asset_quantity * (exit_price - entry_price);
-        balance += asset_quantity * exit_price;
-        asset_quantity = 0.0;
+        const double sell_quantity = asset_quantity;
+        profit = sell_quantity * (exit_price - entry_price);
+        balance += sell_quantity * exit_price;
         position_open = false;
-
+        const std::string sell_order_id = std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+            ).count()
+        );
+        if (!is_backtesting)
+            binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
+                                             sell_quantity, exit_price, sell_order_id, 0.0, 0.0, 5000);
+        asset_quantity = 0.0;
         Logger(LogLevel::INFO) << "Sell at: " << exit_price
                 << " | Profit: " << profit
                 << " | Total Balance: " << balance;
@@ -183,6 +193,16 @@ auto BayesianSignalFiltering::execute(const std::vector<double> &prices, CSVLogg
 
     return profit;
 }
+
+void BayesianSignalFiltering::set_parameters(const std::vector<double>& params) {
+    if (params.size() < 2) {
+        throw std::invalid_argument("Not enough parameters provided");
+    }
+    buyThreshold = params[0];
+    sellThreshold = params[0];
+    rsiThreshold = params[1];
+}
+
 
 auto BayesianSignalFiltering::wrapper_execute(size_t window_size, const std::vector<double> &prices,
                                               CSVLogger &csv_logger) -> std::pair<double, double> {

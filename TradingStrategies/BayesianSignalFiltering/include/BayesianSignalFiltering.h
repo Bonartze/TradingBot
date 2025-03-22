@@ -6,6 +6,11 @@
 #include "../../Common/include/TradingStrategy.h"
 
 class BayesianSignalFiltering : public TradingStrategy {
+
+    double buyThreshold = 0.55;
+    double sellThreshold = 0.55;
+    double rsiThreshold = 60.0;
+
     auto should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) -> bool override;
 
     auto should_sell(const std::vector<double> &prices, double entry_price, CSVLogger &csv_logger) -> bool override;
@@ -27,8 +32,18 @@ class BayesianSignalFiltering : public TradingStrategy {
                           double lower_band) -> double;
 
 public:
-    BayesianSignalFiltering(): TradingStrategy({}, 1000, false, 0.0, 0.0) {
+    BayesianSignalFiltering(): TradingStrategy({}, 1000, false, 0.0, 0.0, "key", "secret", "BTCUSDT") {
     }
+
+    BayesianSignalFiltering(const TradingParams &trading_params, double balance_, bool is_position_open,
+                            double quantity,
+                            double entry_price, const std::string &key, const std::string &secret,
+                            const std::string &symbol_, bool is_backtesting = true): TradingStrategy(
+        trading_params, balance_, is_position_open, entry_price, quantity, key, secret, symbol_, is_backtesting ) {
+    }
+
+    auto set_parameters(const std::vector<double> &) -> void;
+
 
     auto execute(const std::vector<double> &prices, CSVLogger &csv_logger) -> double override;
 

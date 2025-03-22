@@ -25,15 +25,28 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/simdjson/simdjson.git
         GIT_TAG master
 )
+
+FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.2
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
 set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(simdjson)
 
 find_package(Boost REQUIRED COMPONENTS system filesystem)
+find_package(CURL REQUIRED)
 
 find_package(OpenSSL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 add_executable(backtesting
+        ../TradingEngine/src/OKXOrderManager.cpp
+        ../TradingEngine/src/BinanceOrderManager.cpp
+        ../TradingEngine/src/KrakenOrderManager.cpp
+        ../TradingEngine/src/AbstractOrderManager.cpp
         ../TradingStrategies/MeanReversionStrategy/src/MeanReverseStr.cpp
         ../TradingStrategies/Scalping/src/ScalpingStr.cpp
         ./src/run_backtesting.cpp
@@ -58,9 +71,11 @@ target_link_libraries(backtesting PRIVATE
         gtest_main
         jsoncpp_object
         simdjson
+        CURL::libcurl
         OpenSSL::SSL
         OpenSSL::Crypto
         Eigen3::Eigen
+        nlohmann_json::nlohmann_json
 )
 
 target_include_directories(backtesting PRIVATE

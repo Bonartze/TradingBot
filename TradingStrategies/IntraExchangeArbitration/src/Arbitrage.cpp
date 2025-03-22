@@ -12,34 +12,43 @@ double Arbitrage::calculate_potential_profit(double initial_amount, double curre
     return (i % 2 == 1) ? profit : -profit;
 }
 
-
 Arbitrage::Arbitrage(const std::unordered_set<std::string> &user_symbols, const int &version,
                      const std::string &api_key, const std::string &secret_key) {
     try {
+        
+        
         binance_scalping = std::make_unique<LiveBinanceScalping>(version, host, port, target);
         binance_scalping->fetch_raw_data();
         order_graph = std::make_unique<Graph>(binance_scalping->generate_order_graph(user_symbols));
-        order_manager->init(api_key, secret_key);
+        
+        
     } catch (const std::exception &e) {
         Logger(LogLevel::ERROR) << "Error during Arbitrage initialization: " << e.what();
         throw;
     }
 }
 
-
 void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double amount) {
     double current_amount = amount;
     double commission_rate = 0.001;
     double potential_profit = 0.0;
 
+    
     auto send_order_wrapper = [&](const std::string &from_currency, const std::string &to_currency,
-                                  double amount, const std::string &order_type, const std::string &order_id,
+                                  double order_quantity, const std::string &order_type, const std::string &order_id,
                                   Json::Value &json_result) {
-        order_manager->send_order(from_currency.c_str(), order_type.c_str(), "LIMIT", "GTC",
-                                  amount, binance_scalping->get_price(from_currency + to_currency),
-                                  order_id.c_str(), 0, 0, 0, json_result);
+        
+        std::string symbol = from_currency + to_currency;
+        double price = binance_scalping->get_price(symbol);
+        if (order_manager) {
+            order_manager->place_order(symbol, order_type, "LIMIT", "GTC",
+                                         order_quantity, price, order_id, 0.0, 0.0, 5000);
+        } else {
+            Logger(LogLevel::ERROR) << "Order manager not initialized.";
+        }
     };
 
+    
     for (size_t i = 1; i < cycle.size(); i++) {
         std::string from_currency = cycle[i - 1];
         std::string to_currency = cycle[i];
@@ -48,10 +57,12 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
             if (price <= 0) {
                 throw std::runtime_error("Invalid price encountered for " + from_currency + " to " + to_currency);
             }
+            
             current_amount = apply_commission(current_amount, commission_rate);
-
+            
             current_amount = (i % 2 == 1) ? current_amount * price : current_amount / price;
-
+            
+            
             potential_profit += calculate_potential_profit(current_amount, current_amount, i);
         } catch (const std::exception &e) {
             Logger(LogLevel::ERROR) << "Error during order execution: " << e.what();
@@ -59,20 +70,20 @@ void Arbitrage::do_order_sequence(const std::vector<std::string> &cycle, double 
         }
     }
 
+    
     if (potential_profit < 0)
         return;
 
     Json::Value json_result;
-
+    
     for (size_t i = 1; i < cycle.size(); i++) {
         auto now = std::chrono::system_clock::now();
         auto milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(
             now.time_since_epoch()).count();
-
         std::string order_id = std::to_string(milliseconds_since_epoch);
         std::string from_currency = cycle[i - 1];
         std::string to_currency = cycle[i];
-
+        
         std::string order_type = (i % 2 == 1) ? "SELL" : "BUY";
         send_order_wrapper(from_currency, to_currency, current_amount, order_type, order_id, json_result);
     }
@@ -109,16 +120,4 @@ void Arbitrage::find_arbitrage_opportunities(const std::string &source, const do
     } catch (const std::exception &e) {
         Logger(LogLevel::ERROR) << "Error during arbitrage search: " << e.what();
     }
-}
-
-int main() {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    Arbitrage arbitrage({"TON", "ADA", "LTC", "ATOM", "DOT", "BTC", "ETH", "BNB", "USDT", "SOL", "AVAX", "XRP", "UNI"},
-                        11, "", "");
-    arbitrage.find_arbitrage_opportunities("BTC", 100);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    Logger(LogLevel::INFO) << "Execution time: " << elapsed.count() << " microseconds";
-    return 0;
 }

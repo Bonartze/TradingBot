@@ -69,6 +69,7 @@ jobs:
           sudo docker start $CONTAINER_ID
           sudo docker wait $CONTAINER_ID
           sudo docker cp $CONTAINER_ID:/backtesting/Backtesting/data/backtesting_results ${{ github.workspace }}/Backtesting/data/backtesting_results
+          sudo docker cp $CONTAINER_ID:/backtesting/StaticModels/ModelsMetrics ${{ github.workspace }}/StaticModels/ModelsMetrics
           sudo docker rm $CONTAINER_ID
 
       - name: Debug
@@ -79,6 +80,13 @@ jobs:
         with:
           name: backtesting-results
           path: Backtesting/data/backtesting_results
+          retention-days: 7
+
+      - name: Upload Models Metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: models-metrics
+          path: StaticModels/ModelsMetrics
           retention-days: 7
 
 
