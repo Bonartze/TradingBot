@@ -160,7 +160,7 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://localhost:8080/application/json',
+                    'http://89.169.163.170:8080/application/json',
                     finalJson,
                     {
                         headers: {
@@ -186,7 +186,7 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://localhost:8080/application/json',
+                    'http://89.169.163.170:8080/application/json',
                     userJson,
                     {
                         headers: {

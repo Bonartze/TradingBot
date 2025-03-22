@@ -12,7 +12,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include(FetchContent)
 
-# Получение simdjson
 FetchContent_Declare(
         simdjson
         GIT_REPOSITORY https://github.com/simdjson/simdjson.git
@@ -22,7 +21,6 @@ set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
 set(SIMDJSON_BUILD_STATIC ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(simdjson)
 
-# Получение jsoncpp
 FetchContent_Declare(
         jsoncpp
         GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
@@ -30,7 +28,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(jsoncpp)
 
-# Получение nlohmann_json
 FetchContent_Declare(
         nlohmann_json
         GIT_REPOSITORY https://github.com/nlohmann/json.git
@@ -40,7 +37,6 @@ FetchContent_MakeAvailable(nlohmann_json)
 
 find_package(Boost 1.75 REQUIRED COMPONENTS json)
 
-# Подключаем OpenSSL и CURL
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 
@@ -90,7 +86,6 @@ target_link_libraries(StrategiesAPI PRIVATE
         OpenSSL::SSL
         OpenSSL::Crypto
         CURL::libcurl
-        # Если target для jsoncpp создаётся (например, jsoncpp_lib), его тоже нужно добавить:
         jsoncpp
 )
 
