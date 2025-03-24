@@ -23,8 +23,26 @@ public:
                                                           arima_model(std::make_unique<ARIMAModel>(data)) {
         garch_model = std::make_unique<GarchModel>(*arima_model);
     }
+    ArimaGarchAdaptive(const std::string &data) : TradingStrategy({}, 1000, false, 0.0, 0.0, "", "", ""),
+                                                          arima_model(std::make_unique<ARIMAModel>(data)) {
+        garch_model = std::make_unique<GarchModel>(*arima_model);
+    }
 
     ArimaGarchAdaptive(const std::vector<double> &data, const TradingParams &trading_params, double balance,
+                       bool is_position_open, double entry_price, double asset_quantity, const std::string &key,
+                       const std::string &secret, const std::string &symbol, bool is_backtesting = true)
+            : TradingStrategy(
+            trading_params, balance,
+            is_position_open, entry_price,
+            asset_quantity, key, secret, symbol, is_backtesting),
+              arima_model(
+                      // another way -> at first gather data, then fill it out
+                      std::make_unique<ARIMAModel>(
+                              data)) {
+        garch_model = std::make_unique<GarchModel>(*arima_model);
+    }
+
+    ArimaGarchAdaptive(const std::string &data, const TradingParams &trading_params, double balance,
                        bool is_position_open, double entry_price, double asset_quantity, const std::string &key,
                        const std::string &secret, const std::string &symbol, bool is_backtesting = true)
             : TradingStrategy(
