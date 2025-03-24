@@ -16,7 +16,7 @@ using json = nlohmann::json;
 void process_scalping(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
-  
+
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = "../Logs/scalping_" + email + ".csv";
     CSVLogger logger_scalping = CSVLogger(log_file_name);
@@ -97,7 +97,7 @@ void process_mean_reverse(const json &j) {
 void process_arima_garch(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
-  
+
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = "../Logs/arima_garch_" + email + ".csv";
     CSVLogger logger_arima_garch = CSVLogger(log_file_name);
@@ -253,11 +253,12 @@ http::response<http::string_body> handle_http_request(
         http::request<http::string_body> const &req) {
     http::response<http::string_body> response;
 
+
     // for local server launch
-    response.set(http::field::access_control_allow_origin, "http://localhost:3000");
-    response.set(http::field::access_control_allow_methods, "POST, GET, OPTIONS");
-    response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
-    response.set(http::field::access_control_max_age, "86400");
+//    response.set(http::field::access_control_allow_origin, "http://localhost:3000");
+//    response.set(http::field::access_control_allow_methods, "POST, GET, OPTIONS");
+//    response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
+//    response.set(http::field::access_control_max_age, "86400");
 
     if (req.method() == http::verb::options && req.target() == "/application/json") {
         response.result(http::status::ok);

@@ -199,7 +199,7 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://localhost:8080/application/json',
+                    'http://89.169.163.170:5001/application/json',
                     finalJson,
                     {
                         headers: { 'Content-Type': 'application/json' },
