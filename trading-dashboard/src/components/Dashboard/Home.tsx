@@ -1,18 +1,46 @@
 import React from 'react';
-import { Container, Typography, Paper } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
+
+import homeImage from '../../images/preview.png';
 
 const Home: React.FC = () => {
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h4" gutterBottom>
+        <Box
+            
+            sx={{
+                minHeight: '100vh',
+                backgroundColor: '#f0f2f5',
+                py: 4, 
+            }}
+        >
+            <Container
+                maxWidth="md"
+                sx={{
+                    textAlign: 'center',
+                }}
+            >
+                <Typography variant="h3" gutterBottom>
                     Welcome to Trading Dashboard
                 </Typography>
-                <Typography variant="body1">
-                    Here you can choose and configure trading strategies, manage your account, and track analytics.
+                <Typography variant="subtitle1" gutterBottom>
+                    Here you can configure your strategies, view analytics, and more.
                 </Typography>
-            </Paper>
-        </Container>
+
+                {/* Картинка, растянутая на ~80% ширины контейнера */}
+                <Box
+                    component="img"
+                    src={homeImage}
+                    alt="Trading Dashboard Preview"
+                    sx={{
+                        width: '80%',     
+                        maxWidth: '800px',
+                        borderRadius: 2,  
+                        boxShadow: 3,     
+                        mt: 4,            
+                    }}
+                />
+            </Container>
+        </Box>
     );
 };
 
