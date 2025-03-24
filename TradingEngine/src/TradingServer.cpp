@@ -16,6 +16,7 @@ using json = nlohmann::json;
 void process_scalping(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
+  
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = "../Logs/scalping_" + email + ".csv";
     CSVLogger logger_scalping = CSVLogger(log_file_name);
@@ -55,6 +56,7 @@ void process_scalping(const json &j) {
 void process_mean_reverse(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
+
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = "../Logs/mean_reverse_" + email + ".csv";
     CSVLogger logger_mean_reverse = CSVLogger(log_file_name);
@@ -95,6 +97,7 @@ void process_mean_reverse(const json &j) {
 void process_arima_garch(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
+  
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = "../Logs/arima_garch_" + email + ".csv";
     CSVLogger logger_arima_garch = CSVLogger(log_file_name);
@@ -143,6 +146,7 @@ void process_arima_garch(const json &j) {
 void process_bayesian(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
+
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = "../Logs/bayesian_" + email + ".csv";
     CSVLogger logger_bayesian = CSVLogger(log_file_name);
