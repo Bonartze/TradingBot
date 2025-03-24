@@ -13,8 +13,10 @@ namespace http = beast::http;
 namespace net = boost::asio;
 using json = nlohmann::json;
 
-
-void process_scalping(json j) {
+void process_scalping(const json &j) {
+    std::string email = j["email"].get<std::string>();
+    std::string log_file_name = "../Logs/scalping_" + email + ".csv";
+    CSVLogger logger_scalping = CSVLogger(log_file_name);
     ScalpingStr *scalping = nullptr;
     std::string symbol = j["symbol"].get<std::string>();
     std::string data_frame = j["data_frame"].get<std::string>();
@@ -25,21 +27,22 @@ void process_scalping(json j) {
     double sma_long = params["sma_long"].get<double>();
     double rsi_oversold = params["rsi_oversold"].get<double>();
     double rsi_overbought = params["rsi_overbought"].get<double>();
+    bool is_testing = j["is_testing"].get<bool>();
 
     std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
     std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
     TradingParams tp = {sma_short, sma_long, rsi_overbought, rsi_oversold};
 
     scalping = CreateScalpingStrEx(&tp, balance, false, 0.0, 0.0,
-                                   api_key.c_str(), secret_key.c_str(), symbol.c_str());
+                                   api_key.c_str(), secret_key.c_str(), symbol.c_str(), is_testing);
     DataCollector data_collector(symbol, data_frame);
     auto prices = data_collector.get_close_prices();
-    CSVLogger *logger = nullptr;
     std::cout << window_size << ' ' << prices.size() << std::endl;
     for (auto &a: prices)
         std::cout << a << ' ';
     std::cout << std::endl;
-    double result = ScalpingStr_WrapperExecute(scalping, window_size, prices.data(), prices.size(), logger);
+
+    double result = ScalpingStr_WrapperExecute(scalping, window_size, prices.data(), prices.size(), logger_scalping);
     std::cout << "Scalping strategy result: " << result << std::endl;
     DestroyScalpingStr(scalping);
 
@@ -47,7 +50,10 @@ void process_scalping(json j) {
     std::cout << "process_scalping called.\n";
 }
 
-void process_mean_reverse(json j) {
+void process_mean_reverse(const json &j) {
+    std::string email = j["email"].get<std::string>();
+    std::string log_file_name = "../Logs/mean_reverse_" + email + ".csv";
+    CSVLogger logger_mean_reverse = CSVLogger(log_file_name);
     MeanReverseStrategy *mean_reverse = nullptr;
     std::string symbol = j["symbol"].get<std::string>();
     std::string data_frame = j["data_frame"].get<std::string>();
@@ -58,21 +64,23 @@ void process_mean_reverse(json j) {
     double sma_long = params["sma_long"].get<double>();
     double rsi_oversold = params["rsi_oversold"].get<double>();
     double rsi_overbought = params["rsi_overbought"].get<double>();
+    bool is_testing = j["is_testing"].get<bool>();
 
     std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
     std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
     TradingParams tp = {sma_short, sma_long, rsi_overbought, rsi_oversold};
 
     mean_reverse = CreateMeanReverseStrategyEx(&tp, balance, false, 0.0, 0.0,
-                                               api_key.c_str(), secret_key.c_str(), symbol.c_str());
+                                               api_key.c_str(), secret_key.c_str(), symbol.c_str(), is_testing);
     DataCollector data_collector(symbol, data_frame);
     auto prices = data_collector.get_close_prices();
-    CSVLogger *logger = nullptr;
+    // CSVLogger *logger = nullptr;
     std::cout << window_size << ' ' << prices.size() << std::endl;
     for (auto &a: prices)
         std::cout << a << ' ';
     std::cout << std::endl;
-    double result = MeanReverseStrategy_WrapperExecute(mean_reverse, window_size, prices.data(), prices.size(), logger);
+    double result = MeanReverseStrategy_WrapperExecute(mean_reverse, window_size, prices.data(), prices.size(),
+                                                       logger_mean_reverse);
     std::cout << "Mean reverse strategy result: " << result << std::endl;
     DestroyMeanReverseStrategy(mean_reverse);
 
@@ -80,52 +88,34 @@ void process_mean_reverse(json j) {
     std::cout << "mean_reverse called.\n";
 }
 
-void process_inter_exchange_arbitrage(json j) {
-    std::string symbol = j["symbol"].get<std::string>();
-    std::string data_frame = j["data_frame"].get<std::string>();
-
-
-    std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
-    std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
-
-    RunInterexchangeArbitrage(symbol.c_str());
-
-    std::cout << "process_inter_exchange_arbitrage called.\n";
-}
-
-void process_intra_exchange_arbitrage(json j) {
-    std::cout << "process_intra_exchange_arbitrage called.\n";
-}
-
-void process_arima_garch(json j) {
+void process_arima_garch(const json &j) {
+    std::string email = j["email"].get<std::string>();
+    std::string log_file_name = "../Logs/arima_garch_" + email + ".csv";
+    CSVLogger logger_arima_garch = CSVLogger(log_file_name);
     std::cout << "process_arima_garch called.\n";
 
-
+    std::cout << j;
     std::string symbol = j["symbol"].get<std::string>();
     std::string data_frame = j["data_frame"].get<std::string>();
     double balance = j["balance"].get<double>();
-    std::string filepath = j["filepath"].get<std::string>();
-
-    json params = j["parameters"];
-    size_t window_size = params["window_size"].get<size_t>();
+    size_t window_size = j["parameters"]["window_size"].get<size_t>();
 
 
     std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
     std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
-
-
-    ArimaGarchAdaptive *model = CreateArimaGarchAdaptiveEx(filepath.c_str(), nullptr, balance, false,
-                                                           0.0, 0.0, api_key.c_str(), secret_key.c_str(),
-                                                           symbol.c_str());
+    bool is_testing = j["is_testing"].get<bool>();
+    DataCollector data_collector(symbol, data_frame);
+    auto prices = data_collector.get_close_prices();
+    TradingParams params = {0, 0, 0, 0};
+    ArimaGarchAdaptive *model = CreateArimaGarchAdaptiveEx(prices.data(), prices.size(), &params, balance, false, 0.0,
+                                                           0.0,
+                                                           api_key.c_str(), secret_key.c_str(), symbol.c_str(),
+                                                           is_testing);
 
     if (!model) {
         std::cerr << "Error: Failed to create ARIMA-GARCH model.\n";
         return;
     }
-
-
-    DataCollector data_collector(symbol, data_frame);
-    auto prices = data_collector.get_close_prices();
 
     if (prices.empty()) {
         std::cerr << "Error: No price data available for " << symbol << ".\n";
@@ -133,26 +123,129 @@ void process_arima_garch(json j) {
         return;
     }
 
-    CSVLogger *logger = nullptr;
+    //CSVLogger *logger = nullptr;
 
 
-    double result = ArimaGarchStrategy_WrapperExecute(model, window_size, prices.data(), prices.size(), logger);
+    double result = ArimaGarchStrategy_WrapperExecute(model, window_size, prices.data(), prices.size(),
+                                                      logger_arima_garch);
     std::cout << "ARIMA-GARCH strategy result: " << result << std::endl;
 
 
     DestroyArimaGarchAdaptive(model);
 }
 
+void process_bayesian(const json &j) {
+    std::string email = j["email"].get<std::string>();
+    std::string log_file_name = "../Logs/bayesian_" + email + ".csv";
+    CSVLogger logger_bayesian = CSVLogger(log_file_name);
+
+    BayesianSignalFiltering *bayesian = nullptr;
+
+    std::string symbol = j["symbol"].get<std::string>();
+    std::string data_frame = j["data_frame"].get<std::string>();
+    double balance = j["balance"].get<double>();
+
+
+    // bool position_open = j.value("position_open", false);
+    //double entry_price = j.value("entry_price", 0.0);
+    //double quantity = j.value("quantity", 0.0);
+
+
+    std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
+    std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
+    bool is_testing = j["is_testing"].get<bool>();
+
+
+    json params = j["parameters"];
+
+    double window_size = params.value("window_size", 50.0);
+
+
+    TradingParams tp = {};
+
+
+    bayesian = CreateBayesianStrategyEx(
+            &tp,
+            balance,
+            false,
+            0.0,
+            0.0,
+            api_key.c_str(),
+            secret_key.c_str(),
+            symbol.c_str(),
+            is_testing
+    );
+
+
+    DataCollector data_collector(symbol, data_frame);
+    auto prices = data_collector.get_close_prices();
+
+
+    // CSVLogger *logger = nullptr;
+
+
+    double result = BayesianStrategy_WrapperExecute(
+            bayesian,
+            static_cast<size_t>(window_size),
+            prices.data(),
+            prices.size(),
+            logger_bayesian
+    );
+
+    std::cout << "Bayesian strategy result: " << result << std::endl;
+
+
+    DestroyBayesianStrategy(bayesian);
+}
+
+void process_inter_exchange_arbitrage(const json &j) {
+    std::string symbol = j["symbol"].get<std::string>();
+    std::string data_frame = j["data_frame"].get<std::string>();
+
+
+    std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
+    std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
+
+    RunInter_exchangeArbitrage(symbol.c_str());
+
+    std::cout << "process_inter_exchange_arbitrage called.\n";
+}
+
+void process_intra_exchange_arbitrage(const json &j) {
+
+    std::cout << "process_intra_exchange_arbitrage called.\n";
+
+    std::vector<std::string> symbols = j["symbols"].get<std::vector<std::string>>();
+    if (symbols.empty()) {
+        std::cerr << "No symbols provided.\n";
+        return;
+    }
+
+    std::vector<const char *> crypto_pairs;
+    for (const auto &s: symbols) {
+        crypto_pairs.push_back(s.c_str());
+    }
+    crypto_pairs.push_back(nullptr);
+
+    int version = j["version"].get<int>();
+
+    std::string api_key = j["exchange_api"]["api_key"].get<std::string>();
+    std::string secret_key = j["exchange_api"]["secret_key"].get<std::string>();
+
+
+    RunIntra_exchangeArbitrage(crypto_pairs.data(), version, api_key.c_str(), secret_key.c_str());
+}
+
+
 http::response<http::string_body> handle_http_request(
-    http::request<http::string_body> const &req) {
+        http::request<http::string_body> const &req) {
     http::response<http::string_body> response;
 
-
+    // for local server launch
     response.set(http::field::access_control_allow_origin, "http://localhost:3000");
     response.set(http::field::access_control_allow_methods, "POST, GET, OPTIONS");
     response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
     response.set(http::field::access_control_max_age, "86400");
-
 
     if (req.method() == http::verb::options && req.target() == "/application/json") {
         response.result(http::status::ok);
@@ -183,6 +276,8 @@ http::response<http::string_body> handle_http_request(
                 process_intra_exchange_arbitrage(j);
             } else if (strategy == "arima garch") {
                 process_arima_garch(j);
+            } else if (strategy == "bayesian signal pro") {
+                process_bayesian(j);
             } else {
                 throw std::runtime_error("Invalid or unknown strategy");
             }
@@ -209,7 +304,7 @@ http::response<http::string_body> handle_http_request(
 
 
 Session::Session(net::ip::tcp::socket socket)
-    : socket_(std::move(socket)) {
+        : socket_(std::move(socket)) {
 }
 
 void Session::start() {
@@ -259,22 +354,22 @@ void Session::do_write(http::response<http::string_body> response) {
 }
 
 TradingServer::TradingServer(net::io_context &io_context, short port)
-    : io_context_(io_context),
-      acceptor_(io_context_, net::ip::tcp::endpoint(net::ip::tcp::v4(), port)) {
+        : io_context_(io_context),
+          acceptor_(io_context_, net::ip::tcp::endpoint(net::ip::tcp::v4(), port)) {
     do_accept();
 }
 
 void TradingServer::do_accept() {
     acceptor_.async_accept(
-        [this](boost::system::error_code ec, net::ip::tcp::socket socket) {
-            if (!ec) {
-                std::make_shared<Session>(std::move(socket))->start();
-            } else {
-                std::cerr << "Accept error: " << ec.message() << std::endl;
-            }
+            [this](boost::system::error_code ec, net::ip::tcp::socket socket) {
+                if (!ec) {
+                    std::make_shared<Session>(std::move(socket))->start();
+                } else {
+                    std::cerr << "Accept error: " << ec.message() << std::endl;
+                }
 
-            do_accept();
-        }
+                do_accept();
+            }
     );
 }
 

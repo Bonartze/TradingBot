@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container,
     Typography,
@@ -8,12 +8,15 @@ import {
     Box,
     FormControlLabel,
     Checkbox,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
-import {useSearchParams} from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import DeleteAccountButton from '../Auth/DeleteAccountButton';
 
-// Маппинг ID стратегии -> Название
 const STRATEGY_MAP: Record<string, string> = {
     '1': 'bayesian signal pro',
     '2': 'mean reverse',
@@ -27,24 +30,30 @@ const Settings: React.FC = () => {
     const [searchParams] = useSearchParams();
     const strategyId = searchParams.get("strategyId");
 
-    // ========================
+    // Доп. поле для email
+    const [email, setEmail] = useState('');
+
     // Поля для стратегий
-    // ========================
     const [windowSize, setWindowSize] = useState('10');
     const [symbol, setSymbol] = useState('BTCUSDT');
+
+    // Вместо textField для dataFrame — селект
     const [dataFrame, setDataFrame] = useState('1h');
+
     const [isDynamic, setIsDynamic] = useState(false);
     const [balance, setBalance] = useState('1000');
 
-    // Доп. поля для Mean Reverse/Scalping
+    // Поля для Mean Reverse / Scalping
     const [smaLong, setSmaLong] = useState('10');
     const [smaShort, setSmaShort] = useState('5');
     const [rsiOversold, setRsiOversold] = useState('30');
     const [rsiOverbought, setRsiOverbought] = useState('70');
 
+    // Флаг тестового режима (не для арбитражей)
+    const [isTesting, setIsTesting] = useState(false);
+
     const [strategyInitialized, setStrategyInitialized] = useState(false);
 
-    // Загрузка настроек стратегии из localStorage
     useEffect(() => {
         if (!strategyId) return;
         const savedStrategy = localStorage.getItem('strategySettings');
@@ -59,11 +68,12 @@ const Settings: React.FC = () => {
             if (parsed.smaShort) setSmaShort(parsed.smaShort);
             if (parsed.rsiOversold) setRsiOversold(parsed.rsiOversold);
             if (parsed.rsiOverbought) setRsiOverbought(parsed.rsiOverbought);
+            if (typeof parsed.is_testing === 'boolean') setIsTesting(parsed.is_testing);
+            if (parsed.email) setEmail(parsed.email);
         }
         setStrategyInitialized(true);
     }, [strategyId]);
 
-    // Сохранение настроек стратегии в localStorage
     useEffect(() => {
         if (!strategyId || !strategyInitialized) return;
         const strategyData = {
@@ -76,22 +86,33 @@ const Settings: React.FC = () => {
             smaShort,
             rsiOversold,
             rsiOverbought,
+            is_testing: isTesting,
+            email,
         };
         localStorage.setItem('strategySettings', JSON.stringify(strategyData));
-    }, [strategyId, strategyInitialized,
-        windowSize, symbol, dataFrame, isDynamic, balance,
-        smaLong, smaShort, rsiOversold, rsiOverbought]);
+    }, [
+        strategyId,
+        strategyInitialized,
+        windowSize,
+        symbol,
+        dataFrame,
+        isDynamic,
+        balance,
+        smaLong,
+        smaShort,
+        rsiOversold,
+        rsiOverbought,
+        isTesting,
+        email,
+    ]);
 
-    // ========================
     // Поля для пользовательских настроек
-    // ========================
     const [userBgColor, setUserBgColor] = useState('#ffffff');
     const [userPassword, setUserPassword] = useState('');
     const [userInitialized, setUserInitialized] = useState(false);
 
-    // Загрузка userSettings
     useEffect(() => {
-        if (strategyId) return; // если есть стратегия, не грузим userSettings
+        if (strategyId) return;
         const savedUser = localStorage.getItem('userSettings');
         if (savedUser) {
             const parsed = JSON.parse(savedUser);
@@ -101,7 +122,6 @@ const Settings: React.FC = () => {
         setUserInitialized(true);
     }, [strategyId]);
 
-    // Сохранение userSettings
     useEffect(() => {
         if (strategyId || !userInitialized) return;
         const userData = {
@@ -111,16 +131,12 @@ const Settings: React.FC = () => {
         localStorage.setItem('userSettings', JSON.stringify(userData));
     }, [strategyId, userInitialized, userBgColor, userPassword]);
 
-    // Применение цвета фона, если нет strategyId
     useEffect(() => {
         if (!strategyId) {
             document.body.style.backgroundColor = userBgColor;
         }
     }, [strategyId, userBgColor]);
 
-    // ========================
-    // Сабмит
-    // ========================
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -130,32 +146,55 @@ const Settings: React.FC = () => {
             return;
         }
 
-        // Если выбрана стратегия (strategyId != null)
         if (strategyId) {
             const strategyName = STRATEGY_MAP[strategyId] || 'unknown strategy';
 
-            // Формируем JSON по схеме, которую ждёт сервер
-            // Обратите внимание на "parameters" и "exchange_api"
-            const finalJson = {
-                strategy: strategyName,
-                symbol: symbol,
-                data_frame: dataFrame,
-                is_dynamic: isDynamic,
-                balance: Number(balance),  // переводим в число
-                parameters: {
-                    window_size: Number(windowSize),
-                    sma_long: Number(smaLong),
-                    sma_short: Number(smaShort),
-                    rsi_oversold: Number(rsiOversold),
-                    rsi_overbought: Number(rsiOverbought),
-                },
-                exchange_api: {
-                    api_key: "YOUR_API_KEY_HERE",
-                    secret_key: "YOUR_SECRET_KEY_HERE"
-                }
-            };
+            let finalJson: any;
+            if (strategyId === '5' || strategyId === '6') {
+                // Арбитражные стратегии, без is_testing
+                finalJson = {
+                    strategy: strategyName,
+                    symbol,
+                    data_frame: dataFrame,
+                    is_dynamic: isDynamic,
+                    balance: Number(balance),
+                    parameters: {
+                        window_size: Number(windowSize),
+                        sma_long: Number(smaLong),
+                        sma_short: Number(smaShort),
+                        rsi_oversold: Number(rsiOversold),
+                        rsi_overbought: Number(rsiOverbought),
+                    },
+                    exchange_api: {
+                        api_key: "YOUR_API_KEY_HERE",
+                        secret_key: "YOUR_SECRET_KEY_HERE"
+                    },
+                    email
+                };
+            } else {
+                // Остальные стратегии
+                finalJson = {
+                    strategy: strategyName,
+                    symbol,
+                    data_frame: dataFrame,
+                    is_dynamic: isDynamic,
+                    balance: Number(balance),
+                    parameters: {
+                        window_size: Number(windowSize),
+                        sma_long: Number(smaLong),
+                        sma_short: Number(smaShort),
+                        rsi_oversold: Number(rsiOversold),
+                        rsi_overbought: Number(rsiOverbought),
+                    },
+                    exchange_api: {
+                        api_key: "YOUR_API_KEY_HERE",
+                        secret_key: "YOUR_SECRET_KEY_HERE"
+                    },
+                    is_testing: isTesting,
+                    email
+                };
+            }
 
-            // Выводим JSON в консоль, чтобы убедиться, что отправляем
             console.log("Отправляем JSON (стратегия):", JSON.stringify(finalJson, null, 2));
 
             try {
@@ -163,9 +202,7 @@ const Settings: React.FC = () => {
                     'http://localhost:8080/application/json',
                     finalJson,
                     {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                     }
                 );
                 alert(response.data.message || 'Strategy settings saved!');
@@ -173,15 +210,13 @@ const Settings: React.FC = () => {
                 console.log("Axios error:", err);
                 alert(err.response?.data?.error || 'Error saving strategy settings');
             }
-
         } else {
-            // Иначе сохраняем пользовательские настройки
+            // User settings
             const userJson = {
                 bgColor: userBgColor,
                 password: userPassword,
             };
 
-            // Выводим JSON в консоль
             console.log("Отправляем JSON (пользователь):", JSON.stringify(userJson, null, 2));
 
             try {
@@ -189,9 +224,7 @@ const Settings: React.FC = () => {
                     'http://localhost:8080/application/json',
                     userJson,
                     {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                     }
                 );
                 alert(response.data.message || 'User settings saved!');
@@ -229,15 +262,25 @@ const Settings: React.FC = () => {
                                 value={symbol}
                                 onChange={(e) => setSymbol(e.target.value)}
                             />
-                            <TextField
-                                label="Data Frame"
-                                type="text"
-                                fullWidth
-                                margin="normal"
-                                required
-                                value={dataFrame}
-                                onChange={(e) => setDataFrame(e.target.value)}
-                            />
+
+                            {/* Селект для dataFrame */}
+                            <FormControl fullWidth margin="normal" required>
+                                <InputLabel>Data Frame</InputLabel>
+                                <Select
+                                    label="Data Frame"
+                                    value={dataFrame}
+                                    onChange={(e) => setDataFrame(e.target.value as string)}
+                                >
+                                    <MenuItem value="1m">1m</MenuItem>
+                                    <MenuItem value="5m">5m</MenuItem>
+                                    <MenuItem value="15m">15m</MenuItem>
+                                    <MenuItem value="30m">30m</MenuItem>
+                                    <MenuItem value="1h">1h</MenuItem>
+                                    <MenuItem value="4h">4h</MenuItem>
+                                    <MenuItem value="1d">1d</MenuItem>
+                                </Select>
+                            </FormControl>
+
                             <FormControlLabel
                                 control={
                                     <Checkbox
@@ -256,6 +299,8 @@ const Settings: React.FC = () => {
                                 value={balance}
                                 onChange={(e) => setBalance(e.target.value)}
                             />
+
+                            {/* Поля только для mean reverse (2) и scalping (3) */}
                             {(strategyId === '2' || strategyId === '3') && (
                                 <>
                                     <TextField
@@ -296,8 +341,31 @@ const Settings: React.FC = () => {
                                     />
                                 </>
                             )}
+
+                            <TextField
+                                label="Email"
+                                type="email"
+                                fullWidth
+                                margin="normal"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+
+                            {(strategyId !== '5' && strategyId !== '6') && (
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={isTesting}
+                                            onChange={(e) => setIsTesting(e.target.checked)}
+                                        />
+                                    }
+                                    label="Run in Testing Mode"
+                                />
+                            )}
+
                             <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                                Save Strategy Settings
+                                {strategyId ? "Run Strategy" : "Save User Settings"}
                             </Button>
                         </Box>
                     </>

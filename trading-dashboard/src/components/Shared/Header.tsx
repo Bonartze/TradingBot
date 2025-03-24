@@ -1,4 +1,3 @@
-// src/components/Shared/Header.tsx
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
@@ -21,6 +20,8 @@ const Header: React.FC = () => {
                 <Button color="inherit" component={Link} to="/">Home</Button>
                 <Button color="inherit" component={Link} to="/strategies">Strategies</Button>
                 <Button color="inherit" component={Link} to="/settings">Settings</Button>
+                {/* Добавляем кнопку для Statistics */}
+                <Button color="inherit" component={Link} to="/statistics">Statistics</Button>
                 <Button color="inherit" onClick={handleLogout}>Logout</Button>
             </Toolbar>
         </AppBar>

@@ -18,7 +18,7 @@ namespace {
 
 
 std::vector<double> DataCollector::get_close_prices() {
-    auto candles = collectData(200);
+    auto candles = collectData(2000);
     std::vector<double> close_prices;
     close_prices.reserve(candles.size());
     for (const auto& c : candles) {

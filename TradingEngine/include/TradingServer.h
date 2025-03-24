@@ -3,25 +3,27 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <nlohmann/json.hpp>
+#include "../../Logger/include/CSVLogger.h"
 
 namespace net = boost::asio;
 namespace beast = boost::beast;
 namespace http = beast::http;
 
 
-void process_scalping(nlohmann::json j);
+void process_scalping(const nlohmann::json &j);
 
-void process_mean_reverse(nlohmann::json j);
+void process_mean_reverse(const nlohmann::json &j);
 
-void process_inter_exchange_arbitrage(nlohmann::json j);
+void process_inter_exchange_arbitrage(const nlohmann::json &j);
 
-void process_intra_exchange_arbitrage(nlohmann::json j);
+void process_intra_exchange_arbitrage(const nlohmann::json &j);
 
-void process_arima_garch(nlohmann::json j);
+void process_arima_garch(const nlohmann::json &j);
 
+void process_bayesian(const nlohmann::json &j);
 
 beast::http::response<beast::http::string_body> handle_http_request(
-    beast::http::request<beast::http::string_body> const &request
+        beast::http::request<beast::http::string_body> const &request
 );
 
 
@@ -46,6 +48,8 @@ private:
 
 class TradingServer {
 public:
+
+
     TradingServer(net::io_context &io_context, short port);
 
 
@@ -56,4 +60,5 @@ private:
 
     net::io_context &io_context_;
     net::ip::tcp::acceptor acceptor_;
+
 };
