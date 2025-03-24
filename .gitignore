@@ -1,4 +1,3 @@
-
 build/
 cmake-build-debug/
 */build/
@@ -18,6 +17,7 @@ Backtesting/data/bayesian
 ScalpingResults/
 scalping/
 *.png
+!trading-dashboard/src/images/preview.png
 *.jpg
 ModelsMetrics
 node_modules
