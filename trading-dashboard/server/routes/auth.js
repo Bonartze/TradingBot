@@ -10,17 +10,17 @@ router.post('/register', async (req, res) => {
         const { email, password } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: 'Пользователь уже существует' });
+            return res.status(400).json({ error: 'User already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ email, password: hashedPassword });
         await newUser.save();
 
-        res.status(201).json({ message: 'Регистрация успешна' });
+        res.status(201).json({ message: 'Registration successful' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
         res.json({ token });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 

@@ -199,7 +199,7 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://89.169.163.170:8080/application/json',
+                    'https://backckkck.3utilities.com/application/json',
                     finalJson,
                     {
                         headers: {'Content-Type': 'application/json'},
@@ -221,7 +221,7 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://89.169.163.170:8080/application/json',
+                    'https://backckkck.3utilities.com/application/json',
                     userJson,
                     {
                         headers: {'Content-Type': 'application/json'},
