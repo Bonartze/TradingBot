@@ -1,4 +1,3 @@
-// server/routes/auth.js
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -6,7 +5,6 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// Регистрация
 router.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -26,7 +24,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Вход
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -42,7 +39,7 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id },
-            'YOUR_SECRET_KEY', // Замените на ваш секретный ключ
+            'YOUR_SECRET_KEY',
             { expiresIn: '1h' }
         );
 
@@ -53,7 +50,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Middleware для проверки токена
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -72,7 +68,6 @@ function authMiddleware(req, res, next) {
     }
 }
 
-// Удаление аккаунта
 router.delete('/delete', authMiddleware, async (req, res) => {
     try {
         const userId = req.userId;

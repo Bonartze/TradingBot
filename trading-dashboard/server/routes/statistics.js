@@ -4,9 +4,6 @@ const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
-
-// 1) Эндпоинт: получить список логов по email
-// Пример:
 router.get('/list', (req, res) => {
     const email = req.query.email;
     console.log('[DEBUG] /list called with email=', email);
@@ -47,7 +44,6 @@ router.get('/file', (req, res) => {
             return res.status(500).json({error: 'Cannot read log file'});
         }
 
-        // Возвращаем текст CSV‑файла
         return res.json({content: data});
     });
 });
