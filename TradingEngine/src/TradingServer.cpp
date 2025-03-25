@@ -13,12 +13,13 @@ namespace http = beast::http;
 namespace net = boost::asio;
 using json = nlohmann::json;
 
+// for VM
 std::string log_dir = "/home/ivan/TradingBot/TradingEngine/Logs";
 
 
 void process_scalping(const json &j) {
-    if (!std::filesystem::exists("../Logs"))
-        std::filesystem::create_directories("../Logs");
+    if (!std::filesystem::exists(log_dir))
+        std::filesystem::create_directories(log_dir);
 
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = log_dir + "/scalping_" + email + ".csv";
@@ -57,8 +58,8 @@ void process_scalping(const json &j) {
 }
 
 void process_mean_reverse(const json &j) {
-    if (!std::filesystem::exists("../Logs"))
-        std::filesystem::create_directories("../Logs");
+    if (!std::filesystem::exists(log_dir))
+        std::filesystem::create_directories(log_dir);
 
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = log_dir + "/mean_reverse_" + email + ".csv";
@@ -98,8 +99,8 @@ void process_mean_reverse(const json &j) {
 }
 
 void process_arima_garch(const json &j) {
-    if (!std::filesystem::exists("../Logs"))
-        std::filesystem::create_directories("../Logs");
+    if (!std::filesystem::exists(log_dir))
+        std::filesystem::create_directories(log_dir);
 
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = log_dir + "/arima_garch_" + email + ".csv";
@@ -147,8 +148,8 @@ void process_arima_garch(const json &j) {
 }
 
 void process_bayesian(const json &j) {
-    if (!std::filesystem::exists("../Logs"))
-        std::filesystem::create_directories("../Logs");
+    if (!std::filesystem::exists(log_dir))
+        std::filesystem::create_directories(log_dir);
 
     std::string email = j["email"].get<std::string>();
     std::string log_file_name = log_dir + "/bayesian_" + email + ".csv";
