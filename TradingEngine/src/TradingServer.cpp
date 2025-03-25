@@ -260,6 +260,13 @@ http::response<http::string_body> handle_http_request(
 //    response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
 //    response.set(http::field::access_control_max_age, "86400");
 
+
+    response.set(http::field::access_control_allow_origin, "*");
+    response.set(http::field::access_control_allow_methods, "POST, GET, OPTIONS");
+    response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
+    response.set(http::field::access_control_max_age, "86400");
+
+
     if (req.method() == http::verb::options && req.target() == "/application/json") {
         response.result(http::status::ok);
         response.body() = "";
