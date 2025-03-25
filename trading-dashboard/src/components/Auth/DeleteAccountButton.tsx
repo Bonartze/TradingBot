@@ -1,4 +1,3 @@
-// src/components/Auth/DeleteAccountButton.tsx
 import React from 'react';
 import axios from 'axios';
 import {Button} from '@mui/material';
@@ -13,7 +12,7 @@ const DeleteAccountButton: React.FC = () => {
         }
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.delete('http://89.169.163.170:5001/api/auth/delete', {
+            const response = await axios.delete('https://backckkck.3utilities.com/api/auth/delete', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

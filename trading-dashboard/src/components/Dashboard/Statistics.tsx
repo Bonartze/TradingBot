@@ -9,7 +9,7 @@ import {
     TextField
 } from '@mui/material';
 
-// chart.js + react-chartjs-2
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -28,7 +28,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 type MyChartData = ChartData<'line'>;
 
 const Statistics: React.FC = () => {
-    // email можно получать из localStorage или из поля ввода
+    
     const [email, setEmail] = useState('user@example.com');
     const [logFiles, setLogFiles] = useState<string[]>([]);
     const [selectedFile, setSelectedFile] = useState('');
@@ -49,13 +49,12 @@ const Statistics: React.FC = () => {
 
     const loadFile = (filename: string) => {
         axios
-            .get('http://89.169.163.170:5001/api/statistics/file', { params: { filename } })
+            .get('https://backckkck.3utilities.com/api/statistics/file', { params: { filename } })
             .then(res => {
                 setSelectedFile(filename);
                 setLogContent(res.data.content);
-                // Парсим CSV
                 const parsed = parseCsv(res.data.content);
-                // Генерируем данные для графика
+                
                 setChartData(generateChartData(parsed));
             })
             .catch(err => {
@@ -63,7 +62,7 @@ const Statistics: React.FC = () => {
             });
     };
 
-    // Упрощённая функция парсинга CSV
+    
     const parseCsv = (csvString: string) => {
         const lines = csvString.split('\n').filter(line => line.trim() !== '');
         if (lines.length === 0) {
@@ -74,24 +73,24 @@ const Statistics: React.FC = () => {
         return { headers, rows };
     };
 
-    // Генерируем данные для графика
-    // Допустим, ищем колонку "Current Price" и рисуем её
+    
+    
     const generateChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
         const { headers, rows } = parsed;
         if (headers.length === 0 || rows.length === 0) {
             return null;
         }
 
-        // Ищем индекс колонки "Current Price"
+        
         const priceIndex = headers.findIndex(h => h.trim() === 'Current Price');
         if (priceIndex < 0) {
-            // Если нет колонки, вернём null
+            
             return null;
         }
 
-        // Преобразуем каждую строку в число
+        
         const prices = rows.map(r => parseFloat(r[priceIndex]));
-        // Для оси X используем индекс строки
+        
         const labels = rows.map((_, i) => `Trade #${i}`);
 
         return {

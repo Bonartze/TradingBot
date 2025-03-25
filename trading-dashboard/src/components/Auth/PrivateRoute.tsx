@@ -9,7 +9,6 @@ const PrivateRoute: React.FC<Props> = ({ children }) => {
     const token = localStorage.getItem('token');
 
     if (!token) {
-        // Если нет токена, перенаправляем на /login
         return <Navigate to="/login" replace />;
     }
 
