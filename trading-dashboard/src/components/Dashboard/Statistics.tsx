@@ -35,11 +35,10 @@ const Statistics: React.FC = () => {
     const [logContent, setLogContent] = useState('');
     const [chartData, setChartData] = useState<MyChartData | null>(null);
 
-    // Загружаем список лог‑файлов при изменении email
     useEffect(() => {
         if (!email) return;
         axios
-            .get('http://localhost:5001/api/statistics/list', { params: { email } })
+            .get('http://89.169.163.170:5001/api/statistics/list', { params: { email } })
             .then(res => {
                 setLogFiles(res.data.logs || []);
             })
@@ -48,10 +47,9 @@ const Statistics: React.FC = () => {
             });
     }, [email]);
 
-    // Функция загрузки конкретного файла
     const loadFile = (filename: string) => {
         axios
-            .get('http://localhost:5001/api/statistics/file', { params: { filename } })
+            .get('http://89.169.163.170:5001/api/statistics/file', { params: { filename } })
             .then(res => {
                 setSelectedFile(filename);
                 setLogContent(res.data.content);
