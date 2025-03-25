@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Container,
     Typography,
@@ -13,7 +13,7 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
+import {useSearchParams} from 'react-router-dom';
 import axios from 'axios';
 import DeleteAccountButton from '../Auth/DeleteAccountButton';
 
@@ -30,26 +30,26 @@ const Settings: React.FC = () => {
     const [searchParams] = useSearchParams();
     const strategyId = searchParams.get("strategyId");
 
-    // Доп. поле для email
+
     const [email, setEmail] = useState('');
 
-    // Поля для стратегий
+
     const [windowSize, setWindowSize] = useState('10');
     const [symbol, setSymbol] = useState('BTCUSDT');
 
-    // Вместо textField для dataFrame — селект
+
     const [dataFrame, setDataFrame] = useState('1h');
 
     const [isDynamic, setIsDynamic] = useState(false);
     const [balance, setBalance] = useState('1000');
 
-    // Поля для Mean Reverse / Scalping
+
     const [smaLong, setSmaLong] = useState('10');
     const [smaShort, setSmaShort] = useState('5');
     const [rsiOversold, setRsiOversold] = useState('30');
     const [rsiOverbought, setRsiOverbought] = useState('70');
 
-    // Флаг тестового режима (не для арбитражей)
+
     const [isTesting, setIsTesting] = useState(false);
 
     const [strategyInitialized, setStrategyInitialized] = useState(false);
@@ -106,7 +106,7 @@ const Settings: React.FC = () => {
         email,
     ]);
 
-    // Поля для пользовательских настроек
+
     const [userBgColor, setUserBgColor] = useState('#ffffff');
     const [userPassword, setUserPassword] = useState('');
     const [userInitialized, setUserInitialized] = useState(false);
@@ -151,7 +151,7 @@ const Settings: React.FC = () => {
 
             let finalJson: any;
             if (strategyId === '5' || strategyId === '6') {
-                // Арбитражные стратегии, без is_testing
+
                 finalJson = {
                     strategy: strategyName,
                     symbol,
@@ -172,7 +172,7 @@ const Settings: React.FC = () => {
                     email
                 };
             } else {
-                // Остальные стратегии
+
                 finalJson = {
                     strategy: strategyName,
                     symbol,
@@ -199,10 +199,10 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://89.169.163.170:5001/application/json',
+                    'http://89.169.163.170:8080/application/json',
                     finalJson,
                     {
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {'Content-Type': 'application/json'},
                     }
                 );
                 alert(response.data.message || 'Strategy settings saved!');
@@ -211,7 +211,7 @@ const Settings: React.FC = () => {
                 alert(err.response?.data?.error || 'Error saving strategy settings');
             }
         } else {
-            // User settings
+
             const userJson = {
                 bgColor: userBgColor,
                 password: userPassword,
@@ -221,10 +221,10 @@ const Settings: React.FC = () => {
 
             try {
                 const response = await axios.post(
-                    'http://localhost:8080/application/json',
+                    'http://89.169.163.170:8080/application/json',
                     userJson,
                     {
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {'Content-Type': 'application/json'},
                     }
                 );
                 alert(response.data.message || 'User settings saved!');
@@ -236,14 +236,14 @@ const Settings: React.FC = () => {
     };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
-            <Paper elevation={3} sx={{ p: 3 }}>
+        <Container maxWidth="md" sx={{mt: 4}}>
+            <Paper elevation={3} sx={{p: 3}}>
                 {strategyId ? (
                     <>
                         <Typography variant="h4" gutterBottom>
                             Strategy Settings (ID: {strategyId})
                         </Typography>
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 2}}>
                             <TextField
                                 label="Window Size"
                                 type="number"
@@ -364,7 +364,7 @@ const Settings: React.FC = () => {
                                 />
                             )}
 
-                            <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                            <Button type="submit" variant="contained" color="primary" sx={{mt: 2}}>
                                 {strategyId ? "Run Strategy" : "Save User Settings"}
                             </Button>
                         </Box>
@@ -374,7 +374,7 @@ const Settings: React.FC = () => {
                         <Typography variant="h4" gutterBottom>
                             User Settings
                         </Typography>
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 2}}>
                             <TextField
                                 label="Background Color"
                                 type="color"
@@ -391,11 +391,11 @@ const Settings: React.FC = () => {
                                 value={userPassword}
                                 onChange={(e) => setUserPassword(e.target.value)}
                             />
-                            <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                            <Button type="submit" variant="contained" color="primary" sx={{mt: 2}}>
                                 Save User Settings
                             </Button>
-                            <Box sx={{ mt: 4 }}>
-                                <DeleteAccountButton />
+                            <Box sx={{mt: 4}}>
+                                <DeleteAccountButton/>
                             </Box>
                         </Box>
                     </>
