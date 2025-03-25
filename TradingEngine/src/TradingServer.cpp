@@ -13,12 +13,15 @@ namespace http = beast::http;
 namespace net = boost::asio;
 using json = nlohmann::json;
 
+std::string log_dir = "/home/ivan/TradingBot/TradingEngine/Logs";
+
+
 void process_scalping(const json &j) {
     if (!std::filesystem::exists("../Logs"))
         std::filesystem::create_directories("../Logs");
 
     std::string email = j["email"].get<std::string>();
-    std::string log_file_name = "../Logs/scalping_" + email + ".csv";
+    std::string log_file_name = log_dir + "/scalping_" + email + ".csv";
     CSVLogger logger_scalping = CSVLogger(log_file_name);
     ScalpingStr *scalping = nullptr;
     std::string symbol = j["symbol"].get<std::string>();
@@ -58,7 +61,7 @@ void process_mean_reverse(const json &j) {
         std::filesystem::create_directories("../Logs");
 
     std::string email = j["email"].get<std::string>();
-    std::string log_file_name = "../Logs/mean_reverse_" + email + ".csv";
+    std::string log_file_name = log_dir + "/mean_reverse_" + email + ".csv";
     CSVLogger logger_mean_reverse = CSVLogger(log_file_name);
     MeanReverseStrategy *mean_reverse = nullptr;
     std::string symbol = j["symbol"].get<std::string>();
@@ -99,7 +102,7 @@ void process_arima_garch(const json &j) {
         std::filesystem::create_directories("../Logs");
 
     std::string email = j["email"].get<std::string>();
-    std::string log_file_name = "../Logs/arima_garch_" + email + ".csv";
+    std::string log_file_name = log_dir + "/arima_garch_" + email + ".csv";
     CSVLogger logger_arima_garch = CSVLogger(log_file_name);
     std::cout << "process_arima_garch called.\n";
 
@@ -148,7 +151,7 @@ void process_bayesian(const json &j) {
         std::filesystem::create_directories("../Logs");
 
     std::string email = j["email"].get<std::string>();
-    std::string log_file_name = "../Logs/bayesian_" + email + ".csv";
+    std::string log_file_name = log_dir + "/bayesian_" + email + ".csv";
     CSVLogger logger_bayesian = CSVLogger(log_file_name);
 
     BayesianSignalFiltering *bayesian = nullptr;
