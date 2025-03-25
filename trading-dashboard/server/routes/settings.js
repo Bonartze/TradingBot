@@ -1,9 +1,7 @@
-// routes/settings.js
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
-// Middleware для проверки токена
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -21,7 +19,6 @@ function authMiddleware(req, res, next) {
 
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        // При желании можно сохранить настройки в БД
         console.log('Received settings:', req.body);
         return res.json({ message: 'Settings saved successfully' });
     } catch (error) {
