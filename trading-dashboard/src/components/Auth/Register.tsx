@@ -21,7 +21,6 @@ const Register: React.FC = () => {
             setMessage(response.data.message || 'Registration successful!');
             setError('');
 
-            // Optionally, redirect to login
             navigate('/login');
         } catch (err: any) {
             setMessage('');

@@ -26,7 +26,7 @@ const Home: React.FC = () => {
                     Here you can configure your strategies, view analytics, and more.
                 </Typography>
 
-                {/* Картинка, растянутая на ~80% ширины контейнера */}
+                {}
                 <Box
                     component="img"
                     src={homeImage}
