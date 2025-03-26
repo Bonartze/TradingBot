@@ -24,6 +24,7 @@ mongoose
         // Запускаем HTTP-сервер на 5001
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`HTTP server running on port ${PORT}`);
+
         });
     })
     .catch(err => console.error('MongoDB connection error:', err));
