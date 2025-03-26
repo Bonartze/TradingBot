@@ -114,7 +114,7 @@ const Statistics: React.FC = () => {
                 Enter your email to load logs:
             </Typography>
 
-            {/* Поле ввода email */}
+            {}
             <TextField
                 label="Email"
                 variant="outlined"
@@ -145,12 +145,12 @@ const Statistics: React.FC = () => {
                     <Typography variant="h6" gutterBottom>
                         Selected File: {selectedFile}
                     </Typography>
-                    {/* Покажем часть содержимого (или всё) */}
+                    {}
                     <pre style={{maxHeight: 200, overflow: 'auto', background: '#f7f7f7'}}>
             {logContent}
           </pre>
 
-                    {/* Если chartData сформировалось, рисуем график */}
+                    {}
                     {chartData && (
                         <div style={{height: 400}}>
                             <Line data={chartData}/>
