@@ -3,6 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// Убираем fs, https, sslOptions
+// const fs = require('fs');
+// const https = require('https');
+
 const authRoutes = require('./routes/auth');
 const settingsRoutes = require('./routes/settings');
 const statisticsRoutes = require('./routes/statistics');
@@ -24,7 +28,6 @@ mongoose
         // Запускаем HTTP-сервер на 5001
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`HTTP server running on port ${PORT}`);
-
         });
     })
     .catch(err => console.error('MongoDB connection error:', err));
