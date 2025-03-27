@@ -72,7 +72,8 @@ availability, security and performance.
 
 - Robust API:
   A RESTful API, powered by Node.js, provides endpoints for user authentication, strategy configuration, and retrieval
-  of trading statistics. All API endpoints are secured and integrated with CORS support to facilitate communication with the frontend dashboard.
+  of trading statistics. All API endpoints are secured and integrated with CORS support to facilitate communication with
+  the frontend dashboard.
 
 
 - Secure Deployment:
@@ -85,5 +86,17 @@ availability, security and performance.
   A Python-based module renders performance metrics and charts, giving users a clear, real-time visualization of trading
   outcomes and historical performance data.
 
-Docs & UML
-[[Link]]
+# Strategies API generation (as a Dynamic Library)
+
+Some dependencies are required (add later)
+
+```
+git clone git@github.com:Bonartze/TradingBot.git
+cd TradingBot/TradingStrategies && mkdir build && cd build
+cmake ../ && make -j`nproc`
+```
+
+# Docs & UML
+
+https://bonartze.github.io/TradingBot/
+
