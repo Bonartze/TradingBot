@@ -9,6 +9,16 @@ on:
       - "*"
 
 jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set permissions for availability script
+        run: chmod +x ./Scripts/build_server.sh
+      - name: Build API and trading server
+        run: cd Scripts && ./build_server.sh
+
   stock_market_availability:
     runs-on: ubuntu-22.04
     steps:
@@ -21,6 +31,7 @@ jobs:
 
   setup-docker:
     runs-on: ubuntu-22.04
+    needs: build
     steps:
       - name: Install Docker
         run: |

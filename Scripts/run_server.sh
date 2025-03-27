@@ -1,4 +1,6 @@
 #!/bin/bash
+# generating trading strategy API
+
 mkdir -p ../TradingEngine/build && \
 cd ../TradingEngine/build
 cmake ../ && \
