@@ -25,8 +25,9 @@ mongoose
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`HTTP server running on port ${PORT}`);
 
-        https.createServer(sslOptions, app).listen(PORT, () => {
-            console.log(`HTTPS server running on port ${PORT}`);
-        });
-    })
-    .catch(err => console.error('MongoDB connection error:', err));
+            https.createServer(sslOptions, app).listen(PORT, () => {
+                console.log(`HTTPS server running on port ${PORT}`);
+            });
+        })
+            .catch(err => console.error('MongoDB connection error:', err));
+    });
