@@ -314,11 +314,13 @@ http::response<http::string_body> handle_http_request(http::request<http::string
             return response;
         }
 
+
     } else if (req.method() == http::verb::get) {
         response.result(http::status::ok);
         response.body() = "GET request received";
         response.prepare_payload();
         return response;
+
     } else {
         response.result(http::status::bad_request);
         response.body() = "Unsupported HTTP method";
