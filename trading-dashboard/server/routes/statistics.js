@@ -31,7 +31,7 @@ router.get('/file', (req, res) => {
         return res.status(400).json({error: 'filename is required'});
     }
 
-    const logsDir = path.join(__dirname, '../../../TradingEngine/Logs');
+    const logsDir = '/home/ivan/TradingBot/TradingEngine/Logs'
     const filePath = path.join(logsDir, filename);
 
     if (!fs.existsSync(filePath)) {

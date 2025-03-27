@@ -14,7 +14,7 @@ const HTTP_PORT = process.env.PORT || 5001;
 const HTTPS_PORT = 443;
 
 const sslOptions = {
-    key:  fs.readFileSync('/etc/letsencrypt/live/backckkck.3utilities.com/privkey.pem'),
+    key: fs.readFileSync('/etc/letsencrypt/live/backckkck.3utilities.com/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/backckkck.3utilities.com/fullchain.pem')
 };
 
