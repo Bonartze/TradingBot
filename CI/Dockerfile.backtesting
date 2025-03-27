@@ -40,4 +40,4 @@ RUN python3 show_metrics.py
 
 WORKDIR /backtesting/StaticModels/build
 RUN cmake ../ && make -j$(nproc)
-RUN ./metrics && python3 ../src/plot.py
+RUN ./metrics && python3 ../src/plot.py && rm -rf results.md
