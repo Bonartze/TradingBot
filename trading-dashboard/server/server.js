@@ -19,7 +19,7 @@ const sslOptions = {
 };
 
 app.use(express.json());
-app.use(cors({origin: '*'}));
+app.use(cors({ origin: '*' }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/settings', settingsRoutes);
