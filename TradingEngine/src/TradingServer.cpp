@@ -268,55 +268,66 @@ http::response<http::string_body> handle_http_request(http::request<http::string
         return response;
     }
 
-    if (req.method() == http::verb::post && req.target() == "/application/json") {
-        auto j = json::parse(req.body(), nullptr, false);
-        if (j.is_discarded()) {
+    std::string path = std::string(req.target());
+
+    if (req.method() == http::verb::post) {
+        if (path.rfind("/application/json", 0) == 0) {
+            auto j = json::parse(req.body(), nullptr, false);
+            if (j.is_discarded()) {
+                response.result(http::status::bad_request);
+                response.body() = "Invalid JSON in request body";
+                response.prepare_payload();
+                return response;
+            }
+
+            std::string strategy = j.value("strategy", "");
+            try {
+                if (strategy == "scalping") {
+                    process_scalping(j);
+                } else if (strategy == "mean reverse") {
+                    process_mean_reverse(j);
+                } else if (strategy == "inter exchange arbitrage") {
+                    process_inter_exchange_arbitrage(j);
+                } else if (strategy == "intra exchange arbitrage") {
+                    process_intra_exchange_arbitrage(j);
+                } else if (strategy == "arima garch") {
+                    process_arima_garch(j);
+                } else if (strategy == "bayesian signal pro") {
+                    process_bayesian(j);
+                } else {
+                    throw std::runtime_error("Invalid or unknown strategy");
+                }
+
+                response.result(http::status::accepted);
+                response.body() = "Request accepted for processing";
+            } catch (const std::exception &e) {
+                response.result(http::status::internal_server_error);
+                response.body() = std::string("Strategy error: ") + e.what();
+            }
+            response.prepare_payload();
+            return response;
+
+        } else {
             response.result(http::status::bad_request);
-            response.body() = "Invalid JSON in request body";
+            response.body() = "Unsupported POST path";
             response.prepare_payload();
             return response;
         }
 
-        std::string strategy = j.value("strategy", "");
-        try {
-            if (strategy == "scalping") {
-                process_scalping(j);
-            } else if (strategy == "mean reverse") {
-                process_mean_reverse(j);
-            } else if (strategy == "inter exchange arbitrage") {
-                process_inter_exchange_arbitrage(j);
-            } else if (strategy == "intra exchange arbitrage") {
-                process_intra_exchange_arbitrage(j);
-            } else if (strategy == "arima garch") {
-                process_arima_garch(j);
-            } else if (strategy == "bayesian signal pro") {
-                process_bayesian(j);
-            } else {
-                throw std::runtime_error("Invalid or unknown strategy");
-            }
-
-            response.result(http::status::accepted);
-            response.body() = "Request accepted for processing";
-        } catch (const std::exception &e) {
-            response.result(http::status::internal_server_error);
-            response.body() = std::string("Strategy error: ") + e.what();
-        }
-        response.prepare_payload();
 
     } else if (req.method() == http::verb::get) {
         response.result(http::status::ok);
         response.body() = "GET request received";
         response.prepare_payload();
+        return response;
 
     } else {
         response.result(http::status::bad_request);
         response.body() = "Unsupported HTTP method";
         response.prepare_payload();
+        return response;
     }
-
-    return response;
 }
-
 
 Session::Session(net::ip::tcp::socket socket)
         : socket_(std::move(socket)) {
