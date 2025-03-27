@@ -8,7 +8,7 @@ router.get('/list', (req, res) => {
     const email = req.query.email;
     console.log('[DEBUG] /list called with email=', email);
 
-    const logsDir = path.join(__dirname, '../../../TradingEngine/Logs');
+    const logsDir = '/home/ivan/TradingBot/TradingEngine/Logs';
     console.log('[DEBUG] logsDir=', logsDir);
 
     fs.readdir(logsDir, (err, files) => {
