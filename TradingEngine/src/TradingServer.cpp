@@ -253,31 +253,20 @@ void process_intra_exchange_arbitrage(const json &j) {
 }
 
 
-http::response<http::string_body> handle_http_request(
-        http::request<http::string_body> const &req) {
+http::response<http::string_body> handle_http_request(http::request<http::string_body> const &req) {
     http::response<http::string_body> response;
-
-
-    // for local server launch
-//    response.set(http::field::access_control_allow_origin, "http://localhost:3000");
-//    response.set(http::field::access_control_allow_methods, "POST, GET, OPTIONS");
-//    response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
-//    response.set(http::field::access_control_max_age, "86400");
-
 
     response.set(http::field::access_control_allow_origin, "*");
     response.set(http::field::access_control_allow_methods, "POST, GET, OPTIONS");
     response.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
     response.set(http::field::access_control_max_age, "86400");
 
-
-    if (req.method() == http::verb::options && req.target() == "/application/json") {
+    if (req.method() == http::verb::options) {
         response.result(http::status::ok);
         response.body() = "";
         response.prepare_payload();
         return response;
     }
-
 
     if (req.method() == http::verb::post && req.target() == "/application/json") {
         auto j = json::parse(req.body(), nullptr, false);
@@ -313,10 +302,12 @@ http::response<http::string_body> handle_http_request(
             response.body() = std::string("Strategy error: ") + e.what();
         }
         response.prepare_payload();
+
     } else if (req.method() == http::verb::get) {
         response.result(http::status::ok);
         response.body() = "GET request received";
         response.prepare_payload();
+
     } else {
         response.result(http::status::bad_request);
         response.body() = "Unsupported HTTP method";

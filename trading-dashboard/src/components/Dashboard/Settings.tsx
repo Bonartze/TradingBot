@@ -17,7 +17,6 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import DeleteAccountButton from '../Auth/DeleteAccountButton';
 
-// Карта ID стратегии на название
 const STRATEGY_MAP: Record<string, string> = {
     '1': 'bayesian signal pro',
     '2': 'mean reverse',
@@ -31,7 +30,6 @@ const Settings: React.FC = () => {
     const [searchParams] = useSearchParams();
     const strategyId = searchParams.get("strategyId");
 
-    // Общие поля настроек стратегий
     const [email, setEmail] = useState('');
     const [windowSize, setWindowSize] = useState('10');
     const [symbol, setSymbol] = useState('BTCUSDT');
@@ -39,16 +37,13 @@ const Settings: React.FC = () => {
     const [isDynamic, setIsDynamic] = useState(false);
     const [balance, setBalance] = useState('1000');
 
-    // Параметры SMA / RSI для отдельных стратегий
     const [smaLong, setSmaLong] = useState('10');
     const [smaShort, setSmaShort] = useState('5');
     const [rsiOversold, setRsiOversold] = useState('30');
     const [rsiOverbought, setRsiOverbought] = useState('70');
 
-    // Флаг тестового режима
     const [isTesting, setIsTesting] = useState(false);
 
-    // Логика инициализации настроек стратегии из localStorage
     const [strategyInitialized, setStrategyInitialized] = useState(false);
     useEffect(() => {
         if (!strategyId) return;
@@ -70,7 +65,6 @@ const Settings: React.FC = () => {
         setStrategyInitialized(true);
     }, [strategyId]);
 
-    // Автосохранение в localStorage
     useEffect(() => {
         if (!strategyId || !strategyInitialized) return;
         const strategyData = {
@@ -103,7 +97,6 @@ const Settings: React.FC = () => {
         email,
     ]);
 
-    // Пользовательские настройки (когда strategyId нет)
     const [userBgColor, setUserBgColor] = useState('#ffffff');
     const [userPassword, setUserPassword] = useState('');
     const [userInitialized, setUserInitialized] = useState(false);
@@ -135,7 +128,6 @@ const Settings: React.FC = () => {
         }
     }, [strategyId, userBgColor]);
 
-    // Отправка настроек
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -145,7 +137,6 @@ const Settings: React.FC = () => {
             return;
         }
 
-        // Если задан strategyId, отправляем настройки стратегии на C++-сервер
         if (strategyId) {
             const strategyName = STRATEGY_MAP[strategyId] || 'unknown strategy';
 
@@ -172,7 +163,6 @@ const Settings: React.FC = () => {
                     email
                 };
             } else {
-                // mean reverse, scalping, bayesian, arima garch
                 finalJson = {
                     strategy: strategyName,
                     symbol,
@@ -198,16 +188,12 @@ const Settings: React.FC = () => {
             console.log("Отправляем JSON (стратегия):", JSON.stringify(finalJson, null, 2));
 
             try {
-                // Предположим, ваш C++-сервер проксируется Nginx'ом на /application/json
-                // Или напрямую слушает https://backckkck.3utilities.com/application/json
                 const response = await axios.post(
                     'https://backckkck.3utilities.com/application/json',
                     finalJson,
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                            // Если нужно авторизовать запрос, добавьте:
-                            // 'Authorization': `Bearer ${token}`
                         },
                     }
                 );
@@ -217,7 +203,6 @@ const Settings: React.FC = () => {
                 alert(err.response?.data?.error || 'Error saving strategy settings');
             }
         } else {
-            // Сохранение пользовательских настроек (UI, пароль и т.д.)
             const userJson = {
                 bgColor: userBgColor,
                 password: userPassword,
@@ -226,15 +211,12 @@ const Settings: React.FC = () => {
             console.log("Отправляем JSON (пользователь):", JSON.stringify(userJson, null, 2));
 
             try {
-                // Аналогично, если пользовательские настройки тоже обрабатывает C++-сервер
-                // Или, если обрабатывает Node.js, укажите другой URL
                 const response = await axios.post(
                     'https://backckkck.3utilities.com/application/json',
                     userJson,
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                            // 'Authorization': `Bearer ${token}`
                         },
                     }
                 );
@@ -310,7 +292,6 @@ const Settings: React.FC = () => {
                                 onChange={(e) => setBalance(e.target.value)}
                             />
 
-                            {/* Параметры SMA/RSI для mean reverse (2) и scalping (3) */}
                             {(strategyId === '2' || strategyId === '3') && (
                                 <>
                                     <TextField
