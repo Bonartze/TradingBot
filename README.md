@@ -86,6 +86,12 @@ availability, security and performance.
   A Python-based module renders performance metrics and charts, giving users a clear, real-time visualization of trading
   outcomes and historical performance data.
 
+# Metrics examples
+![forecast_comparison.png](images/forecast_comparison.png)
+
+![profit_comparison.jpg](images/profit_comparison.jpg)
+
+![trades_comparison.jpg](images/trades_comparison.jpg)
 # Strategies API generation (as a Dynamic Library)
 
 Some dependencies are required (add later)
