@@ -19,6 +19,83 @@ jobs:
       - name: Build API and trading server
         run: cd Scripts && ./build_server.sh
 
+  generate-docs:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+          sudo apt-get clean
+
+      - name: Create optimized Doxyfile
+        run: |
+          cat << 'EOF' > Doxyfile
+          PROJECT_NAME           = "Trading Bot Documentation"
+          PROJECT_NUMBER         = $GITHUB_SHA
+          OUTPUT_DIRECTORY       = docs
+          INPUT                  = ./src
+          EXCLUDE                = */build/* */cmake-build-debug/* */tests/* */third_party/*
+          RECURSIVE              = YES
+          EXCLUDE_PATTERNS       = *.md *.txt
+          FILE_PATTERNS          = *.h *.hpp *.c *.cpp *.py
+
+          GENERATE_HTML          = YES
+          HTML_OUTPUT            = .
+          GENERATE_LATEX         = NO
+
+          EXTRACT_ALL            = NO
+          EXTRACT_PRIVATE        = NO
+          EXTRACT_STATIC         = NO
+          HIDE_UNDOC_MEMBERS     = YES
+          HIDE_UNDOC_CLASSES     = YES
+
+          HAVE_DOT               = YES
+          UML_LOOK               = YES
+          CALL_GRAPH             = NO
+          CALLER_GRAPH           = NO
+          COLLABORATION_GRAPH    = NO
+
+          DISABLE_INDEX          = NO
+          GENERATE_TREEVIEW      = NO
+          FULL_PATH_NAMES        = NO
+          SHOW_FILES            = NO
+          SHOW_NAMESPACES       = NO
+          OPTIMIZE_OUTPUT_FOR_C  = YES
+          EOF
+
+      - name: Generate documentation
+        run: |
+          mkdir -p docs
+          doxygen Doxyfile
+          touch docs/.nojekyll
+
+      - name: Compress documentation
+        run: |
+          tar -czvf docs.tar.gz docs/
+          mkdir -p compressed_docs
+          mv docs.tar.gz compressed_docs/
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-compressed
+          path: compressed_docs/docs.tar.gz
+          retention-days: 1
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          keep_files: false
+          force_orphan: true
+
   stock_market_availability:
     runs-on: ubuntu-22.04
     steps:
