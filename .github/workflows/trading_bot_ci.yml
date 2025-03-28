@@ -133,7 +133,7 @@ jobs:
           OUTPUT_DIRECTORY       = docs
           INPUT                  = .
           
-          EXCLUDE                = */build/* */cmake-build-debug/* */tests/* */third_party/*
+          EXCLUDE                = */build/* */cmake-build-debug/* */tests/* */third_party/* */trading-dashboard/*
 
           RECURSIVE              = YES
           EXCLUDE_PATTERNS       = *.md *.txt
