@@ -136,7 +136,10 @@ jobs:
           EXCLUDE                = */build/* */cmake-build-debug/* */tests/* */third_party/* */trading-dashboard/*
 
           RECURSIVE              = YES
-          EXCLUDE_PATTERNS       = *.md *.txt
+          EXCLUDE_PATTERNS       = *.md *.txt *napi*.h
+          
+          EXCLUDE_SYMBOLS = Napi::
+          
           
           
           FILE_PATTERNS          = *.h *.hpp *.c *.cpp
