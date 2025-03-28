@@ -166,7 +166,6 @@ jobs:
           EXTRACT_STATIC         = NO
           HIDE_UNDOC_MEMBERS     = YES
           HIDE_UNDOC_CLASSES     = YES
-
           HAVE_DOT               = YES
           UML_LOOK               = YES
           CLASS_GRAPH            = YES
@@ -174,8 +173,6 @@ jobs:
           CALL_GRAPH             = NO
           CALLER_GRAPH           = NO
           DOT_IMAGE_FORMAT       = svg
-          
-          
           SEARCHENGINE           = NO
           DISABLE_INDEX          = YES
           GENERATE_TREEVIEW      = NO
@@ -216,4 +213,3 @@ jobs:
           publish_dir: ./docs
           keep_files: false
           force_orphan: true
-
