@@ -131,33 +131,41 @@ jobs:
           PROJECT_NAME           = "Trading Bot Documentation"
           PROJECT_NUMBER         = $GITHUB_SHA
           OUTPUT_DIRECTORY       = docs
+          
+          
           INPUT                  = .
           
-          EXCLUDE                = */build/* */cmake-build-debug/* */tests/* */third_party/* */trading-dashboard/*
+          
+          EXCLUDE                = \
+            */build/* \
+            */cma ke-build-debug/* \
+            */tests/* \
+            */third_party/* \
+            */trading-dashboard/*
 
           RECURSIVE              = YES
+          
+          
           EXCLUDE_PATTERNS       = *.md *.txt *napi*.h
           
-          EXCLUDE_SYMBOLS = Napi::
           
+          EXCLUDE_SYMBOLS        = Napi::
           
           
           FILE_PATTERNS          = *.h *.hpp *.c *.cpp
 
           GENERATE_HTML          = YES
           HTML_OUTPUT            = .
-          
-          
+
           GENERATE_LATEX         = NO
           
           
-          EXTRACT_ALL            = NO
+          EXTRACT_ALL            = YES
+
           EXTRACT_PRIVATE        = NO
           EXTRACT_STATIC         = NO
           HIDE_UNDOC_MEMBERS     = YES
           HIDE_UNDOC_CLASSES     = YES
-          
-          
           HAVE_DOT               = YES
           UML_LOOK               = YES
           CLASS_GRAPH            = YES
@@ -165,7 +173,6 @@ jobs:
           CALL_GRAPH             = NO
           CALLER_GRAPH           = NO
           DOT_IMAGE_FORMAT       = svg
-
           SEARCHENGINE           = NO
           DISABLE_INDEX          = YES
           GENERATE_TREEVIEW      = NO
