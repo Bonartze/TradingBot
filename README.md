@@ -6,6 +6,8 @@ TradingBot is a system designed to automate multiple trading strategies by integ
 strategy execution, and comprehensive analytics. The platform is built with a modular architecture to ensure
 scalability, security, and high performance.
 
+https://algotrendops.netlify.app/ - website
+
 ## Table of Contents
 
 1. [Overview](#overview)
