@@ -16,7 +16,6 @@ Backtesting/data/mean_reversion
 Backtesting/data/bayesian
 ScalpingResults/
 scalping/
-*.png
 !trading-dashboard/src/images/preview.png
 *.jpg
 ModelsMetrics
