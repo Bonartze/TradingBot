@@ -110,11 +110,11 @@ def analyze_strategy(strategy_name: str, static_dir: str, adaptive_dir: str, out
     plot_comparison(years, static_profit, adaptive_profit,
                     f"Total Profit by Year ({strategy_name})",
                     "Profit",
-                    os.path.join(strategy_out, "profit_comparison.jpg"))
+                    os.path.join(strategy_out, "profit_comparison.png"))
     plot_comparison(years, static_trades, adaptive_trades,
                     f"Number of Trades by Year ({strategy_name})",
                     "Number of Trades",
-                    os.path.join(strategy_out, "trades_comparison.jpg"))
+                    os.path.join(strategy_out, "trades_comparison.png"))
 
     return {
         "profit": {"static": static_profit, "adaptive": adaptive_profit},
@@ -158,7 +158,7 @@ def analyze_backtesting_results(strategy_files: dict, output_root: str):
             plt.xticks(x_labels)
             plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.tight_layout()
-            plt.savefig(os.path.join(output_root, strategy_name, "profit_comparison.jpg"))
+            plt.savefig(os.path.join(output_root, strategy_name, "profit_comparison.png"))
             plt.close()
 
             plt.figure(figsize=(10, 6))
@@ -169,7 +169,7 @@ def analyze_backtesting_results(strategy_files: dict, output_root: str):
             plt.xticks(x_labels)
             plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.tight_layout()
-            plt.savefig(os.path.join(output_root, strategy_name, "trades_comparison.jpg"))
+            plt.savefig(os.path.join(output_root, strategy_name, "trades_comparison.png"))
             plt.close()
     return overall_results
 
@@ -239,7 +239,7 @@ if __name__ == "__main__":
         plt.xticks(months)
         plt.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
-        plt.savefig(os.path.join(arima_out, "profit_comparison.jpg"))
+        plt.savefig(os.path.join(arima_out, "profit_comparison.png"))
         plt.close()
 
         plt.figure(figsize=(10, 6))
@@ -250,7 +250,7 @@ if __name__ == "__main__":
         plt.xticks(months)
         plt.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
-        plt.savefig(os.path.join(arima_out, "trades_comparison.jpg"))
+        plt.savefig(os.path.join(arima_out, "trades_comparison.png"))
         plt.close()
 
     print("Overall Results:")

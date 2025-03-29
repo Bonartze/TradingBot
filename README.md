@@ -166,8 +166,8 @@ The project includes a backtesting framework for simulating strategies on histor
 
 <div style="display:flex;">
   <img src="imgs/forecast_comparison.png" width="300" />
-  <img src="imgs/profit_comparison.jpg" width="300" />
-  <img src="imgs/trades_comparison.jpg" width="300" />
+  <img src="imgs/profit_comparison.png" width="300" />
+  <img src="imgs/trades_comparison.png" width="300" />
 </div>
 
 
