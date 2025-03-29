@@ -1,0 +1,7 @@
+<map id="TradingStrategy" name="TradingStrategy">
+<area shape="rect" id="node1" title=" " alt="" coords="331,5,513,259"/>
+<area shape="rect" id="node2" href="$classArimaGarchAdaptive.html" title=" " alt="" coords="5,321,188,472"/>
+<area shape="rect" id="node3" href="$classBayesianSignalFiltering.html" title=" " alt="" coords="213,329,413,465"/>
+<area shape="rect" id="node4" href="$classMeanReverseStrategy.html" title=" " alt="" coords="437,329,628,465"/>
+<area shape="rect" id="node5" href="$classScalpingStr.html" title=" " alt="" coords="652,307,811,487"/>
+</map>

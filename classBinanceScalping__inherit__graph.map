@@ -1,0 +1,8 @@
+<map id="BinanceScalping" name="BinanceScalping">
+<area shape="rect" id="node1" title=" " alt="" coords="360,5,525,332"/>
+<area shape="rect" id="node2" href="$classBinanceAPI.html" title=" " alt="" coords="5,417,152,509"/>
+<area shape="rect" id="node3" href="$classKrakenAPI.html" title=" " alt="" coords="176,417,323,509"/>
+<area shape="rect" id="node4" href="$classLiveBinanceScalping.html" title=" " alt="" coords="347,380,539,545"/>
+<area shape="rect" id="node5" href="$classLiveBinanceScalpingCurrency.html" title=" " alt="" coords="563,402,802,523"/>
+<area shape="rect" id="node6" href="$classOKXAPI.html" title=" " alt="" coords="827,417,973,509"/>
+</map>
