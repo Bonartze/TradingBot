@@ -55,7 +55,6 @@ const Statistics: React.FC = () => {
                 if (profitChart) {
                     setChartData(profitChart);
                 } else {
-                    // Если нет, можно построить график по "Current Price" (как запасной вариант)
                     const priceChart = generateChartData(parsed);
                     setChartData(priceChart);
                 }
@@ -65,7 +64,6 @@ const Statistics: React.FC = () => {
             });
     };
 
-    // Функция для парсинга CSV
     const parseCsv = (csvString: string) => {
         const lines = csvString.split('\n').filter(line => line.trim() !== '');
         if (lines.length === 0) {
@@ -76,7 +74,6 @@ const Statistics: React.FC = () => {
         return {headers, rows};
     };
 
-    // Функция для генерации графика по "Current Price"
     const generateChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
         const {headers, rows} = parsed;
         if (headers.length === 0 || rows.length === 0) return null;
