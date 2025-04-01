@@ -8,8 +8,6 @@ import {
     ListItemText,
     TextField
 } from '@mui/material';
-
-
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -28,7 +26,6 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 type MyChartData = ChartData<'line'>;
 
 const Statistics: React.FC = () => {
-
     const [email, setEmail] = useState('user@example.com');
     const [logFiles, setLogFiles] = useState<string[]>([]);
     const [selectedFile, setSelectedFile] = useState('');
@@ -54,15 +51,21 @@ const Statistics: React.FC = () => {
                 setSelectedFile(filename);
                 setLogContent(res.data.content);
                 const parsed = parseCsv(res.data.content);
-
-                setChartData(generateChartData(parsed));
+                const profitChart = generateProfitChartData(parsed);
+                if (profitChart) {
+                    setChartData(profitChart);
+                } else {
+                    // Если нет, можно построить график по "Current Price" (как запасной вариант)
+                    const priceChart = generateChartData(parsed);
+                    setChartData(priceChart);
+                }
             })
             .catch(err => {
                 console.error(err);
             });
     };
 
-
+    // Функция для парсинга CSV
     const parseCsv = (csvString: string) => {
         const lines = csvString.split('\n').filter(line => line.trim() !== '');
         if (lines.length === 0) {
@@ -73,25 +76,14 @@ const Statistics: React.FC = () => {
         return {headers, rows};
     };
 
-
+    // Функция для генерации графика по "Current Price"
     const generateChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
         const {headers, rows} = parsed;
-        if (headers.length === 0 || rows.length === 0) {
-            return null;
-        }
-
-
+        if (headers.length === 0 || rows.length === 0) return null;
         const priceIndex = headers.findIndex(h => h.trim() === 'Current Price');
-        if (priceIndex < 0) {
-
-            return null;
-        }
-
-
+        if (priceIndex < 0) return null;
         const prices = rows.map(r => parseFloat(r[priceIndex]));
-
         const labels = rows.map((_, i) => `Trade #${i}`);
-
         return {
             labels,
             datasets: [
@@ -100,6 +92,28 @@ const Statistics: React.FC = () => {
                     data: prices,
                     borderColor: 'blue',
                     backgroundColor: 'blue',
+                    fill: false,
+                }
+            ]
+        };
+    };
+
+    const generateProfitChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
+        const {headers, rows} = parsed;
+        if (headers.length === 0 || rows.length === 0) return null;
+        const profitIndex = headers.findIndex(h => h.trim() === 'FINAL PROFIT');
+        if (profitIndex < 0) return null;
+        const profits = rows.map(r => parseFloat(r[profitIndex]));
+        const labels = rows.map((_, i) => `Trade #${i}`);
+        return {
+            labels,
+            datasets: [
+                {
+                    label: 'Final Profit',
+                    data: profits,
+                    borderColor: 'green',
+                    backgroundColor: 'green',
+                    fill: false,
                 }
             ]
         };
@@ -108,13 +122,11 @@ const Statistics: React.FC = () => {
     return (
         <Container maxWidth="md" style={{marginTop: 40}}>
             <Typography variant="h4" gutterBottom>
-                Statistics
+                Statistics for {email}
             </Typography>
             <Typography variant="body1" gutterBottom>
                 Enter your email to load logs:
             </Typography>
-
-            {}
             <TextField
                 label="Email"
                 variant="outlined"
@@ -122,11 +134,9 @@ const Statistics: React.FC = () => {
                 onChange={e => setEmail(e.target.value)}
                 style={{marginBottom: 20}}
             />
-
             <Typography variant="body1">
                 Below is a list of log files for {email}:
             </Typography>
-
             <List>
                 {logFiles.map(file => (
                     <ListItem
@@ -139,18 +149,14 @@ const Statistics: React.FC = () => {
                     </ListItem>
                 ))}
             </List>
-
             {selectedFile && (
                 <>
                     <Typography variant="h6" gutterBottom>
                         Selected File: {selectedFile}
                     </Typography>
-                    {}
                     <pre style={{maxHeight: 200, overflow: 'auto', background: '#f7f7f7'}}>
             {logContent}
           </pre>
-
-                    {}
                     {chartData && (
                         <div style={{height: 400}}>
                             <Line data={chartData}/>
