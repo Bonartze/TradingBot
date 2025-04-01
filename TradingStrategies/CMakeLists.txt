@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(TradingStrategiesLibrary VERSION 1.0.1 DESCRIPTION "Shared library with strategies API")
+cmake_policy(SET CMP0144 NEW)
+cmake_policy(SET CMP0167 NEW)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -36,6 +38,7 @@ FetchContent_Declare(
         GIT_TAG master
 )
 FetchContent_MakeAvailable(nlohmann_json)
+
 
 find_package(Boost 1.75 REQUIRED COMPONENTS json)
 
@@ -89,7 +92,7 @@ target_link_libraries(StrategiesAPI PRIVATE
         OpenSSL::SSL
         OpenSSL::Crypto
         CURL::libcurl
-        
+
         jsoncpp
 )
 

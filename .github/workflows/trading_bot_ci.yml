@@ -20,7 +20,8 @@ jobs:
 
       - name: Set permissions for availability script
         run: chmod +x ./Scripts/build_server.sh
-
+      - name: Install dependencies
+        run: sudo apt-get install libcurl4-openssl-dev
       - name: Build API and trading server
         run: cd Scripts && ./build_server.sh
 
