@@ -10,11 +10,11 @@ BOOST_ARCHIVE="boost_${BOOST_VERSION//./_}.tar.gz"
 
 echo "[INFO] Installing Boost ${BOOST_VERSION}..."
 cd "$SCRIPT_DIR"
-#wget -c https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_ARCHIVE}
-#tar -xzf ${BOOST_ARCHIVE}
-#cd ${BOOST_DIR}
-#./bootstrap.sh
-#sudo ./b2 install
+wget -c https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_ARCHIVE}
+tar -xzf ${BOOST_ARCHIVE}
+cd ${BOOST_DIR}
+./bootstrap.sh
+sudo ./b2 install
 cd "$SCRIPT_DIR"
 echo "[INFO] Boost installed successfully."
 
