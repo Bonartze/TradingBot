@@ -1,4 +1,6 @@
 #!/bin/bash
+chmod +x ./boost_install
+./boost_install
 mkdir -p ../TradingStrategies/build && cd ../TradingStrategies/build
 
 cmake ../ && \
