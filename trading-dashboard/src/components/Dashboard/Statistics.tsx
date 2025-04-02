@@ -76,7 +76,6 @@ const Statistics: React.FC = () => {
         return {headers, rows};
     };
 
-    // Функция для генерации графика по "Current Price"
     const generateChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
         const {headers, rows} = parsed;
         if (headers.length === 0 || rows.length === 0) return null;
@@ -99,17 +98,30 @@ const Statistics: React.FC = () => {
     };
 
     const generateProfitChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
-        const {headers, rows} = parsed;
-        if (headers.length === 0 || rows.length === 0) return null;
-        const profitIndex = headers.findIndex(h => h.trim() === 'FINAL PROFIT');
-        if (profitIndex < 0) return null;
-        const profits = rows.map(r => parseFloat(r[profitIndex]));
-        const labels = rows.map((_, i) => `Trade #${i}`);
+        const {rows} = parsed;
+        if (rows.length === 0) return null;
+
+        const profits: number[] = [];
+        const labels: string[] = [];
+
+        rows.forEach((row, idx) => {
+            const profitRowIndex = row.findIndex(cell => cell.includes('FINAL PROFIT'));
+            if (profitRowIndex >= 0 && profitRowIndex < row.length - 1) {
+                const profitValue = parseFloat(row[profitRowIndex + 1]);
+                if (!isNaN(profitValue)) {
+                    profits.push(profitValue);
+                    labels.push(`Trade #${idx}`);
+                }
+            }
+        });
+
+        if (profits.length === 0) return null;
+
         return {
             labels,
             datasets: [
                 {
-                    label: 'Final Profit',
+                    label: 'FINAL PROFIT',
                     data: profits,
                     borderColor: 'green',
                     backgroundColor: 'green',
