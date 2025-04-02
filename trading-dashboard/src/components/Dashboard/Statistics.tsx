@@ -106,7 +106,7 @@ const Statistics: React.FC = () => {
             labels,
             datasets: [
                 {
-                    label: 'Final Profit',
+                    label: 'FINAL PROFIT',
                     data: profits,
                     borderColor: 'green',
                     backgroundColor: 'green',
