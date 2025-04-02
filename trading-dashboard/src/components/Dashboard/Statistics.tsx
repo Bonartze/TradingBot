@@ -55,6 +55,7 @@ const Statistics: React.FC = () => {
                 if (profitChart) {
                     setChartData(profitChart);
                 } else {
+                    // Если нет, можно построить график по "Current Price" (как запасной вариант)
                     const priceChart = generateChartData(parsed);
                     setChartData(priceChart);
                 }
@@ -64,6 +65,7 @@ const Statistics: React.FC = () => {
             });
     };
 
+    // Функция для парсинга CSV
     const parseCsv = (csvString: string) => {
         const lines = csvString.split('\n').filter(line => line.trim() !== '');
         if (lines.length === 0) {
@@ -74,10 +76,11 @@ const Statistics: React.FC = () => {
         return {headers, rows};
     };
 
+    // Функция для генерации графика по "Current Price"
     const generateChartData = (parsed: { headers: string[]; rows: string[][] }): MyChartData | null => {
         const {headers, rows} = parsed;
         if (headers.length === 0 || rows.length === 0) return null;
-        const priceIndex = headers.findIndex(h => h.trim() === 'Trade profit');
+        const priceIndex = headers.findIndex(h => h.trim() === 'Current Price');
         if (priceIndex < 0) return null;
         const prices = rows.map(r => parseFloat(r[priceIndex]));
         const labels = rows.map((_, i) => `Trade #${i}`);
@@ -85,7 +88,7 @@ const Statistics: React.FC = () => {
             labels,
             datasets: [
                 {
-                    label: 'Trade proft',
+                    label: 'Current Price',
                     data: prices,
                     borderColor: 'blue',
                     backgroundColor: 'blue',
@@ -106,7 +109,7 @@ const Statistics: React.FC = () => {
             labels,
             datasets: [
                 {
-                    label: 'FINAL PROFIT',
+                    label: 'Final Profit',
                     data: profits,
                     borderColor: 'green',
                     backgroundColor: 'green',
