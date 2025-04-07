@@ -5,11 +5,15 @@
 #include "../../../Logger/include/Logger.h"
 #include "../../Common/include/TradingStrategy.h"
 
+constexpr double LOWER_BOUND = 0.55;
+constexpr double UPPER_BOUND = 60;
+constexpr int BASE_BALANCE = 1000;
+
 class BayesianSignalFiltering : public TradingStrategy {
 
-    double buyThreshold = 0.55;
-    double sellThreshold = 0.55;
-    double rsiThreshold = 60.0;
+    double buyThreshold = LOWER_BOUND;
+    double sellThreshold = LOWER_BOUND;
+    double rsiThreshold = UPPER_BOUND;
 
     auto should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) -> bool override;
 
@@ -32,14 +36,14 @@ class BayesianSignalFiltering : public TradingStrategy {
                           double lower_band) -> double;
 
 public:
-    BayesianSignalFiltering(): TradingStrategy({}, 1000, false, 0.0, 0.0, "key", "secret", "BTCUSDT") {
+    BayesianSignalFiltering() : TradingStrategy({}, BASE_BALANCE, false, 0.0, 0.0, "key", "secret", "BTCUSDT") {
     }
 
     BayesianSignalFiltering(const TradingParams &trading_params, double balance_, bool is_position_open,
                             double quantity,
                             double entry_price, const std::string &key, const std::string &secret,
-                            const std::string &symbol_, bool is_backtesting = true): TradingStrategy(
-        trading_params, balance_, is_position_open, entry_price, quantity, key, secret, symbol_, is_backtesting ) {
+                            const std::string &symbol_, bool is_backtesting = true) : TradingStrategy(
+            trading_params, balance_, is_position_open, entry_price, quantity, key, secret, symbol_, is_backtesting) {
     }
 
     auto set_parameters(const std::vector<double> &) -> void;
@@ -49,5 +53,5 @@ public:
 
     auto wrapper_execute(size_t window_size, const std::vector<double> &prices,
                          CSVLogger &csv_logger)
-        -> std::pair<double, double>;
+    -> std::pair<double, double>;
 };
