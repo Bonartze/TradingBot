@@ -16,6 +16,9 @@ using tcp = net::ip::tcp;
 
 enum class Market:std::uint8_t { BINANCE, KRAKEN, OKX };
 
+//! Omitting linters
+// NOLINTBEGIN
+
 struct OrderBookEntry {
     std::string symbol;
     double bid_price;
@@ -50,7 +53,6 @@ struct OrderBookEntry {
 
 class BinanceScalping {
 protected:
-    // NOLINTBEGIN
     std::string host;
     std::string port;
     std::string target;

@@ -8,14 +8,19 @@ auto TradingMethods::sma(const std::vector<double> &prices, size_t period) -> do
     if (prices.empty()) {
         throw std::invalid_argument("No prices provided");
     }
-    size_t effective_period = std::min(prices.size(), period);
-    std::cout << "Prices sma: " << prices.size() << " Period: " << effective_period << std::endl;
-    const double sum = std::accumulate(prices.end() - effective_period, prices.end(), 0.0);
+    const size_t effective_period = std::min(prices.size(), period);
+    // std::cout << "Prices sma: " << prices.size() << " Period: " << effective_period << std::endl;
+    const double sum = std::accumulate(
+        prices.end() - static_cast<std::vector<double>::difference_type>(effective_period),
+        prices.end(),
+        0.0
+    );
+
     return sum / static_cast<double>(effective_period);
 }
 
 auto TradingMethods::rsi(const std::vector<double> &prices, size_t period) -> double {
-    size_t effective_period = std::min(prices.size(), static_cast<size_t>(period));
+    const size_t effective_period = std::min(prices.size(), period);
     if (effective_period < 2) {
         throw std::invalid_argument("Not enough prices provided for RSI calculation");
     }
@@ -29,8 +34,8 @@ auto TradingMethods::rsi(const std::vector<double> &prices, size_t period) -> do
             loss -= change;
         }
     }
-    gain /= effective_period;
-    loss /= effective_period;
+    gain /= static_cast<double>(effective_period);
+    loss /= static_cast<double>(effective_period);
     if (loss == 0) {
         return 100.0;
     }
@@ -44,7 +49,8 @@ auto TradingMethods::rsi_m(const std::vector<double> &prices, int period) -> std
     }
 
     std::vector<double> rsi_values;
-    double gain = 0.0, loss = 0.0;
+    double gain = 0.0;
+    double loss = 0.0;
 
     for (int i = 1; i < period; ++i) {
         const double change = prices[i] - prices[i - 1];
@@ -85,8 +91,12 @@ auto TradingMethods::ema(const std::vector<double> &prices, size_t window_size) 
 
     const double koef = 2.0 / (static_cast<double>(window_size) + 1);
 
-    double ema_prev = std::accumulate(prices.begin(), prices.begin() + static_cast<double>(window_size), 0.0) /
-                      static_cast<double>(window_size);
+    double ema_prev = std::accumulate(
+                          prices.begin(),
+                          prices.begin() + static_cast<std::vector<double>::difference_type>(window_size),
+                          0.0
+                      ) / static_cast<double>(window_size);
+
 
     for (size_t i = window_size; i < prices.size(); ++i) {
         ema_prev = (prices[i] * koef) + (ema_prev * (1 - koef));
@@ -113,24 +123,24 @@ auto TradingMethods::sma_m(const std::vector<double> &prices, int period) -> std
 }
 
 
-auto TradingMethods::bollinger_bands(const std::vector<double> &prices, int period, double num_std_dev)
+auto TradingMethods::bollinger_bands(const std::vector<double> &prices, const BollingerBandsParams &params)
     -> std::tuple<double, double, double> {
-    if (prices.size() < period) {
+    if (prices.size() < params.period) {
         return {0.0, 0.0, 0.0};
     }
 
-    const double sum = std::accumulate(prices.end() - period, prices.end(), 0.0);
-    const double mean = sum / period;
+    const double sum = std::accumulate(prices.end() - params.period, prices.end(), 0.0);
+    const double mean = sum / params.period;
 
     double variance = 0.0;
-    for (auto it = prices.end() - period; it != prices.end(); ++it) {
+    for (auto it = prices.end() - params.period; it != prices.end(); ++it) {
         variance += std::pow(*it - mean, 2);
     }
-    variance /= (period - 1);
+    variance /= (params.period - 1);
     const double stdev = std::sqrt(variance);
 
-    const double upperBand = mean + (num_std_dev * stdev);
-    const double lowerBand = mean - (num_std_dev * stdev);
+    const double upperBand = mean + (params.num_std_dev * stdev);
+    const double lowerBand = mean - (params.num_std_dev * stdev);
 
     return std::make_tuple(lowerBand, mean, upperBand);
 }

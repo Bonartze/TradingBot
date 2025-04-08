@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
-#include "BinanceAPI.h"
-#include "KrakenAPI.h"
-#include "OKXAPI.h"
+#include <vector>
 #include <thread>
+#include "../../Common/include/BinanceScalping.h"
+#include "../../Common/include/Common.h"
 
 class ExchangeAPI {
     static std::vector<std::unique_ptr<BinanceScalping> > apis;
@@ -11,6 +11,5 @@ class ExchangeAPI {
     static std::vector<OrderBookEntry> orders;
 
 public:
-    static void run_interexchange_arbitrage(std::string crypto_pair);
-
+    static void run_interexchange_arbitrage(const std::string &crypto_pair);
 };
