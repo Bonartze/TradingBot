@@ -1,15 +1,14 @@
 #include "../include/MeanReverseStr.h"
 #include "../../Common/include/TradingMethods.h"
-#include "../../../Logger/include/CSVLogger.h"
+#include "../../../Logger/include/Logger.h"
 #include <algorithm>
 #include <chrono>
-#include <thread>
 
-constexpr size_t SHORT_WINDOW_SIZE = 20;
-constexpr size_t LONG_WINDOW_SIZE = 30;
+constexpr double COMMISSION_RATE = 0.01;
+constexpr int RECV_WINDOW = 5000;
 
 auto MeanReverseStrategy::calculate_fee(double amount) -> double {
-    return std::max(amount * 0.01, 0.01);
+    return std::max(amount * COMMISSION_RATE, COMMISSION_RATE);
 }
 
 auto MeanReverseStrategy::set_parameters(const std::vector<double> &params) -> void {
@@ -23,13 +22,14 @@ auto MeanReverseStrategy::set_parameters(const std::vector<double> &params) -> v
 }
 
 
-bool MeanReverseStrategy::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) {
-    double ema_short = TradingMethods::ema(prices, trading_params.sma_short);
-    double ema_long = TradingMethods::ema(prices, trading_params.sma_long);
-    double current_price = prices.back();
+auto MeanReverseStrategy::should_buy(const std::vector<double> &prices,
+                                     [[maybe_unused]] CSVLogger &csv_logger) -> bool {
+    const double ema_short = TradingMethods::ema(prices, static_cast<size_t>(trading_params.sma_short));
+    const double ema_long = TradingMethods::ema(prices, static_cast<size_t>(trading_params.sma_long));
+    const double current_price = prices.back();
 
-    bool buy_signal = ema_short < ema_long && current_price < ema_long;
-    std::cerr << "Params: " << buy_signal << " " << ema_short << " " << ema_long << " " << current_price << std::endl;
+    const bool buy_signal = ema_short < ema_long && current_price < ema_long;
+    //std::cerr << "Params: " << buy_signal << " " << ema_short << " " << ema_long << " " << current_price << std::endl;
     Logger(LogLevel::DEBUG) << "Buy check: EMA Short = " << ema_short
             << ", EMA Long = " << ema_long
             << ", Current Price = " << current_price
@@ -37,13 +37,13 @@ bool MeanReverseStrategy::should_buy(const std::vector<double> &prices, CSVLogge
     return buy_signal;
 }
 
-bool MeanReverseStrategy::should_sell(const std::vector<double> &prices, double entry_price,
-                                      CSVLogger &csv_logger) {
-    double ema_short = TradingMethods::ema(prices, trading_params.sma_short);
-    double ema_long = TradingMethods::ema(prices, trading_params.sma_long);
-    double current_price = prices.back();
+auto MeanReverseStrategy::should_sell(const std::vector<double> &prices, [[maybe_unused]] double entry_price,
+                                      [[maybe_unused]] CSVLogger &csv_logger) -> bool {
+    const double ema_short = TradingMethods::ema(prices, static_cast<size_t>(trading_params.sma_short));
+    const double ema_long = TradingMethods::ema(prices, static_cast<size_t>(trading_params.sma_long));
+    const double current_price = prices.back();
 
-    bool sell_signal = ema_short > ema_long && current_price > ema_long;
+    const bool sell_signal = ema_short > ema_long && current_price > ema_long;
     Logger(LogLevel::DEBUG) << "Sell check: EMA Short = " << ema_short
             << ", EMA Long = " << ema_long
             << ", Current Price = " << current_price
@@ -56,7 +56,7 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
     double profit = 0.0;
 
 
-    std::string symbol = "BTCUSDT";
+    const std::string symbol = "BTCUSDT";
 
     if (!position_open && should_buy(prices, csv_logger)) {
         const double max_quantity = (balance - calculate_fee(balance)) / current_price;
@@ -75,7 +75,7 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
             });
 
 
-            std::string buy_order_id = std::to_string(
+            const std::string buy_order_id = std::to_string(
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()
                 ).count()
@@ -84,7 +84,7 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
             if (binanceOrderManager && !is_backtesting) {
                 binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
                                                  asset_quantity, entry_price, buy_order_id,
-                                                 0.0, 0.0, 5000);
+                                                 0.0, 0.0, RECV_WINDOW);
             } else {
                 Logger(LogLevel::ERROR) << "Order manager not initialized for BUY.";
             }
@@ -95,7 +95,7 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
         const double exit_price = current_price;
         profit = asset_quantity * (exit_price - entry_price) - calculate_fee(asset_quantity);
         balance += asset_quantity * exit_price - calculate_fee(asset_quantity);
-        double sell_quantity = asset_quantity;
+        const double sell_quantity = asset_quantity;
         asset_quantity = 0.0;
         position_open = false;
         std::cerr << "In sell\n";
@@ -108,7 +108,7 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
         });
 
 
-        std::string sell_order_id = std::to_string(
+        const std::string sell_order_id = std::to_string(
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch()
             ).count()
@@ -117,7 +117,7 @@ auto MeanReverseStrategy::execute(const std::vector<double> &prices, CSVLogger &
         if (binanceOrderManager && !is_backtesting) {
             binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
                                              sell_quantity, exit_price, sell_order_id,
-                                             0.0, 0.0, 5000);
+                                             0.0, 0.0, RECV_WINDOW);
         } else {
             Logger(LogLevel::ERROR) << "Order manager not initialized for SELL.";
         }
@@ -139,7 +139,9 @@ auto MeanReverseStrategy::wrapper_execute(size_t window_size, const std::vector<
     size_t trades_count = 0;
 
     for (size_t i = window_size; i <= prices.size(); i += window_size) {
-        std::vector<double> price_segment(prices.begin() + i - window_size, prices.begin() + i);
+        auto start = prices.begin() + static_cast<std::ptrdiff_t>(i) - static_cast<std::ptrdiff_t>(window_size);
+        auto end = prices.begin() + static_cast<std::ptrdiff_t>(i);
+        const std::vector<double> price_segment(start, end);
         total_profit += execute(price_segment, csv_logger);
         trades_count++;
     }

@@ -1,60 +1,66 @@
 #include "../include/ArimaGarchAdaptive.h"
+#include "../../../Logger/include/Logger.h"
 #include <cmath>
 #include <chrono>
-#include <thread>
 
 
 constexpr double HIGH_VOLATILITY_LEVEL = 50.0;
 constexpr double LOW_VOLATILITY_LEVEL = 150.0;
+constexpr double COMMISSION_RATE = 1.02;
+constexpr double VOLATILITY_LEVEL = 200.0;
+constexpr int MIN_PRICES_SIZE = 20;
+constexpr int RECV_WINDOW = 5000;
+
 
 auto ArimaGarchAdaptive::should_buy(const std::vector<double> &prices, CSVLogger &csv_logger) -> bool {
-    if (prices.empty())
+    if (prices.empty()) {
         return false;
+    }
 
-    double current_price = prices.back();
+    const double current_price = prices.back();
     auto arima_pred = arima_model->forecast(1);
     auto garch_pred = garch_model->forecast(arima_model->get_residuals(), 1);
 
-    double arima_forecast = arima_pred[0];
-    double volatility = std::sqrt(garch_pred[0]);
+    const double arima_forecast = arima_pred[0];
+    const double volatility = std::sqrt(garch_pred[0]);
 
     csv_logger.logRow({
-        "should_buy", std::to_string(current_price), std::to_string(arima_forecast), std::to_string(volatility)
+        "should_buy", std::to_string(current_price), std::to_string(arima_forecast),
+        std::to_string(volatility)
     });
 
-    if (volatility < LOW_VOLATILITY_LEVEL)
+    if (volatility < LOW_VOLATILITY_LEVEL) {
         return arima_forecast > current_price;
-    else if (volatility > HIGH_VOLATILITY_LEVEL)
+    }
+    if (volatility > HIGH_VOLATILITY_LEVEL) {
         return arima_forecast < current_price;
+    }
 
     return false;
 }
 
 auto ArimaGarchAdaptive::should_sell(const std::vector<double> &prices, double entry_price,
                                      CSVLogger &csv_logger) -> bool {
-    if (prices.empty())
-        return false;
+    if (prices.empty()) { return false; }
 
-    double current_price = prices.back();
+    const double current_price = prices.back();
     auto garch_pred = garch_model->forecast(arima_model->get_residuals(), 1);
-    double volatility = std::sqrt(garch_pred[0]);
+    const double volatility = std::sqrt(garch_pred[0]);
 
     csv_logger.logRow({
-        "should_sell", std::to_string(current_price), std::to_string(entry_price), std::to_string(volatility)
+        "should_sell", std::to_string(current_price), std::to_string(entry_price),
+        std::to_string(volatility)
     });
 
 
-    if (current_price >= entry_price * 1.02)
-        return true;
-    if (volatility > 200.0)
-        return true;
+    if (current_price >= entry_price * COMMISSION_RATE) { return true; }
+    if (volatility > VOLATILITY_LEVEL) { return true; }
 
     return false;
 }
 
 auto ArimaGarchAdaptive::execute(const std::vector<double> &prices, CSVLogger &csv_logger) -> double {
-    if (prices.size() < 20)
-        return 0.0;
+    if (prices.size() < MIN_PRICES_SIZE) { return 0.0; }
 
     const double current_price = prices.back();
     double profit = 0.0;
@@ -80,10 +86,11 @@ auto ArimaGarchAdaptive::execute(const std::vector<double> &prices, CSVLogger &c
                 ).count()
             );
 
-            if (!is_backtesting)
+            if (!is_backtesting) {
                 binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
                                                  asset_quantity, entry_price, buy_order_id,
-                                                 0.0, 0.0, 5000);
+                                                 0.0, 0.0, RECV_WINDOW);
+            }
 
             Logger(LogLevel::INFO) << "Buy at: " << entry_price
                     << " | Quantity: " << asset_quantity
@@ -111,10 +118,11 @@ auto ArimaGarchAdaptive::execute(const std::vector<double> &prices, CSVLogger &c
         );
 
 
-        if (!is_backtesting)
+        if (!is_backtesting) {
             binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
                                              sell_quantity, exit_price, sell_order_id,
-                                             0.0, 0.0, 5000);
+                                             0.0, 0.0, RECV_WINDOW);
+        }
 
         Logger(LogLevel::INFO) << "Sell at: " << exit_price
                 << " | Profit: " << profit
@@ -142,7 +150,10 @@ auto ArimaGarchAdaptive::wrapper_execute(size_t window_size, const std::vector<d
 
 
     for (size_t i = window_size; i <= prices.size(); i += window_size) {
-        std::vector<double> price_segment(prices.begin() + i - window_size, prices.begin() + i);
+        const std::vector<double> price_segment(
+            prices.begin() + static_cast<std::ptrdiff_t>(i) - static_cast<std::ptrdiff_t>(window_size),
+            prices.begin() + static_cast<std::ptrdiff_t>(i)
+        );
         total_profit += execute(price_segment, csv_logger);
         trades_count++;
     }
@@ -150,7 +161,7 @@ auto ArimaGarchAdaptive::wrapper_execute(size_t window_size, const std::vector<d
 
     if (position_open) {
         const double final_price = prices.back();
-        double final_profit = asset_quantity * (final_price - entry_price);
+        const double final_profit = asset_quantity * (final_price - entry_price);
         balance += asset_quantity * final_price;
         total_profit += final_profit;
         asset_quantity = 0.0;

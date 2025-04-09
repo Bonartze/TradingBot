@@ -2,9 +2,9 @@
 #include <iostream>
 #include "../../Common/include/Common.h"
 
+
 LiveBinanceScalping::LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
-                                         const std::string &target_): BinanceScalping(version, host_, port_, target_)
-{
+                                         const std::string &target_): BinanceScalping(version, host_, port_, target_) {
 }
 
 void LiveBinanceScalping::fetch_raw_data(size_t scalping_data_point) {
@@ -47,7 +47,7 @@ Graph &LiveBinanceScalping::generate_order_graph(const std::unordered_set<std::s
         std::string_view base_currency;
         std::string_view quote_currency;
         bool valid_pair = false;
-
+        auto currencies = getCurrencies();
         for (size_t i = 1; i < currency_pair.size(); ++i) {
             base_currency = std::string_view(currency_pair).substr(0, i);
             quote_currency = std::string_view(currency_pair).substr(i);
@@ -72,4 +72,8 @@ Graph &LiveBinanceScalping::generate_order_graph(const std::unordered_set<std::s
         std::cout << std::endl;
     }
     return order_graph;
+}
+
+int main() {
+    return 0;
 }

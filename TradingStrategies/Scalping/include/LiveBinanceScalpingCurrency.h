@@ -2,11 +2,10 @@
 #include "../../Common/include/BinanceScalping.h"
 
 class LiveBinanceScalpingCurrency : public BinanceScalping {
-private:
     std::vector<double> prices;
 
 public:
-    [[nodiscard]] auto get_prices() const -> const std::vector<double> &{
+    [[nodiscard]] auto get_prices() const -> const std::vector<double> & {
         return prices;
     }
 
@@ -15,5 +14,6 @@ public:
 
     void fetch_raw_data(size_t scalping_data_point);
 
-    void fetch_raw_data(std::vector<OrderBookEntry> &v) override {}
+    void fetch_raw_data(std::vector<OrderBookEntry> &vec) override {
+    }
 };

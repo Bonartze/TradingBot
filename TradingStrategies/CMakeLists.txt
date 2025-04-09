@@ -1,50 +1,35 @@
 cmake_minimum_required(VERSION 3.16)
-
 project(TradingStrategiesLibrary VERSION 1.0.1 DESCRIPTION "Shared library with strategies API")
-cmake_policy(SET CMP0144 NEW)
-cmake_policy(SET CMP0167 NEW)
+
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.28")
+    cmake_policy(SET CMP0144 NEW)
+endif ()
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.29")
+    cmake_policy(SET CMP0167 NEW)
+endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(BOOST_ROOT "/usr/local")
-set(BOOST_INCLUDEDIR "/usr/local/include")
-set(BOOST_LIBRARYDIR "/usr/local/lib")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-include(FetchContent)
+# Указываем корневые пути к Boost, если нужно (в случае нестандартного расположения)
+# set(BOOST_ROOT "/usr")
+# set(BOOST_INCLUDEDIR "/usr/include")
+# set(BOOST_LIBRARYDIR "/usr/lib")
 
-
-FetchContent_Declare(
-        simdjson
-        GIT_REPOSITORY https://github.com/simdjson/simdjson.git
-        GIT_SHALLOW TRUE
-)
-set(SIMDJSON_JUST_LIBRARY ON CACHE INTERNAL "")
-set(SIMDJSON_BUILD_STATIC ON CACHE INTERNAL "")
-FetchContent_MakeAvailable(simdjson)
-
-
-FetchContent_Declare(
-        jsoncpp
-        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
-        GIT_TAG master
-)
-FetchContent_MakeAvailable(jsoncpp)
-
-FetchContent_Declare(
-        nlohmann_json
-        GIT_REPOSITORY https://github.com/nlohmann/json.git
-        GIT_TAG master
-)
-FetchContent_MakeAvailable(nlohmann_json)
-
-
+# Поиск пакетов через apt-установленные dev-пакеты
 find_package(Boost 1.75 REQUIRED COMPONENTS json)
-
-
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(nlohmann_json REQUIRED) # если установлен пакет nlohmann-json3-dev
+find_package(jsoncpp REQUIRED)       # возможно, потребуется указать корректный поиск для jsoncpp
+
+# Для simdjson может понадобиться найти пакет, если такой есть в репозитории
+find_package(simdjson REQUIRED)      # Если пакет называется libsimdjson-dev
+
+# Если какой-либо пакет не находится, можно попробовать установить его:
+# apt install nlohmann-json3-dev libjsoncpp-dev libsimdjson-dev
 
 add_library(StrategiesAPI SHARED
         ../Logger/src/Logger.cpp
@@ -77,23 +62,17 @@ set_target_properties(StrategiesAPI PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_SO
 target_include_directories(StrategiesAPI
         PRIVATE .
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
-        PRIVATE ${simdjson_SOURCE_DIR}/include
-        PRIVATE ${Boost_INCLUDE_DIRS}
-        PRIVATE ${jsoncpp_SOURCE_DIR}/include
 )
 
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-
 target_link_libraries(StrategiesAPI PRIVATE
-        nlohmann_json::nlohmann_json
+        nlohmann_json::nlohmann_json   # если найдётся соответствующий таргет
         ${Boost_LIBRARIES}
         Eigen3::Eigen
-        simdjson
+        simdjson::simdjson             # если пакет и таргет найдены
         OpenSSL::SSL
         OpenSSL::Crypto
         CURL::libcurl
-
-        jsoncpp
+        jsoncpp_lib                  # название таргета для jsoncpp может отличаться, проверьте документацию
 )
 
 include(GNUInstallDirs)

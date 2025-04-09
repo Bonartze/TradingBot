@@ -3,18 +3,16 @@
 #include <unordered_set>
 #include <vector>
 #include <string>
-#include <sstream>
-#include <fstream>
-#include "../../../Logger/include/Logger.h"
 
-extern std::unordered_set<std::string> currencies;
+auto getCurrencies() -> const std::unordered_set<std::string> &;
+
 
 extern const char *const host;
 extern const char *const target;
 extern const char *const port;
 
 struct Candle {
-    long timestamp;
+    int64_t timestamp;
     double open;
     double high;
     double low;

@@ -1,6 +1,12 @@
 #pragma once
+
 #include <vector>
 #include <iostream>
+
+struct BollingerBandsParams {
+    int period;
+    double num_std_dev;
+};
 
 class TradingMethods {
 public:
@@ -15,6 +21,6 @@ public:
     static auto sma_m(const std::vector<double> &prices, int period) -> std::vector<double>;
 
 
-    static auto bollinger_bands(const std::vector<double> &prices, int period,
-                                double numStdDev) -> std::tuple<double, double, double>;
+    static auto bollinger_bands(const std::vector<double> &prices,
+                                const BollingerBandsParams &params) -> std::tuple<double, double, double>;
 };

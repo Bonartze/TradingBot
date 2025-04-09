@@ -1,13 +1,10 @@
 #include "../include/BinanceAPI.h"
 
 #include "simdjson.h"
-#include <iostream>
 #include <boost/beast/version.hpp>
 
 
-
-
-void BinanceAPI::fetch_raw_data(std::vector<OrderBookEntry> &r_order) {
+auto BinanceAPI::fetch_raw_data(std::vector<OrderBookEntry> &r_order) -> void {
     connect();
 
     http::request<http::string_body> req{http::verb::get, target, m_version};
@@ -31,7 +28,7 @@ void BinanceAPI::fetch_raw_data(std::vector<OrderBookEntry> &r_order) {
     order.bid_qty = std::stod(std::string(doc["bidQty"].get_string().value()));
     order.ask_qty = std::stod(std::string(doc["askQty"].get_string().value()));
     r_order.emplace_back(order);
-    std::cout << std::fixed << std::setprecision(10)
+    /*std::cout << std::fixed << std::setprecision(10)
             << "Bid Price: " << order.bid_price << " (Qty: " << order.bid_qty << ")\n"
-            << "Ask Price: " << order.ask_price << " (Qty: " << order.ask_qty << ")\n";
+            << "Ask Price: " << order.ask_price << " (Qty: " << order.ask_qty << ")\n";*/
 }

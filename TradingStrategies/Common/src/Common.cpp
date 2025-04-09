@@ -1,35 +1,39 @@
 #include "../include/Common.h"
+#include <sstream>
+#include <fstream>
+#include "../../../Logger/include/Logger.h"
 
 auto loadCandles(const std::string &filename) -> std::vector<Candle> {
-        std::vector<Candle> candles;
-        std::ifstream file(filename);
-        std::string line;
-        while (std::getline(file, line)) {
-                std::stringstream ss_(line);
-                std::string value;
-                Candle candle = {};
+    std::vector<Candle> candles;
+    std::ifstream file(filename);
+    std::string line;
+    while (std::getline(file, line)) {
+        std::stringstream ss_(line);
+        std::string value;
+        Candle candle = {};
 
-                std::getline(ss_, value, ',');
-                candle.timestamp = std::stol(value);
-                std::getline(ss_, value, ',');
-                candle.open = std::stod(value);
-                std::getline(ss_, value, ',');
-                candle.high = std::stod(value);
-                std::getline(ss_, value, ',');
-                candle.low = std::stod(value);
-                std::getline(ss_, value, ',');
-                candle.close = std::stod(value);
-                std::getline(ss_, value, ',');
-                candle.volume = std::stod(value);
+        std::getline(ss_, value, ',');
+        candle.timestamp = std::stol(value);
+        std::getline(ss_, value, ',');
+        candle.open = std::stod(value);
+        std::getline(ss_, value, ',');
+        candle.high = std::stod(value);
+        std::getline(ss_, value, ',');
+        candle.low = std::stod(value);
+        std::getline(ss_, value, ',');
+        candle.close = std::stod(value);
+        std::getline(ss_, value, ',');
+        candle.volume = std::stod(value);
 
-                candles.push_back(candle);
-        }
+        candles.push_back(candle);
+    }
 
-        Logger(LogLevel::INFO) << "Loaded candles: " << candles.size() << " from file: " << filename;
-        return candles;
+    Logger(LogLevel::INFO) << "Loaded candles: " << candles.size() << " from file: " << filename;
+    return candles;
 }
 
-std::unordered_set<std::string> currencies = {
+auto getCurrencies() -> const std::unordered_set<std::string> & {
+    static const std::unordered_set<std::string> currencies = {
         "1000SATS",
         "1INCH",
         "1INCHDOWN",
@@ -649,7 +653,9 @@ std::unordered_set<std::string> currencies = {
         "ZRO",
         "ZRX",
         "UNKNOWN"
-};
+    };
+    return currencies;
+}
 
 const char *const host = "api.binance.com";
 const char *const port = "443";
