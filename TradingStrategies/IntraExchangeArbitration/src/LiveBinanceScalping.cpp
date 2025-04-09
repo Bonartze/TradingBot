@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../../Common/include/Common.h"
 
+
 LiveBinanceScalping::LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
                                          const std::string &target_): BinanceScalping(version, host_, port_, target_) {
 }
@@ -71,4 +72,8 @@ Graph &LiveBinanceScalping::generate_order_graph(const std::unordered_set<std::s
         std::cout << std::endl;
     }
     return order_graph;
+}
+
+int main() {
+    return 0;
 }

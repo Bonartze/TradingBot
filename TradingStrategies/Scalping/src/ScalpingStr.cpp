@@ -1,17 +1,16 @@
 #include "../include/ScalpingStr.h"
 #include "../../../Logger/include/Logger.h"
 #include "../../Common/include/TradingMethods.h"
-#include <sstream>
-#include <algorithm>
-#include <iostream>
 #include <filesystem>
 #include <chrono>
 
+constexpr int RECV_WINDOW = 5000;
+
 auto ScalpingStr::should_buy(const std::vector<double> &prices,
                              CSVLogger &csv_logger) -> bool {
-    std::cout <<"Pries sb: "<< prices.size() << std::endl;
-    const double sma_short = TradingMethods::sma(prices, trading_params.sma_short);
-    const double sma_long = TradingMethods::sma(prices, trading_params.sma_long);
+    //std::cout <<"Pries sb: "<< prices.size() << std::endl;
+    const double sma_short = TradingMethods::sma(prices, static_cast<size_t>(trading_params.sma_short));
+    const double sma_long = TradingMethods::sma(prices, static_cast<size_t>(trading_params.sma_long));
     const double current_price = prices.back();
 
     Logger(LogLevel::DEBUG) << "Buy Check - Current Price: " << current_price
@@ -31,7 +30,7 @@ auto ScalpingStr::should_buy(const std::vector<double> &prices,
 
 auto ScalpingStr::should_sell(const std::vector<double> &prices,
                               double entry_price, CSVLogger &csv_logger) -> bool {
-    const double sma_short = TradingMethods::sma(prices, trading_params.sma_short);
+    const double sma_short = TradingMethods::sma(prices, static_cast<size_t>(trading_params.sma_short));
     const double current_price = prices.back();
 
     Logger(LogLevel::DEBUG) << "Sell Check - Current Price: " << current_price
@@ -65,8 +64,8 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
                           CSVLogger &csv_logger) -> double {
     const double current_price = prices.back();
     double profit = 0.0;
-
-    std::string symbol = "BTCUSDT";
+    //! crutch, change ASAP
+    const std::string symbol = "BTCUSDT";
 
     if (!position_open && should_buy(prices, csv_logger)) {
         const double max_quantity = balance / current_price;
@@ -85,7 +84,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
             });
 
 
-            std::string buy_order_id = std::to_string(
+            const std::string buy_order_id = std::to_string(
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()
                 ).count()
@@ -94,7 +93,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
             if (binanceOrderManager && !is_backtesting) {
                 binanceOrderManager->place_order(symbol, "BUY", "LIMIT", "GTC",
                                                  asset_quantity, entry_price, buy_order_id,
-                                                 0.0, 0.0, 5000);
+                                                 0.0, 0.0, RECV_WINDOW);
             } else {
                 Logger(LogLevel::ERROR) << "Order manager not initialized for BUY.";
             }
@@ -106,7 +105,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
         profit = asset_quantity * (exit_price - entry_price);
         balance += asset_quantity * exit_price;
 
-        double sell_quantity = asset_quantity;
+        const double sell_quantity = asset_quantity;
         asset_quantity = 0.0;
         position_open = false;
 
@@ -119,7 +118,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
         });
 
 
-        std::string sell_order_id = std::to_string(
+        const std::string sell_order_id = std::to_string(
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch()
             ).count()
@@ -127,7 +126,7 @@ auto ScalpingStr::execute(const std::vector<double> &prices,
         if (binanceOrderManager && !is_backtesting) {
             binanceOrderManager->place_order(symbol, "SELL", "LIMIT", "GTC",
                                              sell_quantity, exit_price, sell_order_id,
-                                             0.0, 0.0, 5000);
+                                             0.0, 0.0, RECV_WINDOW);
         } else {
             Logger(LogLevel::ERROR) << "Order manager not initialized for SELL.";
         }
@@ -148,7 +147,9 @@ auto ScalpingStr::wrapper_execute(size_t window_size, const std::vector<double> 
     double total_profit = 0.0;
     size_t trades_count = 0;
     for (size_t i = window_size; i <= prices.size(); i += window_size) {
-        const std::vector<double> price_segment(prices.begin() + i - window_size, prices.begin() + i);
+        auto start = prices.begin() + static_cast<std::ptrdiff_t>(i - window_size);
+        auto end = prices.begin() + static_cast<std::ptrdiff_t>(i);
+        const std::vector<double> price_segment(start, end);
         total_profit += execute(price_segment, logger);
         trades_count++;
     }

@@ -1,8 +1,6 @@
 #include "../include/OKXAPI.h"
 #include <boost/beast/version.hpp>
-#include <iostream>
 #include <simdjson.h>
-
 
 
 void OKXAPI::fetch_raw_data(std::vector<OrderBookEntry> &r_order) {
@@ -31,9 +29,8 @@ void OKXAPI::fetch_raw_data(std::vector<OrderBookEntry> &r_order) {
     order.bid_qty = std::stod(std::string(ticker_data["bidSz"].get_string().value()));
     order.ask_qty = std::stod(std::string(ticker_data["askSz"].get_string().value()));
     r_order.emplace_back(order);
-    // Debug
-    std::cout << std::fixed << std::setprecision(10) << "Ask Price: " << order.ask_price << std::endl;
+    /*std::cout << std::fixed << std::setprecision(10) << "Ask Price: " << order.ask_price << std::endl;
     std::cout << std::fixed << std::setprecision(10) << "Bid Price: " << order.bid_price << std::endl;
     std::cout << std::fixed << std::setprecision(10) << "Bid Qty: " << order.bid_qty << std::endl;
-    std::cout << std::fixed << std::setprecision(10) << "Ask Qty: " << order.ask_qty << std::endl;
+    std::cout << std::fixed << std::setprecision(10) << "Ask Qty: " << order.ask_qty << std::endl;*/
 }

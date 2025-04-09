@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <exception>
 #include <iostream>
+
 Bellman_Ford::Bellman_Ford(const Graph &graph) : graph(graph) {
     if (graph.empty()) {
         throw std::invalid_argument("Graph is empty. Bellman-Ford cannot operate on an empty graph.");
@@ -18,7 +19,7 @@ bool Bellman_Ford::find_negative_cycle(const std::string &source, std::vector<st
         std::unordered_map<std::string, double> distances;
         std::unordered_map<std::string, std::string> predecessors;
 
-        for (const auto &[vertex, _] : graph) {
+        for (const auto &[vertex, _]: graph) {
             distances[vertex] = std::numeric_limits<double>::infinity();
             predecessors[vertex] = "";
         }
@@ -28,9 +29,10 @@ bool Bellman_Ford::find_negative_cycle(const std::string &source, std::vector<st
 
         for (size_t i = 1; i <= graph.size(); ++i) {
             last_updated_vertex = "";
-            for (const auto &[u, edges] : graph) {
-                for (const auto &[v, weight] : edges) {
-                    if (distances[u] != std::numeric_limits<double>::infinity() && distances[u] + weight < distances[v]) {
+            for (const auto &[u, edges]: graph) {
+                for (const auto &[v, weight]: edges) {
+                    if (distances[u] != std::numeric_limits<double>::infinity() && distances[u] + weight < distances[
+                            v]) {
                         distances[v] = distances[u] + weight;
                         predecessors[v] = u;
                         last_updated_vertex = v;
@@ -60,7 +62,6 @@ bool Bellman_Ford::find_negative_cycle(const std::string &source, std::vector<st
         }
 
         return false;
-
     } catch (const std::invalid_argument &e) {
         std::cerr << "Invalid argument: " << e.what() << std::endl;
         throw;

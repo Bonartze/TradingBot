@@ -36,7 +36,7 @@ void LiveBinanceScalpingCurrency::fetch_raw_data(size_t scalping_data_point) {
         http::read(stream, buffer, res);
 
         try {
-            std::string body = res.body();
+            std::string body = res.body(); //NOLINT
             simdjson::ondemand::parser parser;
             auto doc = parser.iterate(body);
 

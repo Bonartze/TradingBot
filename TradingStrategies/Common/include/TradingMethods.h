@@ -1,5 +1,7 @@
 #pragma once
+
 #include <vector>
+#include <iostream>
 
 struct BollingerBandsParams {
     int period;

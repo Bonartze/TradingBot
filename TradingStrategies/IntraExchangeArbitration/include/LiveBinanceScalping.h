@@ -1,4 +1,5 @@
 #pragma once
+
 #include <boost/beast/http.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/version.hpp>
@@ -15,37 +16,42 @@
 #include "../../Common/include/Graph.h"
 #include "../../Common/include/BinanceScalping.h"
 
-namespace beast = boost::beast;
-namespace http = beast::http;
 namespace net = boost::asio;
-namespace ssl = net::ssl;
-
 using tcp = net::ip::tcp;
 
+//namespace beast = boost::beast;
+//namespace http = beast::http;
+//namespace ssl = net::ssl;
+
+
 class LiveBinanceScalping : public BinanceScalping {
-private:
     std::unordered_map<std::string, double> cryptomarket_pairs;
     Graph order_graph;
 
 public:
-    double get_price(const std::string &crypto_pair) {
+    explicit LiveBinanceScalping(const int8_t &version, const std::string &host_,
+                                 const std::string &port_, const std::string &target_);
+
+    LiveBinanceScalping(const LiveBinanceScalping &) = delete;
+
+    auto operator=(const LiveBinanceScalping &) -> LiveBinanceScalping & = delete;
+
+    LiveBinanceScalping(LiveBinanceScalping &&) noexcept = delete;
+
+    auto operator=(LiveBinanceScalping &&) noexcept -> LiveBinanceScalping & = delete;
+
+    ~LiveBinanceScalping() override = default;
+
+    auto get_price(const std::string &crypto_pair) -> double {
         return cryptomarket_pairs[crypto_pair];
     }
 
-    // constructor, necessary to clarify the version of the API
-    explicit LiveBinanceScalping(const int8_t &version, const std::string &host_, const std::string &port_,
-                                 const std::string &target_);
+    auto fetch_raw_data(size_t scalping_data_points = 1) -> void;
 
-    // fetch raw data from Binance API
-    void fetch_raw_data(size_t scalping_data_points = 1);
+    auto get_price_map() -> const std::unordered_map<std::string, double> &;
 
-    // just getting the price map
-    const std::unordered_map<std::string, double> &get_price_map();
+    auto generate_order_graph(const std::unordered_set<std::string> &) -> Graph &;
 
-    //parse obtained data and creating graph order, for clarifying check DOXYGEN docs
-    Graph &generate_order_graph(const std::unordered_set<std::string> &);
-
-    ~LiveBinanceScalping() = default;
-
-    void fetch_raw_data(std::vector<OrderBookEntry> &) override{}
+    void fetch_raw_data(std::vector<OrderBookEntry> &data) override {
+    }
 };
